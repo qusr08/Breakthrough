@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 16
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -200,7 +200,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 9.5, z: -10}
+  m_LocalPosition: {x: 7.5, y: 15.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -263,13 +263,13 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 992c3973212ff784faeff72881d1b48f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 10, y: 20}
+  m_Size: {x: 16, y: 32}
   m_AdaptiveModeThreshold: 0
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -283,7 +283,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2111922723}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 9.5, z: 0}
+  m_LocalPosition: {x: 7.5, y: 15.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -301,6 +301,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba4d5fc022b0f042ab885d84222c502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pieces:
+  - {fileID: 7692163691044995960, guid: cae84b5979a8ebe4ba55640737a96419, type: 3}
+  - {fileID: 6325487561354524483, guid: 06bfd1ea8a13fac4b87f0c5da14c9939, type: 3}
+  - {fileID: 7987852413788310772, guid: 3c667f165e714cf40ac81237c4862113, type: 3}
+  - {fileID: 4269078927080848529, guid: 7de3ecc92af41eb449926172806d785a, type: 3}
+  - {fileID: 5328561207584519141, guid: 9d7db05c6501aa648ab641c8f59fcf94, type: 3}
+  - {fileID: 1220800296013395787, guid: 551903a816113994490c83e41ac9093c, type: 3}
+  - {fileID: 3928570567170264427, guid: 9df122c01a702ef46964c3f8c76a3914, type: 3}
+  - {fileID: 820110859602211326, guid: 35dc0caff16a6fa4fa2a54f7f3d1d09f, type: 3}
+  - {fileID: 8326230235973600278, guid: b6257b1adde3fff4fb7bd9f721f7cc66, type: 3}
+  - {fileID: 5026444595670390361, guid: b88f2d6194f854b4ea6d7ac3b868d216, type: 3}
   spriteRenderer: {fileID: 2111922724}
-  boardWidth: 10
-  boardHeight: 20
+  BoardWidth: 16
+  BoardHeight: 32
+  topSpawnGap: 4
