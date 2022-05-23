@@ -271,7 +271,7 @@ PlayerSettings:
   m_BuildTargetBatching:
   - m_BuildTarget: WebGL
     m_StaticBatching: 0
-    m_DynamicBatching: 1
+    m_DynamicBatching: 0
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: MacStandaloneSupport
     m_GraphicsJobs: 0
@@ -558,12 +558,13 @@ PlayerSettings:
   webGLTemplate: APPLICATION:Default
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
-  webGLCompressionFormat: 0
+  webGLCompressionFormat: 1
   webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 1
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    13: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
