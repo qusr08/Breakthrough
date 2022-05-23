@@ -13,6 +13,10 @@ public class Piece : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 	}
 
+	private void Awake ( ) {
+		OnValidate( );
+	}
+
 	private void Start ( ) {
 		foreach(Transform tile in transform) {
 			tile.localScale = new Vector3(0.95f, 0.95f, 1);
