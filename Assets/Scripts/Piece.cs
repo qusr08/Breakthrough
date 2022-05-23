@@ -13,6 +13,12 @@ public class Piece : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 	}
 
+	private void Start ( ) {
+		foreach(Transform tile in transform) {
+			tile.localScale = new Vector3(0.95f, 0.95f, 1);
+		}
+	}
+
 	private void Update ( ) {
 		// TODO: Make inputs more expandable and better functioning
 		// TODO: Add the ability to hold a button down and have the piece move continuously
