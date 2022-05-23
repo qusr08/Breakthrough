@@ -31,8 +31,8 @@ public class Board : MonoBehaviour {
 
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		spriteRenderer.size = new Vector2(BoardWidth, BoardHeight);
-		float positionX = (BoardWidth / 2) - (BoardWidth % 2 == 0 ? 0.5f : 0);
-		float positionY = (BoardHeight / 2) - (BoardHeight % 2 == 0 ? 0.5f : 0);
+		float positionX = (BoardWidth / 2) - (BoardWidth % 2 == 0 ? 0.5f : 0f);
+		float positionY = (BoardHeight / 2) - (BoardHeight % 2 == 0 ? 0.5f : 0f);
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the camera orthographic size and position so it fits the entire board
@@ -50,33 +50,13 @@ public class Board : MonoBehaviour {
 
 	public void SpawnRandomPiece ( ) {
 		Vector3 spawnPosition = new Vector3((BoardWidth / 2) - 0.5f, BoardHeight - topSpawnGap - 0.5f);
+
 		Instantiate(pieces[Random.Range(0, pieces.Length)], spawnPosition, Quaternion.identity);
 	}
 
-	public bool IsMoveInBounds (Piece piece, Vector3 direction) {
-		foreach (Transform tile in piece.transform) {
-			if (!IsInBounds(Vector3Int.RoundToInt(tile.transform.position + direction))) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public bool IsRotationInBounds (Piece piece, float degRotation) {
-		foreach (Transform tile in piece.transform) {
-			Vector3 newPosition = Quaternion.Euler(0, 0, degRotation) * (tile.position - piece.transform.position) + piece.transform.position;
-
-			if (!IsInBounds(Vector3Int.RoundToInt(newPosition))) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private bool IsInBounds (Vector3 position) {
+	public bool IsInBounds (Vector3 position) {
 		bool isInBounds = (position.x >= 0 && position.x < BoardWidth && position.y >= 0 && position.y < BoardHeight);
+
 		return (isInBounds && board[Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)] == null);
 	}
 
