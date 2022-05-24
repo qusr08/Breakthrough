@@ -301,18 +301,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba4d5fc022b0f042ab885d84222c502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieces:
-  - {fileID: 7692163691044995960, guid: cae84b5979a8ebe4ba55640737a96419, type: 3}
-  - {fileID: 6325487561354524483, guid: 06bfd1ea8a13fac4b87f0c5da14c9939, type: 3}
-  - {fileID: 7987852413788310772, guid: 3c667f165e714cf40ac81237c4862113, type: 3}
-  - {fileID: 4269078927080848529, guid: 7de3ecc92af41eb449926172806d785a, type: 3}
-  - {fileID: 5328561207584519141, guid: 9d7db05c6501aa648ab641c8f59fcf94, type: 3}
-  - {fileID: 1220800296013395787, guid: 551903a816113994490c83e41ac9093c, type: 3}
-  - {fileID: 3928570567170264427, guid: 9df122c01a702ef46964c3f8c76a3914, type: 3}
-  - {fileID: 820110859602211326, guid: 35dc0caff16a6fa4fa2a54f7f3d1d09f, type: 3}
-  - {fileID: 8326230235973600278, guid: b6257b1adde3fff4fb7bd9f721f7cc66, type: 3}
-  - {fileID: 5026444595670390361, guid: b88f2d6194f854b4ea6d7ac3b868d216, type: 3}
+  tilePrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+  blocks:
+  - {fileID: 5606474013152507964, guid: 87e6002164630cc4f9cac0d4278699b2, type: 3}
+  - {fileID: 4293458010481301890, guid: 539ed584931d05a45b6dd1339045495c, type: 3}
+  - {fileID: 5222843227452634790, guid: 6ef1fe2c4e647f64ea711d717aa76abe, type: 3}
+  - {fileID: 1830994206690904804, guid: 83e247d4eea9e634ea58530f51d67c67, type: 3}
+  - {fileID: 1804251442152853886, guid: dae5ff1e93f888746b03dac0db898216, type: 3}
+  - {fileID: 623521767164865886, guid: 2cb6a50001040e742a2a7474e3615bac, type: 3}
+  - {fileID: 4241923347586638877, guid: d790677eaf8b1154886706939aa35074, type: 3}
+  - {fileID: 2036633918095540079, guid: 5e7eaa5985181d747854da99f8aff9dd, type: 3}
+  - {fileID: 1404170622813699853, guid: 1b6c8b56b4b4f4e46aa3405e1c2f520d, type: 3}
+  - {fileID: 1579645476526848396, guid: 25776378ebc293d47acd0aef6866281f, type: 3}
   spriteRenderer: {fileID: 2111922724}
   BoardWidth: 16
   BoardHeight: 28
   topSpawnGap: 4
+  bottomSpawnGap: 2
+  wallHeight: 5
