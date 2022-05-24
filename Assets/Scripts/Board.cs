@@ -59,8 +59,7 @@ public class Board : MonoBehaviour {
 		for (int i = 0; i < BoardWidth; i++) {
 			for (int j = bottomSpawnGap; j < wallHeight + bottomSpawnGap; j++) {
 				BlockTile blockTile = Instantiate(tilePrefab, new Vector3(i, j), Quaternion.identity).GetComponent<BlockTile>( );
-				blockTile.Color = BlockTile.TileColor.COAL;
-				blockTile.PercentBomb = 0;
+				blockTile.SetTileColor(BlockTile.TileColor.COAL);
 
 				board[i, j] = blockTile;
 			}
@@ -88,8 +87,36 @@ public class Board : MonoBehaviour {
 		}
 
 		for (int i = 0; i < blockTilePositions.Count; i++) {
-			switch (board[blockTilePositions[i].x, blockTilePositions[i].y].Type) {
+			BlockTile currentTile = board[blockTilePositions[i].x, blockTilePositions[i].y];
+
+			switch (currentTile.Type) {
 				case BlockTile.TileType.BOMB_DIRECTION:
+					switch (currentTile.Direction) {
+						case BlockTile.TileDirection.RIGHT:
+							for (int j = blockTilePositions[i].x; j < BoardWidth; j++) {
+								explodedBlockTiles.Add(new Vector2Int(j, blockTilePositions[i].y));
+							}
+
+							break;
+						case BlockTile.TileDirection.DOWN:
+							for (int j = blockTilePositions[i].y; j >= 0; j--) {
+								explodedBlockTiles.Add(new Vector2Int(blockTilePositions[i].x, j));
+							}
+
+							break;
+						case BlockTile.TileDirection.LEFT:
+							for (int j = blockTilePositions[i].x; j >= 0; j--) {
+								explodedBlockTiles.Add(new Vector2Int(j, blockTilePositions[i].y));
+							}
+
+							break;
+						case BlockTile.TileDirection.UP:
+							for (int j = blockTilePositions[i].y; j < BoardHeight; j++) {
+								explodedBlockTiles.Add(new Vector2Int(blockTilePositions[i].x, j));
+							}
+
+							break;
+					}
 					break;
 				case BlockTile.TileType.BOMB_SURROUND:
 					for (int j = -1; j <= 1; j++) {
@@ -100,6 +127,16 @@ public class Board : MonoBehaviour {
 
 					break;
 				case BlockTile.TileType.BOMB_LINE:
+					if ((int) currentTile.Direction % 2 == 1) { // Vertical
+						for (int j = 0; j < BoardHeight; j++) {
+							explodedBlockTiles.Add(new Vector2Int(blockTilePositions[i].x, j));
+						}
+					} else { // Horizontal
+						for (int j = 0; j < BoardWidth; j++) {
+							explodedBlockTiles.Add(new Vector2Int(j, blockTilePositions[i].y));
+						}
+					}
+
 					break;
 			}
 		}

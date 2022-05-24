@@ -12,7 +12,7 @@ public class BlockTile : MonoBehaviour {
 	[Space]
 	[SerializeField] public TileColor Color = TileColor.COAL;
 	[SerializeField] public TileType Type = TileType.NONE;
-	[SerializeField] [Range(0, 100)] public int PercentBomb = 10;
+	[SerializeField] public TileDirection Direction = TileDirection.RIGHT;
 
 	public enum TileColor {
 		YELLOW, DARK_GREEN, DARK_BLUE, TEAL, DARK_PINK, ORANGE, LIGHT_GREEN, LIGHT_BLUE, PURPLE, LIGHT_PINK, COAL
@@ -20,6 +20,10 @@ public class BlockTile : MonoBehaviour {
 
 	public enum TileType {
 		NONE, BOMB_DIRECTION, BOMB_SURROUND, BOMB_LINE
+	}
+
+	public enum TileDirection {
+		RIGHT, DOWN, LEFT, UP
 	}
 
 #if UNITY_EDITOR
@@ -39,34 +43,21 @@ public class BlockTile : MonoBehaviour {
 
 	private void Start ( ) {
 		transform.localScale = new Vector3(0.95f, 0.95f, 1);
-
-		if (Random.Range(1, 101) <= PercentBomb) {
-			SetTileType(TileType.BOMB_SURROUND);
-
-			switch (Random.Range(0, 3)) {
-				case 0:
-					// SetTileType(TileType.BOMB_DIRECTION);
-
-					break;
-				case 1:
-					// SetTileType(TileType.BOMB_SURROUND);
-
-					break;
-				case 2:
-					// SetTileType(TileType.BOMB_LINE);
-
-					break;
-			}
-		}
+		SetTileDirection((TileDirection) Random.Range(0, 4));
 	}
 
-	private void SetTileColor (TileColor color) {
+	public void SetTileColor (TileColor color) {
 		Color = color;
 		spriteRenderer.sprite = colors[(int) Color];
 	}
 
-	private void SetTileType (TileType type) {
+	public void SetTileType (TileType type) {
 		Type = type;
 		iconSpriteRenderer.sprite = icons[(int) Type];
+	}
+
+	public void SetTileDirection (TileDirection direction) {
+		Direction = direction;
+		transform.eulerAngles = new Vector3(0, 0, (int) Direction * -90);
 	}
 }

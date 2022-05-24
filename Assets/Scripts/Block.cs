@@ -6,11 +6,30 @@ public class Block : MonoBehaviour {
 	[SerializeField] private Board board;
 	[Space]
 	[SerializeField] [Min(0.001f)] private float fallTime;
+	[SerializeField] [Range(0, 100)] public int PercentBomb = 60;
 
 	private float prevTime;
 
 	private void Awake ( ) {
 		board = FindObjectOfType<Board>( );
+	}
+
+	private void Start ( ) {
+		if (Random.Range(1, 101) <= PercentBomb) {
+			BlockTile blockTile = GetComponentsInChildren<BlockTile>( )[Random.Range(0, transform.childCount)];
+
+			switch (Random.Range(0, 3)) {
+				case 0:
+					blockTile.SetTileType(BlockTile.TileType.BOMB_DIRECTION);
+					break;
+				case 1:
+					blockTile.SetTileType(BlockTile.TileType.BOMB_SURROUND);
+					break;
+				case 2:
+					blockTile.SetTileType(BlockTile.TileType.BOMB_LINE);
+					break;
+			}
+		}
 	}
 
 	private void Update ( ) {
@@ -66,6 +85,9 @@ public class Block : MonoBehaviour {
 		}
 
 		transform.RotateAround(transform.position, new Vector3(0, 0, 1), -90);
+		foreach (BlockTile blockTile in GetComponentsInChildren<BlockTile>( )) {
+			blockTile.SetTileDirection((BlockTile.TileDirection) (((int) blockTile.Direction + 1) % 4));
+		}
 
 		return true;
 	}
