@@ -41,17 +41,19 @@ public class BlockTile : MonoBehaviour {
 		transform.localScale = new Vector3(0.95f, 0.95f, 1);
 
 		if (Random.Range(1, 101) <= PercentBomb) {
+			SetTileType(TileType.BOMB_SURROUND);
+
 			switch (Random.Range(0, 3)) {
 				case 0:
-					SetTileType(TileType.BOMB_DIRECTION);
+					// SetTileType(TileType.BOMB_DIRECTION);
 
 					break;
 				case 1:
-					SetTileType(TileType.BOMB_SURROUND);
+					// SetTileType(TileType.BOMB_SURROUND);
 
 					break;
 				case 2:
-					SetTileType(TileType.BOMB_LINE);
+					// SetTileType(TileType.BOMB_LINE);
 
 					break;
 			}

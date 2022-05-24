@@ -318,4 +318,4 @@ MonoBehaviour:
   BoardHeight: 28
   topSpawnGap: 4
   bottomSpawnGap: 2
-  wallHeight: 5
+  wallHeight: 7

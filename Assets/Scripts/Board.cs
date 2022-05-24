@@ -16,7 +16,7 @@ public class Board : MonoBehaviour {
 	[SerializeField] [Range(2, 10)] private int bottomSpawnGap = 2;
 	[SerializeField] [Range(3, 8)] private int wallHeight = 5;
 
-	private Transform[ , ] board;
+	private BlockTile[ , ] board;
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
@@ -41,7 +41,7 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Awake ( ) {
-		board = new Transform[BoardWidth, BoardHeight];
+		board = new BlockTile[BoardWidth, BoardHeight];
 	}
 
 	private void Start ( ) {
@@ -57,28 +57,62 @@ public class Board : MonoBehaviour {
 
 	private void GenerateWall ( ) {
 		for (int i = 0; i < BoardWidth; i++) {
-			for (int j = bottomSpawnGap; j < wallHeight; j++) {
-				BlockTile blockTile = Instantiate(tilePrefab, new Vector3(i, j), Quaternion.identity).GetComponent<BlockTile>();
+			for (int j = bottomSpawnGap; j < wallHeight + bottomSpawnGap; j++) {
+				BlockTile blockTile = Instantiate(tilePrefab, new Vector3(i, j), Quaternion.identity).GetComponent<BlockTile>( );
 				blockTile.Color = BlockTile.TileColor.COAL;
 				blockTile.PercentBomb = 0;
 
-				board[i, j] = blockTile.transform;
+				board[i, j] = blockTile;
 			}
 		}
 	}
 
-	public bool IsInBounds (Vector3 position) {
-		bool isInBounds = (position.x >= 0 && position.x < BoardWidth && position.y >= 0 && position.y < BoardHeight);
-
-		return (isInBounds && board[Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)] == null);
+	public bool IsInBounds (Vector2Int position) {
+		return (position.x >= 0 && position.x < BoardWidth && position.y >= 0 && position.y < BoardHeight);
 	}
 
-	public void AddTilesToBoard (Block piece) {
-		foreach (Transform tile in piece.transform) {
-			int x = Mathf.RoundToInt(tile.transform.position.x);
-			int y = Mathf.RoundToInt(tile.transform.position.y);
+	public bool IsBoardTileFree (Vector2Int position) {
+		return (board[position.x, position.y] == null);
+	}
 
-			board[x, y] = tile;
+	public void AddTilesToBoard (Block block) {
+		List<Vector2Int> blockTilePositions = new List<Vector2Int>( );
+		List<Vector2Int> explodedBlockTiles = new List<Vector2Int>( );
+
+		foreach (BlockTile blockTile in block.GetComponentsInChildren<BlockTile>( )) {
+			int x = Mathf.RoundToInt(blockTile.transform.position.x);
+			int y = Mathf.RoundToInt(blockTile.transform.position.y);
+			blockTilePositions.Add(new Vector2Int(x, y));
+
+			board[x, y] = blockTile;
+		}
+
+		for (int i = 0; i < blockTilePositions.Count; i++) {
+			switch (board[blockTilePositions[i].x, blockTilePositions[i].y].Type) {
+				case BlockTile.TileType.BOMB_DIRECTION:
+					break;
+				case BlockTile.TileType.BOMB_SURROUND:
+					for (int j = -1; j <= 1; j++) {
+						for (int k = -1; k <= 1; k++) {
+							explodedBlockTiles.Add(blockTilePositions[i] + new Vector2Int(j, k));
+						}
+					}
+
+					break;
+				case BlockTile.TileType.BOMB_LINE:
+					break;
+			}
+		}
+
+		for (int i = 0; i < explodedBlockTiles.Count; i++) {
+			RemoveTileFromBoard(explodedBlockTiles[i]);
+		}
+	}
+
+	private void RemoveTileFromBoard (Vector2Int position) {
+		if (IsInBounds(position) && !IsBoardTileFree(position)) {
+			Destroy(board[position.x, position.y].gameObject);
+			board[position.x, position.y] = null;
 		}
 	}
 }

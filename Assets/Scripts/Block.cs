@@ -28,9 +28,7 @@ public class Block : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.UpArrow)) {
 			Rotate(-90);
 
-			// TODO: Move block to the left or right to satisfy a rotation
-			//		 Made tbe block move away from walls
-			// TODO: Move block away from other blocks to be able to rotate
+			// TODO: Move block to satisfy a rotation
 		}
 
 		if (Time.time - prevTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime)) {
@@ -46,7 +44,9 @@ public class Block : MonoBehaviour {
 
 	public bool Move (Vector3 direction) {
 		foreach (Transform child in transform) {
-			if (!board.IsInBounds(Vector3Int.RoundToInt(child.transform.position + direction))) {
+			Vector2Int position = Vector2Int.RoundToInt(child.position + direction);
+
+			if (!board.IsInBounds(position) || !board.IsBoardTileFree(position)) {
 				return false;
 			}
 		}
@@ -57,39 +57,12 @@ public class Block : MonoBehaviour {
 	}
 
 	public bool Rotate (float degRotation) {
-		bool canRotate = true;
-
-		// Check to see if block can rotate
 		foreach (Transform child in transform) {
-			Vector3 newPosition = Quaternion.Euler(0, 0, degRotation) * (child.position - transform.position) + transform.position;
+			Vector2Int position = Vector2Int.RoundToInt(Quaternion.Euler(0, 0, degRotation) * (child.position - transform.position) + transform.position);
 
-			if (!board.IsInBounds(Vector3Int.RoundToInt(newPosition))) {
-				canRotate = false;
+			if (!board.IsInBounds(position) || !board.IsBoardTileFree(position)) {
+				return false;
 			}
-		}
-
-		// If the block cant rotate and is near a wall, move it away from the wall and then rotate
-		if (!canRotate) {
-			// Check to see which wall the block is
-			Vector3 direction = (Mathf.RoundToInt(transform.position.x) == 0 ? Vector3.right : Vector3.left);
-
-			// If the block can move away from the wall, try and rotate it again
-			if (Move(direction)) {
-				foreach (Transform child in transform) {
-					Vector3 newPosition = Quaternion.Euler(0, 0, degRotation) * (child.position - transform.position) + transform.position;
-
-					if (!board.IsInBounds(Vector3Int.RoundToInt(newPosition))) {
-						continue;
-					}
-				}
-
-				canRotate = true;
-			}
-		}
-
-		// If the block cant rotate at all, then return false
-		if (!canRotate) {
-			return false;
 		}
 
 		transform.RotateAround(transform.position, new Vector3(0, 0, 1), -90);
