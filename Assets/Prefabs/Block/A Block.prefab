@@ -51,6 +51,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   board: {fileID: 0}
   fallTime: 0.8
+  moveTime: 0.1
+  PercentBomb: 60
 --- !u!1001 &2230852817621012498
 PrefabInstance:
   m_ObjectHideFlags: 0

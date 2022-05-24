@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 999272537
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -8489704650120020800, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -111,13 +111,13 @@ MonoBehaviour:
   icons:
   - {fileID: 0}
   - {fileID: 1161201145128540330, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
-  - {fileID: 2130535880278150251, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
   - {fileID: 184950751378207249, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
+  - {fileID: 2130535880278150251, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
   spriteRenderer: {fileID: 1130229828950931900}
   iconSpriteRenderer: {fileID: 1130229829663535140}
   Color: 10
   Type: 0
-  PercentBomb: 10
+  Direction: 0
 --- !u!1 &1130229829663535146
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,8 +186,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 999272537
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

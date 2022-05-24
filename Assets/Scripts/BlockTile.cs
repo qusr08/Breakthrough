@@ -3,6 +3,18 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+public enum TileColor {
+	YELLOW, DARK_GREEN, DARK_BLUE, TEAL, DARK_PINK, ORANGE, LIGHT_GREEN, LIGHT_BLUE, PURPLE, LIGHT_PINK, COAL
+}
+
+public enum TileType {
+	NONE, BOMB_DIRECTION, BOMB_SURROUND, BOMB_LINE
+}
+
+public enum TileDirection {
+	RIGHT, DOWN, LEFT, UP
+}
+
 public class BlockTile : MonoBehaviour {
 	[SerializeField] private Sprite[ ] colors;
 	[SerializeField] private Sprite[ ] icons;
@@ -13,18 +25,6 @@ public class BlockTile : MonoBehaviour {
 	[SerializeField] public TileColor Color = TileColor.COAL;
 	[SerializeField] public TileType Type = TileType.NONE;
 	[SerializeField] public TileDirection Direction = TileDirection.RIGHT;
-
-	public enum TileColor {
-		YELLOW, DARK_GREEN, DARK_BLUE, TEAL, DARK_PINK, ORANGE, LIGHT_GREEN, LIGHT_BLUE, PURPLE, LIGHT_PINK, COAL
-	}
-
-	public enum TileType {
-		NONE, BOMB_DIRECTION, BOMB_SURROUND, BOMB_LINE
-	}
-
-	public enum TileDirection {
-		RIGHT, DOWN, LEFT, UP
-	}
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;

@@ -6,9 +6,14 @@ public class Block : MonoBehaviour {
 	[SerializeField] private Board board;
 	[Space]
 	[SerializeField] [Min(0.001f)] private float fallTime;
+	[SerializeField] [Min(0.001f)] private float moveTime;
 	[SerializeField] [Range(0, 100)] public int PercentBomb = 60;
 
-	private float prevTime;
+	private float prevFallTime;
+	private float prevMoveTime;
+
+	private Vector2Int moveTo;
+	private Vector2Int fallTo;
 
 	private void Awake ( ) {
 		board = FindObjectOfType<Board>( );
@@ -20,13 +25,13 @@ public class Block : MonoBehaviour {
 
 			switch (Random.Range(0, 3)) {
 				case 0:
-					blockTile.SetTileType(BlockTile.TileType.BOMB_DIRECTION);
+					blockTile.SetTileType(TileType.BOMB_DIRECTION);
 					break;
 				case 1:
-					blockTile.SetTileType(BlockTile.TileType.BOMB_SURROUND);
+					blockTile.SetTileType(TileType.BOMB_SURROUND);
 					break;
 				case 2:
-					blockTile.SetTileType(BlockTile.TileType.BOMB_LINE);
+					blockTile.SetTileType(TileType.BOMB_LINE);
 					break;
 			}
 		}
@@ -35,24 +40,31 @@ public class Block : MonoBehaviour {
 	private void Update ( ) {
 		// TODO: Make inputs more expandable and better functioning
 		// TODO: Add the ability to hold a button down and have the block move continuously
+		// TODO: Make it so a block is not placed if it is moving/rotating
+		//		     Probably have to alter prevTime or something to prevent that from happening
 
-		if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-			Move(Vector3.left);
-		}
-
-		if (Input.GetKeyDown(KeyCode.RightArrow)) {
-			Move(Vector3.right);
+		if (Time.time - prevMoveTime > moveTime) {
+			if (Input.GetKey(KeyCode.LeftArrow)) {
+				Move(Vector3.left);
+				prevMoveTime = Time.time;
+			} else if (Input.GetKey(KeyCode.RightArrow)) {
+				Move(Vector3.right);
+				prevMoveTime = Time.time;
+			} else {
+				prevMoveTime = 0;
+			}
 		}
 
 		if (Input.GetKeyDown(KeyCode.UpArrow)) {
 			Rotate(-90);
 
 			// TODO: Move block to satisfy a rotation
+			//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
 		}
 
-		if (Time.time - prevTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime)) {
+		if (Time.time - prevFallTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime)) {
 			if (Move(Vector3.down)) {
-				prevTime = Time.time;
+				prevFallTime = Time.time;
 			} else {
 				board.AddTilesToBoard(this);
 				enabled = false;
@@ -86,7 +98,7 @@ public class Block : MonoBehaviour {
 
 		transform.RotateAround(transform.position, new Vector3(0, 0, 1), -90);
 		foreach (BlockTile blockTile in GetComponentsInChildren<BlockTile>( )) {
-			blockTile.SetTileDirection((BlockTile.TileDirection) (((int) blockTile.Direction + 1) % 4));
+			blockTile.SetTileDirection((TileDirection) (((int) blockTile.Direction + 1) % 4));
 		}
 
 		return true;
