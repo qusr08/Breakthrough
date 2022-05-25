@@ -9,13 +9,6 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject[ ] blocks;
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
-	[Space]
-	[SerializeField] [Range(10, 40)] public int BoardWidth = 20;
-	[SerializeField] [Range(10, 40)] public int BoardHeight = 20;
-	[SerializeField] [Range(2, 10)] private int topSpawnGap = 4;
-	[SerializeField] [Range(2, 10)] private int bottomSpawnGap = 2;
-	[SerializeField] [Range(3, 8)] private int wallHeight = 5;
-	[SerializeField] [Range(0, 6)] private int cameraPadding = 3;
 
 	private BlockTile[ , ] board;
 
@@ -32,20 +25,20 @@ public class Board : MonoBehaviour {
 
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		// This makes it easier when converting from piece transform position to a board array index
-		spriteRenderer.size = new Vector2(BoardWidth, BoardHeight);
-		float positionX = (BoardWidth / 2) - (BoardWidth % 2 == 0 ? 0.5f : 0f);
-		float positionY = (BoardHeight / 2) - (BoardHeight % 2 == 0 ? 0.5f : 0f);
+		spriteRenderer.size = new Vector2(Constants.BOARD_WIDTH, Constants.BOARD_HEIGHT);
+		float positionX = (Constants.BOARD_WIDTH / 2) - (Constants.BOARD_WIDTH % 2 == 0 ? 0.5f : 0f);
+		float positionY = (Constants.BOARD_HEIGHT / 2) - (Constants.BOARD_HEIGHT % 2 == 0 ? 0.5f : 0f);
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the camera orthographic size and position so it fits the entire board
-		Camera.main.orthographicSize = (BoardHeight + cameraPadding) / 2f;
+		Camera.main.orthographicSize = (Constants.BOARD_HEIGHT + Constants.BOARD_CAMERA_PADDING) / 2f;
 		Camera.main.transform.position = new Vector3(positionX, positionY, Camera.main.transform.position.z);
 
 		// TODO: Set the UI element sizes when the board is resized
 	}
 
 	private void Awake ( ) {
-		board = new BlockTile[BoardWidth, BoardHeight];
+		board = new BlockTile[Constants.BOARD_WIDTH, Constants.BOARD_HEIGHT];
 	}
 
 	private void Start ( ) {
@@ -56,14 +49,14 @@ public class Board : MonoBehaviour {
 	}
 
 	public void SpawnRandomBlock ( ) {
-		Vector3 spawnPosition = new Vector3((BoardWidth / 2) - 0.5f, BoardHeight - topSpawnGap - 0.5f);
+		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
 		Instantiate(blocks[Random.Range(0, blocks.Length)], spawnPosition, Quaternion.identity);
 	}
 
 	private void GenerateWall ( ) {
-		for (int i = 0; i < BoardWidth; i++) {
-			for (int j = bottomSpawnGap; j < wallHeight + bottomSpawnGap; j++) {
+		for (int i = 0; i < Constants.BOARD_WIDTH; i++) {
+			for (int j = Constants.BOARD_BOTTOM_PADDING; j < Constants.BOARD_WALL_HEIGHT + Constants.BOARD_BOTTOM_PADDING; j++) {
 				BlockTile blockTile = Instantiate(tilePrefab, new Vector3(i, j), Quaternion.identity).GetComponent<BlockTile>( );
 				blockTile.SetTileColor(TileColor.COAL);
 
@@ -73,7 +66,7 @@ public class Board : MonoBehaviour {
 	}
 
 	public bool IsInBounds (Vector2Int position) {
-		return (position.x >= 0 && position.x < BoardWidth && position.y >= 0 && position.y < BoardHeight);
+		return (position.x >= 0 && position.x < Constants.BOARD_WIDTH && position.y >= 0 && position.y < Constants.BOARD_HEIGHT);
 	}
 
 	public bool IsBoardTileFree (Vector2Int position) {
@@ -149,11 +142,11 @@ public class Board : MonoBehaviour {
 					break;
 				case TileType.BOMB_LINE:
 					if ((int) currentTile.Direction % 2 == 1) { // Vertical
-						for (int j = 0; j < BoardHeight; j++) {
+						for (int j = 0; j < Constants.BOARD_HEIGHT; j++) {
 							explodedBlockTiles.Add(new Vector2Int(blockTilePositions[i].x, j));
 						}
 					} else { // Horizontal
-						for (int j = 0; j < BoardWidth; j++) {
+						for (int j = 0; j < Constants.BOARD_WIDTH; j++) {
 							explodedBlockTiles.Add(new Vector2Int(j, blockTilePositions[i].y));
 						}
 					}

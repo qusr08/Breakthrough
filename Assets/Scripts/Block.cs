@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Block : MonoBehaviour {
 	[SerializeField] private Board board;
-	[Space]
-	[SerializeField] [Min(0.001f)] private float fallTime;
-	[SerializeField] [Min(0.001f)] private float moveTime;
-	[SerializeField] [Range(0, 100)] public int PercentBomb = 60;
 
 	private float prevFallTime;
 	private float prevMoveTime;
@@ -20,7 +16,7 @@ public class Block : MonoBehaviour {
 	}
 
 	private void Start ( ) {
-		if (Random.Range(1, 101) <= PercentBomb) {
+		if (Random.Range(0f, 1f) < Constants.BLOCK_PERCENT_BOMB) {
 			BlockTile blockTile = GetComponentsInChildren<BlockTile>( )[Random.Range(0, transform.childCount)];
 
 			switch (Random.Range(0, 3)) {
@@ -43,7 +39,7 @@ public class Block : MonoBehaviour {
 		// TODO: Make it so a block is not placed if it is moving/rotating
 		//		     Probably have to alter prevTime or something to prevent that from happening
 
-		if (Time.time - prevMoveTime > moveTime) {
+		if (Time.time - prevMoveTime > Constants.BLOCK_MOVE_TIME) {
 			if (Input.GetKey(KeyCode.LeftArrow)) {
 				Move(Vector3.left);
 				prevMoveTime = Time.time;
@@ -56,13 +52,13 @@ public class Block : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown(KeyCode.UpArrow)) {
-			Rotate(-90);
+			Rotate(Constants.BLOCK_ROTATE_DIRECTION * 90);
 
 			// TODO: Move block to satisfy a rotation
 			//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
 		}
 
-		if (Time.time - prevFallTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime)) {
+		if (Time.time - prevFallTime > (Input.GetKey(KeyCode.DownArrow) ? Constants.BLOCK_FALL_TIME / 10 : Constants.BLOCK_FALL_TIME)) {
 			if (Move(Vector3.down)) {
 				prevFallTime = Time.time;
 			} else {
@@ -96,7 +92,7 @@ public class Block : MonoBehaviour {
 			}
 		}
 
-		transform.RotateAround(transform.position, new Vector3(0, 0, 1), -90);
+		transform.RotateAround(transform.position, new Vector3(0, 0, 1), degRotation);
 		foreach (BlockTile blockTile in GetComponentsInChildren<BlockTile>( )) {
 			blockTile.SetTileDirection((TileDirection) (((int) blockTile.Direction + 1) % 4));
 		}
