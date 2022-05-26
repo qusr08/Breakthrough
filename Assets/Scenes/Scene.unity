@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 15.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -367,22 +367,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba4d5fc022b0f042ab885d84222c502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+  blockPrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
   blocks:
-  - {fileID: 5606474013152507964, guid: 87e6002164630cc4f9cac0d4278699b2, type: 3}
   - {fileID: 4293458010481301890, guid: 539ed584931d05a45b6dd1339045495c, type: 3}
+  - {fileID: 5606474013152507964, guid: 87e6002164630cc4f9cac0d4278699b2, type: 3}
   - {fileID: 5222843227452634790, guid: 6ef1fe2c4e647f64ea711d717aa76abe, type: 3}
-  - {fileID: 1830994206690904804, guid: 83e247d4eea9e634ea58530f51d67c67, type: 3}
-  - {fileID: 1804251442152853886, guid: dae5ff1e93f888746b03dac0db898216, type: 3}
   - {fileID: 623521767164865886, guid: 2cb6a50001040e742a2a7474e3615bac, type: 3}
+  - {fileID: 4241923347586638877, guid: 7290a25c1f11dd04eb472620877d38da, type: 3}
   - {fileID: 4241923347586638877, guid: d790677eaf8b1154886706939aa35074, type: 3}
-  - {fileID: 2036633918095540079, guid: 5e7eaa5985181d747854da99f8aff9dd, type: 3}
-  - {fileID: 1404170622813699853, guid: 1b6c8b56b4b4f4e46aa3405e1c2f520d, type: 3}
-  - {fileID: 1579645476526848396, guid: 25776378ebc293d47acd0aef6866281f, type: 3}
+  - {fileID: 623521767164865886, guid: 808f2d35324e3634b9e1ca784298fe90, type: 3}
+  - {fileID: 1830994206690904804, guid: 2a40bf84d9fceaa418ca8937961614b6, type: 3}
+  - {fileID: 1830994206690904804, guid: 80f33c43e6300d04f81962f8fa125a2a, type: 3}
   spriteRenderer: {fileID: 2111922724}
-  BoardWidth: 16
-  BoardHeight: 28
-  topSpawnGap: 4
-  bottomSpawnGap: 2
-  wallHeight: 7
-  cameraPadding: 2
