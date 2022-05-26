@@ -49,8 +49,10 @@ public class Board : MonoBehaviour {
 	}
 
 	public void SpawnMino ( ) {
+		// The spawn position is going to be near the top middle of the board
 		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
+		// Spawn a random type of block
 		Instantiate(blocks[Random.Range(0, blocks.Length)], spawnPosition, Quaternion.identity);
 	}
 
@@ -77,6 +79,7 @@ public class Board : MonoBehaviour {
 		List<Vector2Int> blockPositions = new List<Vector2Int>( );
 		List<Vector2Int> explodedBlocks = new List<Vector2Int>( );
 
+		// Add all blocks that are part of the mino to the board
 		foreach (Block block in mino.GetComponentsInChildren<Block>( )) {
 			int x = Mathf.RoundToInt(block.transform.position.x);
 			int y = Mathf.RoundToInt(block.transform.position.y);
@@ -90,9 +93,12 @@ public class Board : MonoBehaviour {
 		//		     Probably going to need to use coroutines for each bomb or something
 		// TODO: Further test bombs to see if one needs to be removed or a different bomb needs to be added
 
+		// Loop through all added blocks to see if one of them was a boom block
 		for (int i = 0; i < blockPositions.Count; i++) {
 			Block currentTile = board[blockPositions[i].x, blockPositions[i].y];
 
+			// Add all exploded blocks to an array that will be cleared at the end of this for loop
+			// This is so boom blocks to not get rid of other boom blocks before they have exploded
 			switch (currentTile.Type) {
 				case BlockType.BOOM_DIRECTION:
 					explodedBlocks.Add(blockPositions[i]);
@@ -155,6 +161,7 @@ public class Board : MonoBehaviour {
 			}
 		}
 
+		// Remove all blocks that are to be exploded from the board
 		for (int i = 0; i < explodedBlocks.Count; i++) {
 			RemoveBlockFromBoard(explodedBlocks[i]);
 		}

@@ -60,6 +60,5 @@ public class Block : MonoBehaviour {
 
 	public void SetDirection (BlockDirection direction) {
 		Direction = direction;
-		// transform.eulerAngles = new Vector3(0, 0, (int) Direction * Constants.MINO_ROTATE_DIRECTION * 90);
 	}
 }
