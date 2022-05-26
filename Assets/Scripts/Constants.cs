@@ -12,7 +12,11 @@ public static class Constants {
 
 	public const float BLOCK_PERCENT_BOMB = 0.6f;
 	public const float BLOCK_FALL_TIME = 1.0f;
-	public const float BLOCK_MOVE_TIME = 0.05f;
+	public const float BLOCK_MOVE_TIME = 0.1f;
+	public const float BLOCK_ROTATE_TIME = 0.25f;
 	public const float BLOCK_ROTATE_DIRECTION = -1; // Clockwise
 	public const float BLOCK_TILE_SCALE = 0.95f;
+	public const float BLOCK_DAMP_SPEED = 0.04f;
+
+	public const float CLOSE_ENOUGH = 0.01f;
 }

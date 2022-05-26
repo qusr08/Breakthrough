@@ -42,9 +42,10 @@ public class BlockTile : MonoBehaviour {
 	}
 
 	private void Start ( ) {
-		transform.localScale = new Vector3(Constants.BLOCK_TILE_SCALE, Constants.BLOCK_TILE_SCALE, 1);
-
 		SetTileDirection((TileDirection) Random.Range(0, 4));
+
+		transform.localScale = new Vector3(Constants.BLOCK_TILE_SCALE, Constants.BLOCK_TILE_SCALE, 1);
+		transform.eulerAngles = new Vector3(0, 0, (int) Direction * Constants.BLOCK_ROTATE_DIRECTION * 90);
 	}
 
 	public void SetTileColor (TileColor color) {
@@ -59,6 +60,6 @@ public class BlockTile : MonoBehaviour {
 
 	public void SetTileDirection (TileDirection direction) {
 		Direction = direction;
-		transform.eulerAngles = new Vector3(0, 0, (int) Direction * Constants.BLOCK_ROTATE_DIRECTION * 90);
+		// transform.eulerAngles = new Vector3(0, 0, (int) Direction * Constants.BLOCK_ROTATE_DIRECTION * 90);
 	}
 }

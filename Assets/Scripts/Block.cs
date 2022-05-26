@@ -5,11 +5,16 @@ using UnityEngine;
 public class Block : MonoBehaviour {
 	[SerializeField] private Board board;
 
+	private bool canMove;
+
 	private float prevFallTime;
 	private float prevMoveTime;
+	private float prevRotateTime;
 
-	private Vector2Int moveTo;
-	private Vector2Int fallTo;
+	private Vector3 moveTo;
+	private Vector3 moveVelocity;
+	private Vector3 rotateTo;
+	private Vector3 rotateVelocity;
 
 	private void Awake ( ) {
 		board = FindObjectOfType<Board>( );
@@ -31,70 +36,92 @@ public class Block : MonoBehaviour {
 					break;
 			}
 		}
+
+		canMove = true;
+		moveTo = transform.position;
 	}
 
 	private void Update ( ) {
 		// TODO: Make inputs more expandable and better functioning
-		// TODO: Add the ability to hold a button down and have the block move continuously
 		// TODO: Make it so a block is not placed if it is moving/rotating
 		//		     Probably have to alter prevTime or something to prevent that from happening
 
-		if (Time.time - prevMoveTime > Constants.BLOCK_MOVE_TIME) {
-			if (Input.GetKey(KeyCode.LeftArrow)) {
-				Move(Vector3.left);
-				prevMoveTime = Time.time;
-			} else if (Input.GetKey(KeyCode.RightArrow)) {
-				Move(Vector3.right);
-				prevMoveTime = Time.time;
-			} else {
-				prevMoveTime = 0;
-			}
-		}
+		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.BLOCK_DAMP_SPEED);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, Constants.BLOCK_DAMP_SPEED);
 
-		if (Input.GetKeyDown(KeyCode.UpArrow)) {
-			Rotate(Constants.BLOCK_ROTATE_DIRECTION * 90);
+		if (!canMove) {
+			// Debug.Log($"position: {moveTo} == {transform.position} | rotation: {rotateTo} == {transform.eulerAngles}");
+			// Debug.Log($"position {Utils.CompareVectors(moveTo, transform.position)} | rotation: {Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)}");
 
-			// TODO: Move block to satisfy a rotation
-			//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
-		}
+			if (Utils.CompareVectors(moveTo, transform.position) && Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)) {
+				// The position and rotation of the block might be a little off, so make sure it is exact before the block pieces deactivated
+				transform.eulerAngles = rotateTo;
+				transform.position = moveTo;
 
-		if (Time.time - prevFallTime > (Input.GetKey(KeyCode.DownArrow) ? Constants.BLOCK_FALL_TIME / 10 : Constants.BLOCK_FALL_TIME)) {
-			if (Move(Vector3.down)) {
-				prevFallTime = Time.time;
-			} else {
+				// Add the tiles to the board and spawn another block
 				board.AddTilesToBoard(this);
 				enabled = false;
 				board.SpawnRandomBlock( );
+			}
+
+			return;
+		}
+
+		float hori = Input.GetAxisRaw("Horizontal");
+		float vert = Input.GetAxisRaw("Vertical");
+
+		if (hori == 0) {
+			prevMoveTime = 0;
+		} else if (Time.time - prevMoveTime > Constants.BLOCK_MOVE_TIME) {
+			Move(Vector3.right * hori);
+			prevMoveTime = Time.time;
+		}
+
+		// TODO: Move block to satisfy a rotation
+		//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
+
+		if (vert == 0) {
+			prevRotateTime = 0;
+		} else if (vert > 0 && Time.time - prevRotateTime > Constants.BLOCK_ROTATE_TIME) {
+			Rotate(Constants.BLOCK_ROTATE_DIRECTION * 90);
+			prevRotateTime = Time.time;
+		}
+
+		if (Time.time - prevFallTime > (vert < 0 ? Constants.BLOCK_FALL_TIME / 20 : Constants.BLOCK_FALL_TIME)) {
+			if (Move(Vector3.down)) {
+				prevFallTime = Time.time;
+			} else {
+				canMove = false;
 			}
 		}
 	}
 
 	public bool Move (Vector3 direction) {
 		foreach (Transform child in transform) {
-			Vector2Int position = Vector2Int.RoundToInt(child.position + direction);
+			Vector2Int position = Vector2Int.RoundToInt(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z) + direction);
 
 			if (!board.IsInBounds(position) || !board.IsBoardTileFree(position)) {
 				return false;
 			}
 		}
 
-		transform.position += direction;
+		moveTo += direction;
 
 		return true;
 	}
 
 	public bool Rotate (float degRotation) {
 		foreach (Transform child in transform) {
-			Vector2Int position = Vector2Int.RoundToInt(Quaternion.Euler(0, 0, degRotation) * (child.position - transform.position) + transform.position);
+			Vector2Int position = Vector2Int.RoundToInt(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z + degRotation));
 
 			if (!board.IsInBounds(position) || !board.IsBoardTileFree(position)) {
 				return false;
 			}
 		}
 
-		transform.RotateAround(transform.position, new Vector3(0, 0, 1), degRotation);
+		rotateTo += Vector3.forward * degRotation;
 		foreach (BlockTile blockTile in GetComponentsInChildren<BlockTile>( )) {
-			blockTile.SetTileDirection((TileDirection) (((int) blockTile.Direction + 1) % 4));
+			blockTile.SetTileDirection((TileDirection) (((int) blockTile.Direction - Constants.BLOCK_ROTATE_DIRECTION) % 4));
 		}
 
 		return true;
