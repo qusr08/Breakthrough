@@ -81,26 +81,26 @@ public class Mino : MonoBehaviour {
 		if (hori == 0) {
 			prevMoveTime = 0;
 		} else if (Time.time - prevMoveTime > Constants.MINO_MOVE_TIME) {
-			Move(Vector3.right * hori);
-
-			// Make the first horizontal movement of the player be a longer delay in between movements
-			// This prevents the player having to quickly tap the left and right buttons to move one board space
-			if (prevMoveTime == 0) {
-				prevMoveTime = Time.time;
-			} else {
-				prevMoveTime = Time.time - (Constants.MINO_MOVE_TIME / 1.5f);
+			if (Move(Vector3.right * hori)) {
+				// Make the first horizontal movement of the player be a longer delay in between movements
+				// This prevents the player having to quickly tap the left and right buttons to move one board space
+				if (prevMoveTime == 0) {
+					prevMoveTime = Time.time;
+				} else {
+					prevMoveTime = Time.time - (Constants.MINO_MOVE_TIME / 1.5f);
+				}
+				placeTime = Constants.MINO_PLACE_TIME;
 			}
-			placeTime = Constants.MINO_PLACE_TIME;
 		}
 
 		// Rotate the mino
 		if (vert == 0) {
 			prevRotateTime = 0;
 		} else if (vert > 0 && Time.time - prevRotateTime > Constants.MINO_ROTATE_TIME) {
-			Rotate(Constants.MINO_ROTATE_DIRECTION * 90);
-
-			prevRotateTime = Time.time;
-			placeTime = Constants.MINO_PLACE_TIME;
+			if (Rotate(Constants.MINO_ROTATE_DIRECTION * 90)) {
+				placeTime = Constants.MINO_PLACE_TIME;
+				prevRotateTime = Time.time;
+			}
 		}
 
 		// Have the mino automatically fall downwards, or fall faster downwards according to player input

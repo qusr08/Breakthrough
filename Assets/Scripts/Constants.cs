@@ -14,7 +14,7 @@ public static class Constants {
 	public const float MINO_FALL_TIME = 1.0f;
 	public const float MINO_MOVE_TIME = 0.15f;
 	public const float MINO_ROTATE_TIME = 0.25f;
-	public const float MINO_PLACE_TIME = 1f;
+	public const float MINO_PLACE_TIME = 0.75f;
 	public const float MINO_ROTATE_DIRECTION = -1; // Clockwise
 	public const float MINO_TILE_SCALE = 0.95f;
 	public const float MINO_DAMP_SPEED = 0.04f;
