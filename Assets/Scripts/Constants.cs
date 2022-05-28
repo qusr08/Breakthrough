@@ -12,12 +12,17 @@ public static class Constants {
 
 	public const float MINO_PERCENT_BOOM = 0.6f;
 	public const float MINO_FALL_TIME = 1.0f;
+	public const float MINO_FALL_TIME_ACCELERATED = MINO_FALL_TIME / 20f;
 	public const float MINO_MOVE_TIME = 0.15f;
+	public const float MINO_MOVE_TIME_ACCELERATED = MINO_MOVE_TIME / 2f;
 	public const float MINO_ROTATE_TIME = 0.25f;
 	public const float MINO_PLACE_TIME = 0.75f;
 	public const float MINO_ROTATE_DIRECTION = -1; // Clockwise
 	public const float MINO_TILE_SCALE = 0.95f;
 	public const float MINO_DAMP_SPEED = 0.04f;
+
+	public const int BOOM_SURROUND_SIZE = 2;
+	public const int BOOM_DIRECTION_SIZE = 4;
 
 	public const float CLOSE_ENOUGH = 0.01f;
 }

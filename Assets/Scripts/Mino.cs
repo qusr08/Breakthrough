@@ -63,10 +63,8 @@ public class Mino : MonoBehaviour {
 				transform.eulerAngles = rotateTo;
 				transform.position = moveTo;
 
-				// Add the tiles to the board and spawn another mino
+				// Add the blocks to the board
 				board.AddMinoToBoard(this);
-				enabled = false;
-				board.SpawnMino( );
 			}
 
 			return;
@@ -87,7 +85,7 @@ public class Mino : MonoBehaviour {
 				if (prevMoveTime == 0) {
 					prevMoveTime = Time.time;
 				} else {
-					prevMoveTime = Time.time - (Constants.MINO_MOVE_TIME / 1.5f);
+					prevMoveTime = Time.time - Constants.MINO_MOVE_TIME_ACCELERATED;
 				}
 				placeTime = Constants.MINO_PLACE_TIME;
 			}
@@ -104,7 +102,7 @@ public class Mino : MonoBehaviour {
 		}
 
 		// Have the mino automatically fall downwards, or fall faster downwards according to player input
-		if (Time.time - prevFallTime > (vert < 0 ? Constants.MINO_FALL_TIME / 20 : Constants.MINO_FALL_TIME)) {
+		if (Time.time - prevFallTime > (vert < 0 ? Constants.MINO_FALL_TIME_ACCELERATED : Constants.MINO_FALL_TIME)) {
 			if (Move(Vector3.down)) {
 				prevFallTime = Time.time;
 

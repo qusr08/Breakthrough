@@ -35,7 +35,21 @@ public static class Utils {
 		return new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
 	}
 
-	public static Vector3 Vect3Round (Vector3 vector) {
-		return new Vector3(Mathf.Round(vector.x), Mathf.Round(vector.y), Mathf.Round(vector.z));
+	public static Vector3Int Vect3Round (Vector3 vector) {
+		return new Vector3Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
+	}
+
+	public static Vector2Int Vect2Round (Vector2 vector) {
+		return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
+	}
+
+	public static List<Transform> GetImmediateChildren (Transform transform) {
+		List<Transform> children = new List<Transform>( );
+
+		foreach (Transform child in transform) {
+			children.Add(child);
+		}
+
+		return children;
 	}
 }
