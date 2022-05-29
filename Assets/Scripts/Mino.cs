@@ -115,13 +115,13 @@ public class Mino : MonoBehaviour {
 		}
 	}
 
-	public bool Move (Vector3 direction) {
+	private bool Move (Vector3 direction) {
 		// Check to see if any of the blocks that are part of this mino collide with other blocks that are part of the board already
 		// If they do, then this mino cannot move in that direction
 		foreach (Transform child in transform) {
-			Vector2Int position = Vector2Int.RoundToInt(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z) + direction);
+			Vector3 toPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z) + direction);
 
-			if (!board.IsInBounds(position) || !board.IsBoardSpaceFree(position)) {
+			if (!board.IsPositionValid(toPosition, transform)) {
 				return false;
 			}
 		}
@@ -131,16 +131,16 @@ public class Mino : MonoBehaviour {
 		return true;
 	}
 
-	public bool Rotate (float degRotation) {
+	private bool Rotate (float degRotation) {
 		// TODO: Move mino to satisfy a rotation
 		//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
 
 		// Check to see if any of the blocks that are part of this mino collide with other blocks that are part of the board already
 		// If they do, then this mino cannot rotate in that direction
 		foreach (Transform child in transform) {
-			Vector2Int position = Vector2Int.RoundToInt(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z + degRotation));
+			Vector3 toPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(moveTo + child.localPosition, moveTo, rotateTo.z + degRotation));
 
-			if (!board.IsInBounds(position) || !board.IsBoardSpaceFree(position)) {
+			if (!board.IsPositionValid(toPosition, transform)) {
 				return false;
 			}
 		}

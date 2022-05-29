@@ -302,7 +302,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-  blocks:
+  blockGroupPrefab: {fileID: 8478777859116991009, guid: 6280865aa4e29264b8d65953181e9dc7, type: 3}
+  minoPrefabs:
   - {fileID: 4293458010481301890, guid: 539ed584931d05a45b6dd1339045495c, type: 3}
   - {fileID: 5606474013152507964, guid: 87e6002164630cc4f9cac0d4278699b2, type: 3}
   - {fileID: 5222843227452634790, guid: 6ef1fe2c4e647f64ea711d717aa76abe, type: 3}

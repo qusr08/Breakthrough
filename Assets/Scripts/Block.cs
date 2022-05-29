@@ -25,8 +25,22 @@ public class Block : MonoBehaviour {
 	[SerializeField] public BlockColor Color = BlockColor.COAL;
 	[SerializeField] public BlockType Type = BlockType.NONE;
 	[SerializeField] public BlockDirection Direction = BlockDirection.RIGHT;
-	[Space]
-	[SerializeField] public int BlockGroup = -1;
+
+	public Vector3 Position {
+		get {
+			return transform.position;
+		}
+
+		set {
+			transform.position = value;
+		}
+	}
+
+	public BlockGroup BlockGroup {
+		get {
+			return transform.parent.GetComponent<BlockGroup>( );
+		}
+	}
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
