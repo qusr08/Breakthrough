@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BlockGroup : MonoBehaviour {
 	[SerializeField] private Board board;
+	[Space]
+	[SerializeField] public bool IsModified;
+	[SerializeField] public bool CanMove;
 
 	private float prevFallTime;
 
@@ -31,17 +34,13 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		// If the block group has no blocks inside of it, get ridda da bitch
-		if (Size == 0) {
-			Destroy(gameObject);
-
-			return;
-		}
-
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
 
+		// Move the board group down if it is able to
 		if (Time.time - prevFallTime > Constants.MINO_FALL_TIME_ACCELERATED) {
-			if (Move(Vector3.down)) {
+			CanMove = Move(Vector3.down);
+
+			if (CanMove) {
 				prevFallTime = Time.time;
 			}
 		}
@@ -63,12 +62,24 @@ public class BlockGroup : MonoBehaviour {
 		return true;
 	}
 
-	public void MergeToBlockGroup (BlockGroup blockGroup) {
+	public static void MergeToBlockGroup (BlockGroup fromBlockGroup, BlockGroup toBlockGroup) {
 		// TODO: Make it so the smaller group merges with the bigger group to save processing time
 
-		while (Size > 0) {
-			this[0].transform.SetParent(blockGroup.transform, true);
+		while (fromBlockGroup.Size > 0) {
+			fromBlockGroup[0].transform.SetParent(toBlockGroup.transform, true);
 		}
+
+		DestroyImmediate(fromBlockGroup.gameObject);
+	}
+
+	public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
+		// Merge all block groups that are part of the parameter array into one block group
+		while (blockGroups.Count > 1) {
+			MergeToBlockGroup(blockGroups[1], blockGroups[0]);
+			blockGroups.RemoveAt(1);
+		}
+
+		return blockGroups[0];
 	}
 }
 

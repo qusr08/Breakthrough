@@ -4,6 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public enum BoardUpdateState {
+	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
+}
+
 public class Board : MonoBehaviour {
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
@@ -11,8 +15,37 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 
-	private List<Block> boomBlocks;
+	// TODO: Change this to some sort of tree list to make it easier to handle
+	private List<List<List<Block>>> explodingBlockFrames;
+	private float prevExplodeTime;
 
+	private BoardUpdateState _boardUpdateState;
+	public BoardUpdateState BoardUpdateState {
+		get {
+			return _boardUpdateState;
+		}
+
+		set {
+			switch (value) {
+				case BoardUpdateState.PLACING_MINO:
+					GenerateRandomMino( );
+
+					break;
+				case BoardUpdateState.UPDATING_BOOM_BLOCKS:
+					UpdateExplodingBlockFrames( );
+
+					break;
+				case BoardUpdateState.UPDATING_BLOCK_GROUPS:
+					UpdateBlockGroups( );
+
+					explodingBlockFrames.Clear( );
+
+					break;
+			}
+
+			_boardUpdateState = value;
+		}
+	}
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
@@ -40,17 +73,70 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Awake ( ) {
-		boomBlocks = new List<Block>( );
+		explodingBlockFrames = new List<List<List<Block>>>( );
 	}
 
 	private void Start ( ) {
 		GenerateWall( );
-		SpawnMino( );
+
+		BoardUpdateState = BoardUpdateState.PLACING_MINO;
 
 		// TODO: Add game loop
 	}
 
-	public void SpawnMino ( ) {
+	private void Update ( ) {
+		switch (BoardUpdateState) {
+			case BoardUpdateState.PLACING_MINO:
+				break;
+			case BoardUpdateState.UPDATING_BOOM_BLOCKS:
+				// If a certain amount of time has passed, destroy the next frame of blocks
+				if (Time.time - prevExplodeTime > Constants.BOOM_ANIMATION_SPEED) {
+					// Loop through each of the boom blocks explosion frames
+					for (int i = explodingBlockFrames.Count - 1; i >= 0; i--) {
+						// Remove each block in the frame
+						while (explodingBlockFrames[i][0].Count > 0) {
+							RemoveBlockFromBoard(explodingBlockFrames[i][0][0]);
+							explodingBlockFrames[i][0].RemoveAt(0);
+						}
+
+						// Remove the current frame
+						explodingBlockFrames[i].RemoveAt(0);
+
+						// If there are no more frames in the current boom block frame list, remove it from the main list
+						if (explodingBlockFrames[i].Count == 0) {
+							explodingBlockFrames.RemoveAt(i);
+						}
+					}
+
+					// If there are no more boom blocks to explode, switch the update state
+					if (explodingBlockFrames.Count == 0) {
+						BoardUpdateState = BoardUpdateState.UPDATING_BLOCK_GROUPS;
+					}
+
+					prevExplodeTime = Time.time;
+				}
+
+				break;
+			case BoardUpdateState.UPDATING_BLOCK_GROUPS:
+				// Wait until all block groups have finished moving
+				bool blockGroupsCanMove = false;
+				foreach (BlockGroup blockGroup in GetComponentsInChildren<BlockGroup>( )) {
+					if (blockGroup.CanMove) {
+						blockGroupsCanMove = true;
+						break;
+					}
+				}
+
+				// Once all of the block groups cannot move anymore, spawn another mino for the player
+				if (!blockGroupsCanMove) {
+					BoardUpdateState = BoardUpdateState.PLACING_MINO;
+				}
+
+				break;
+		}
+	}
+
+	public void GenerateRandomMino ( ) {
 		// The spawn position is going to be near the top middle of the board
 		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
@@ -69,13 +155,142 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	public Block GetBlockAtPosition (Vector3 position) {
-		RaycastHit2D hit = Physics2D.Raycast(position + Vector3.back, Vector3.forward);
-		if (hit) {
-			return hit.transform.GetComponent<Block>( );
+	private void UpdateExplodingBlockFrames ( ) {
+		// Whether or not a new block to be exploded was found
+		bool foundExplodedBlock;
+		// The index of the current frame within a block frame list
+		int frameIndex = 0;
+
+		// Construct the frames of each boom block animation
+		do {
+			foundExplodedBlock = false;
+
+			// Loops through each boom block that has been added to the board
+			for (int i = 0; i < explodingBlockFrames.Count; i++) {
+				// Some boom blocks may have longer frame sequences
+				if (explodingBlockFrames[i].Count <= frameIndex) {
+					continue;
+				}
+
+				// Loops through each block that will explode on the current frame
+				foreach (Block block in explodingBlockFrames[i][frameIndex]) {
+					// Add all neighboring blocks to this current block to the next frame
+					foreach (Block neighborBlock in GetSurroundingBlocks(block)) {
+						// If a neighbor is found, then there will be a next frame of the explosion
+						if (AddExplodingBlock(neighborBlock, i, frameIndex + 1)) {
+							foundExplodedBlock = true;
+						}
+					}
+				}
+			}
+
+			frameIndex++;
+		} while (foundExplodedBlock);
+	}
+
+	private void UpdateBlockGroups ( ) {
+		// Get the current block groups on the board
+		BlockGroup[ ] blockGroups = GetComponentsInChildren<BlockGroup>( );
+		int mergeToGroupIndex = -1;
+
+		// Merge all of the modified block groups into one block group
+		for (int i = blockGroups.Length - 1; i >= 0; i--) {
+			if (blockGroups[i].IsModified) {
+				if (mergeToGroupIndex < 0) {
+					mergeToGroupIndex = i;
+				} else {
+					BlockGroup.MergeToBlockGroup(blockGroups[i], blockGroups[mergeToGroupIndex]);
+				}
+			}
 		}
 
-		return null;
+		// If there were no modifed block groups, then return and do no moving of blocks
+		if (mergeToGroupIndex == -1) {
+			return;
+		}
+
+		// For each of the blocks contained within modified block groups, add them back to the board in new block groups
+		// The "true" will exclude the block group this block is currently in when checking for surrounding groups, so no blocks will be re-added to this group
+		foreach (Block block in blockGroups[mergeToGroupIndex].GetComponentsInChildren<Block>( )) {
+			AddBlockToBoard(block, true);
+		}
+
+		// Destroy this group once all blocks have been moved
+		Destroy(blockGroups[mergeToGroupIndex].gameObject);
+	}
+
+	private bool AddExplodingBlock (Block block, int blockFramesIndex, int frameIndex) {
+		// Make sure the block is within range of the boom block and is not anther boom block
+		if (!explodingBlockFrames[blockFramesIndex][0][0].IsWithinRange(block) || block.IsBoomBlock) {
+			return false;
+		}
+
+		// Check to see if the block has already been added to a frame 
+		foreach (List<Block> blockFrame in explodingBlockFrames[blockFramesIndex]) {
+			if (blockFrame.Contains(block)) {
+				return false;
+			}
+		}
+
+		// Make sure the block frame list is big enough for the frame index
+		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
+			explodingBlockFrames[blockFramesIndex].Add(new List<Block>( ));
+		}
+
+		explodingBlockFrames[blockFramesIndex][frameIndex].Add(block);
+
+		return true;
+	}
+
+	private void AddBoomBlock (Block block) {
+		explodingBlockFrames.Add(new List<List<Block>>( ) { new List<Block>( ) { block } });
+	}
+
+	public void AddMinoToBoard (Mino mino) {
+		// Add all blocks that are part of the mino to the board
+		while (mino.transform.childCount > 0) {
+			AddBlockToBoard(mino.transform.GetChild(0).GetComponent<Block>( ));
+		}
+
+		Destroy(mino.gameObject);
+
+		BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
+	}
+
+	private void AddBlockToBoard (Block block, bool excludeCurrentBlockGroup = false) {
+		// Make sure the block exists
+		if (block == null) {
+			return;
+		}
+
+		// Get the surrounding block groups of the block that was just added
+		List<BlockGroup> blockGroups = GetSurroundingBlockGroups(block, excludeCurrentBlockGroup);
+
+		// If the block has no surrounding block groups, create a new one
+		if (blockGroups.Count == 0) {
+			BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform.position, Quaternion.identity).GetComponent<BlockGroup>( );
+			blockGroup.transform.SetParent(transform, true);
+			block.transform.SetParent(blockGroup.transform, true);
+		} else {
+			// If the block has one or more block groups surrounding it, merge those groups together and add it to the merged block group
+			block.transform.SetParent(BlockGroup.MergeAllBlockGroups(blockGroups).transform, true);
+		}
+
+		if (block.IsBoomBlock) {
+			AddBoomBlock(block);
+		}
+	}
+
+	private void RemoveBlockFromBoard (Block block) {
+		// Make sure the block exists
+		if (block == null) {
+			return;
+		}
+
+		// Make sure the block group that the block was a part of is marked as modified
+		block.BlockGroup.IsModified = true;
+
+		DestroyImmediate(block.gameObject);
 	}
 
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {
@@ -88,145 +303,34 @@ public class Board : MonoBehaviour {
 		return (isInBounds && (!isBlockAtPosition || hasParentTransform));
 	}
 
-	private void ExplodeBoomBlocks ( ) {
-		List<Vector3> explodedBlocks = new List<Vector3>( );
-
-		// Get the exploded blocks based on how the boom blocks explode
-		foreach (Block boomBlock in boomBlocks) {
-			// Add all exploded blocks to an array that will be cleared at the end of this for loop
-			// This is so boom blocks to not get rid of other boom blocks before they have exploded
-			switch (boomBlock.Type) {
-				case BlockType.BOOM_DIRECTION:
-					explodedBlocks.Add(boomBlock.Position);
-
-					bool negative = (boomBlock.Direction == BlockDirection.LEFT || boomBlock.Direction == BlockDirection.DOWN);
-					int l = (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
-					int u = (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
-
-					if ((int) boomBlock.Direction % 2 == 1) { // Vertical
-						for (int j = l; j <= u; j++) {
-							for (int k = -1; k <= 1; k++) {
-								explodedBlocks.Add(boomBlock.Position + new Vector3(k, j));
-							}
-						}
-					} else { // Horizontal
-						for (int j = l; j <= u; j++) {
-							for (int k = -1; k <= 1; k++) {
-								explodedBlocks.Add(boomBlock.Position + new Vector3(j, k));
-							}
-						}
-					}
-
-					break;
-				case BlockType.BOOM_SURROUND:
-					for (int j = -Constants.BOOM_SURROUND_SIZE; j <= Constants.BOOM_SURROUND_SIZE; j++) {
-						for (int k = -Constants.BOOM_SURROUND_SIZE; k <= Constants.BOOM_SURROUND_SIZE; k++) {
-							explodedBlocks.Add(boomBlock.Position + new Vector3(j, k));
-						}
-					}
-
-					break;
-				case BlockType.BOOM_LINE:
-					if ((int) boomBlock.Direction % 2 == 1) { // Vertical
-						for (int j = 0; j < Constants.BOARD_HEIGHT; j++) {
-							explodedBlocks.Add(new Vector3(boomBlock.Position.x, j));
-						}
-					} else { // Horizontal
-						for (int j = 0; j < Constants.BOARD_WIDTH; j++) {
-							explodedBlocks.Add(new Vector3(j, boomBlock.Position.y));
-						}
-					}
-
-					break;
-			}
+	public Block GetBlockAtPosition (Vector3 position) {
+		RaycastHit2D hit = Physics2D.Raycast(position + Vector3.back, Vector3.forward);
+		if (hit) {
+			return hit.transform.GetComponent<Block>( );
 		}
-		boomBlocks.Clear( );
 
-		// Remove all blocks that are to be exploded from the board
-		List<Block> blocksToRemove = new List<Block>( );
-		for (int i = 0; i < explodedBlocks.Count; i++) {
-			Block block = GetBlockAtPosition(explodedBlocks[i]);
-
-			if (block != null) {
-				blocksToRemove.Add(block);
-			}
-		}
-		RemoveBlocksFromBoard(blocksToRemove);
+		return null;
 	}
 
-	public void AddMinoToBoard (Mino mino) {
-		// Add all blocks that are part of the mino to the board
-		while (mino.transform.childCount > 0) {
-			Block block = mino.transform.GetChild(0).GetComponent<Block>( );
-
-			AddBlockToBoard(block);
-
-			if (block.Type != BlockType.NONE) {
-				boomBlocks.Add(block);
-			}
-		}
-		Destroy(mino.gameObject);
-
-		ExplodeBoomBlocks( );
-
-		SpawnMino( );
-	}
-
-	private void AddBlockToBoard (Block block) {
-		if (block == null) {
-			return;
-		}
-
-		// Get the surrounding block groups of the block that was just added
-		List<BlockGroup> blockGroups = GetSurroundingBlockGroups(block.Position);
-
-		// If the block has no surrounding block groups, create a new one
-		if (blockGroups.Count == 0) {
-			BlockGroup blockGroup = Instantiate(blockGroupPrefab, Vector3.zero, Quaternion.identity).GetComponent<BlockGroup>( );
-			blockGroup.transform.SetParent(transform, true);
-			block.transform.SetParent(blockGroup.transform, true);
-		} else {
-			// If the block has one or more block groups surrounding it, merge those groups together and add it to the merged block group
-			block.transform.SetParent(MergeBlockGroups(blockGroups).transform, true);
-		}
-	}
-
-	private void RemoveBlocksFromBoard (List<Block> blocks) {
-		List<BlockGroup> changedBlockGroups = new List<BlockGroup>( );
-
-		// Destroy all of the blocks in the parameter array
-		// Also keep track of all the block groups that may have been modified
-		while (blocks.Count > 0) {
-			if (blocks[0].BlockGroup != null && !changedBlockGroups.Contains(blocks[0].BlockGroup)) {
-				changedBlockGroups.Add(blocks[0].BlockGroup);
-			}
-
-			// Destroy the block object
-			DestroyImmediate(blocks[0].gameObject);
-			blocks.RemoveAt(0);
-		}
-
-		// If there were block groups that may have been changed, they need to be updated
-		if (changedBlockGroups.Count > 0) {
-			// Merge all possibly changed block groups together
-			BlockGroup blockGroup = MergeBlockGroups(changedBlockGroups);
-			// Store the blocks that are in the block group in a temp array
-			List<Block> tempBlocks = new List<Block>(blockGroup.transform.GetComponentsInChildren<Block>( ));
-
-			// Remove all of the blocks from the block group
-			foreach (Block tempBlock in tempBlocks) {
-				tempBlock.transform.SetParent(transform, true);
-			}
-
-			// Re-add all of the blocks to the board, which will update their block groups
-			foreach (Block tempBlock in tempBlocks) {
-				AddBlockToBoard(tempBlock);
-			}
-		}
-	}
-
-	public List<BlockGroup> GetSurroundingBlockGroups (Vector3 position) {
+	public List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
 		List<BlockGroup> surroundingGroups = new List<BlockGroup>( );
+
+		foreach (Block neighborBlock in GetSurroundingBlocks(block)) {
+			// If there is a block at the neighboring position and it has a new block group, add it to the surrounding block group list
+			// Also, make sure the neighbor block does or does not have the same group as the block parameter
+			bool isNewBlockGroup = (neighborBlock.BlockGroup != null && !surroundingGroups.Contains(neighborBlock.BlockGroup));
+			bool isExcludedBlockGroup = (excludeCurrentBlockGroup && neighborBlock.BlockGroup == block.BlockGroup);
+
+			if (isNewBlockGroup && !isExcludedBlockGroup) {
+				surroundingGroups.Add(neighborBlock.BlockGroup);
+			}
+		}
+
+		return surroundingGroups;
+	}
+
+	public List<Block> GetSurroundingBlocks (Block block, bool excludeNullBlocks = true) {
+		List<Block> surroundingBlocks = new List<Block>( );
 
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
@@ -235,25 +339,19 @@ public class Board : MonoBehaviour {
 					continue;
 				}
 
-				Block block = GetBlockAtPosition(position + new Vector3(i, j));
+				Block neighborBlock = GetBlockAtPosition(block.Position + new Vector3(i, j));
 
-				// If there is a block at the neighboring position and it has a new block group, add it to the surrounding block group list
-				if (block != null && block.BlockGroup != null && !surroundingGroups.Contains(block.BlockGroup)) {
-					surroundingGroups.Add(block.BlockGroup);
+				// If there is a block at the neighboring position, add it to the list
+				if (excludeNullBlocks || neighborBlock != null) {
+					surroundingBlocks.Add(neighborBlock);
 				}
 			}
 		}
 
-		return surroundingGroups;
+		return surroundingBlocks;
 	}
 
-	private BlockGroup MergeBlockGroups (List<BlockGroup> blockGroups) {
-		// Merge all block groups that are part of the parameter array into one block group
-		while (blockGroups.Count > 1) {
-			blockGroups[1].MergeToBlockGroup(blockGroups[0]);
-			blockGroups.RemoveAt(1);
-		}
-
-		return blockGroups[0];
-	}
+	// EXCLUDE NULL BLOCKS FROM BEING FILTERED OUT IN GETSURROUNDINGBLOCKS
+	// CHANGED BLOCK PARAMETER BACK TO POSITION PARAMETER BECAUSE OF NULL BLOCKS
+	// GETCARDINALPOSITIONS METHOD
 }

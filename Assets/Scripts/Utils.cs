@@ -39,17 +39,7 @@ public static class Utils {
 		return new Vector3Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
 	}
 
-	public static Vector2Int Vect2Round (Vector2 vector) {
-		return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
-	}
-
-	public static List<Transform> GetImmediateChildren (Transform transform) {
-		List<Transform> children = new List<Transform>( );
-
-		foreach (Transform child in transform) {
-			children.Add(child);
-		}
-
-		return children;
+	public static bool IsEven (int value) {
+		return (value % 2 == 0);
 	}
 }

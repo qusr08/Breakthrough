@@ -42,6 +42,12 @@ public class Block : MonoBehaviour {
 		}
 	}
 
+	public bool IsBoomBlock {
+		get {
+			return (Type != BlockType.NONE);
+		}
+	}
+
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -76,5 +82,56 @@ public class Block : MonoBehaviour {
 
 	public void SetDirection (BlockDirection direction) {
 		Direction = direction;
+	}
+
+	public bool IsWithinRange (Block block) {
+		bool negative = (Direction == BlockDirection.LEFT || Direction == BlockDirection.DOWN);
+		// Calculate the bounds of this block
+		int minX = -1, maxX = -1, minY = -1, maxY = -1;
+
+		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
+		switch (Type) {
+			case BlockType.BOOM_DIRECTION:
+				if (Utils.IsEven((int) Direction)) { // Horizontal
+					minX = (int) Position.x + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
+					maxX = (int) Position.x + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
+					minY = (int) Position.y - 1;
+					maxY = (int) Position.y + 1;
+				} else { // Vertical
+					minX = (int) Position.x - 1;
+					maxX = (int) Position.x + 1;
+					minY = (int) Position.y + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
+					maxY = (int) Position.y + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
+				}
+
+				break;
+			case BlockType.BOOM_LINE:
+				if (Utils.IsEven((int) Direction)) { // Horizontal
+					minX = 0;
+					maxX = Constants.BOARD_WIDTH;
+					minY = (int) Position.y;
+					maxY = (int) Position.y;
+				} else { // Vertical
+					minX = (int) Position.x;
+					maxX = (int) Position.x;
+					minY = 0;
+					maxY = Constants.BOARD_HEIGHT;
+				}
+
+				break;
+			case BlockType.BOOM_SURROUND:
+				minX = (int) Position.x - Constants.BOOM_SURROUND_SIZE;
+				maxX = (int) Position.x + Constants.BOOM_SURROUND_SIZE;
+				minY = (int) Position.y - Constants.BOOM_SURROUND_SIZE;
+				maxY = (int) Position.y + Constants.BOOM_SURROUND_SIZE;
+
+				break;
+		}
+
+		// Check to see if the block position is within the bounds of the block
+		bool inX = (block.Position.x >= minX && block.Position.x <= maxX);
+		bool inY = (block.Position.y >= minY && block.Position.y <= maxY);
+
+		return (inX && inY);
 	}
 }
