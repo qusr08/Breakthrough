@@ -84,7 +84,7 @@ public class Block : MonoBehaviour {
 		Direction = direction;
 	}
 
-	public bool IsWithinRange (Block block) {
+	public bool IsWithinRange (Vector3 position) {
 		bool negative = (Direction == BlockDirection.LEFT || Direction == BlockDirection.DOWN);
 		// Calculate the bounds of this block
 		int minX = -1, maxX = -1, minY = -1, maxY = -1;
@@ -129,8 +129,8 @@ public class Block : MonoBehaviour {
 		}
 
 		// Check to see if the block position is within the bounds of the block
-		bool inX = (block.Position.x >= minX && block.Position.x <= maxX);
-		bool inY = (block.Position.y >= minY && block.Position.y <= maxY);
+		bool inX = (position.x >= minX && position.x <= maxX);
+		bool inY = (position.y >= minY && position.y <= maxY);
 
 		return (inX && inY);
 	}

@@ -4,6 +4,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/*
+ * NOTE: THERE IS SOME ERROR WITH BOOM BLOCKS NOT EXPLODING CORRECTLY
+ * 
+ * I THINK IT HAS SOMETHING TO DO WITH THE BLOCK GROUPS, BUT I AM UNSURE
+ * 
+ * ALL THREE BOOM BLOCKS ARE EFFECTED
+ */
+
 public enum BoardUpdateState {
 	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
 }
@@ -16,7 +24,7 @@ public class Board : MonoBehaviour {
 	[SerializeField] private SpriteRenderer spriteRenderer;
 
 	// TODO: Change this to some sort of tree list to make it easier to handle
-	private List<List<List<Block>>> explodingBlockFrames;
+	private List<List<List<Vector3>>> explodingBlockFrames;
 	private float prevExplodeTime;
 
 	private BoardUpdateState _boardUpdateState;
@@ -39,6 +47,10 @@ public class Board : MonoBehaviour {
 					UpdateBlockGroups( );
 
 					explodingBlockFrames.Clear( );
+
+					foreach (BlockGroup blockGroup in GetComponentsInChildren<BlockGroup>( )) {
+						blockGroup.CanMove = true;
+					}
 
 					break;
 			}
@@ -73,7 +85,7 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Awake ( ) {
-		explodingBlockFrames = new List<List<List<Block>>>( );
+		explodingBlockFrames = new List<List<List<Vector3>>>( );
 	}
 
 	private void Start ( ) {
@@ -123,6 +135,7 @@ public class Board : MonoBehaviour {
 				foreach (BlockGroup blockGroup in GetComponentsInChildren<BlockGroup>( )) {
 					if (blockGroup.CanMove) {
 						blockGroupsCanMove = true;
+
 						break;
 					}
 				}
@@ -173,11 +186,11 @@ public class Board : MonoBehaviour {
 				}
 
 				// Loops through each block that will explode on the current frame
-				foreach (Block block in explodingBlockFrames[i][frameIndex]) {
+				foreach (Vector3 position in explodingBlockFrames[i][frameIndex]) {
 					// Add all neighboring blocks to this current block to the next frame
-					foreach (Block neighborBlock in GetSurroundingBlocks(block)) {
+					foreach (Vector3 neighborPosition in Utils.GetCardinalPositions(position)) {
 						// If a neighbor is found, then there will be a next frame of the explosion
-						if (AddExplodingBlock(neighborBlock, i, frameIndex + 1)) {
+						if (AddExplodingBlock(neighborPosition, i, frameIndex + 1)) {
 							foundExplodedBlock = true;
 						}
 					}
@@ -219,31 +232,30 @@ public class Board : MonoBehaviour {
 		Destroy(blockGroups[mergeToGroupIndex].gameObject);
 	}
 
-	private bool AddExplodingBlock (Block block, int blockFramesIndex, int frameIndex) {
-		// Make sure the block is within range of the boom block and is not anther boom block
-		if (!explodingBlockFrames[blockFramesIndex][0][0].IsWithinRange(block) || block.IsBoomBlock) {
-			return false;
-		}
-
+	private bool AddExplodingBlock (Vector3 position, int blockFramesIndex, int frameIndex) {
 		// Check to see if the block has already been added to a frame 
-		foreach (List<Block> blockFrame in explodingBlockFrames[blockFramesIndex]) {
-			if (blockFrame.Contains(block)) {
+		foreach (List<Vector3> frame in explodingBlockFrames[blockFramesIndex]) {
+			if (frame.Contains(position)) {
 				return false;
 			}
 		}
 
-		// Make sure the block frame list is big enough for the frame index
-		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
-			explodingBlockFrames[blockFramesIndex].Add(new List<Block>( ));
+		// Check to see if the position is within the range of the boom block
+		if (!GetBlockAtPosition(explodingBlockFrames[blockFramesIndex][0][0]).IsWithinRange(position)) {
+			return false;
 		}
 
-		explodingBlockFrames[blockFramesIndex][frameIndex].Add(block);
+		// Make sure the block frame list is big enough for the frame index
+		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
+			explodingBlockFrames[blockFramesIndex].Add(new List<Vector3>( ));
+		}
+		explodingBlockFrames[blockFramesIndex][frameIndex].Add(position);
 
 		return true;
 	}
 
 	private void AddBoomBlock (Block block) {
-		explodingBlockFrames.Add(new List<List<Block>>( ) { new List<Block>( ) { block } });
+		explodingBlockFrames.Add(new List<List<Vector3>>( ) { new List<Vector3>( ) { block.Position } });
 	}
 
 	public void AddMinoToBoard (Mino mino) {
@@ -281,7 +293,9 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	private void RemoveBlockFromBoard (Block block) {
+	private void RemoveBlockFromBoard (Vector3 position) {
+		Block block = GetBlockAtPosition(position);
+
 		// Make sure the block exists
 		if (block == null) {
 			return;
@@ -315,7 +329,7 @@ public class Board : MonoBehaviour {
 	public List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
 		List<BlockGroup> surroundingGroups = new List<BlockGroup>( );
 
-		foreach (Block neighborBlock in GetSurroundingBlocks(block)) {
+		foreach (Block neighborBlock in GetSurroundingBlocks(block.Position)) {
 			// If there is a block at the neighboring position and it has a new block group, add it to the surrounding block group list
 			// Also, make sure the neighbor block does or does not have the same group as the block parameter
 			bool isNewBlockGroup = (neighborBlock.BlockGroup != null && !surroundingGroups.Contains(neighborBlock.BlockGroup));
@@ -329,29 +343,18 @@ public class Board : MonoBehaviour {
 		return surroundingGroups;
 	}
 
-	public List<Block> GetSurroundingBlocks (Block block, bool excludeNullBlocks = true) {
+	public List<Block> GetSurroundingBlocks (Vector3 position, bool excludeNullBlocks = true) {
 		List<Block> surroundingBlocks = new List<Block>( );
 
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				// Only get the four cardinal directions around the position
-				if (Mathf.Abs(i) == Mathf.Abs(j)) {
-					continue;
-				}
+		foreach (Vector3 cardinalPosition in Utils.GetCardinalPositions(position)) {
+			Block neighborBlock = GetBlockAtPosition(cardinalPosition);
 
-				Block neighborBlock = GetBlockAtPosition(block.Position + new Vector3(i, j));
-
-				// If there is a block at the neighboring position, add it to the list
-				if (excludeNullBlocks || neighborBlock != null) {
-					surroundingBlocks.Add(neighborBlock);
-				}
+			// If there is a block at the neighboring position, add it to the list
+			if (!excludeNullBlocks || (excludeNullBlocks && neighborBlock != null)) {
+				surroundingBlocks.Add(neighborBlock);
 			}
 		}
 
 		return surroundingBlocks;
 	}
-
-	// EXCLUDE NULL BLOCKS FROM BEING FILTERED OUT IN GETSURROUNDINGBLOCKS
-	// CHANGED BLOCK PARAMETER BACK TO POSITION PARAMETER BECAUSE OF NULL BLOCKS
-	// GETCARDINALPOSITIONS METHOD
 }

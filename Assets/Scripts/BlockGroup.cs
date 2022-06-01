@@ -36,6 +36,10 @@ public class BlockGroup : MonoBehaviour {
 	private void Update ( ) {
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
 
+		if (board.BoardUpdateState != BoardUpdateState.UPDATING_BLOCK_GROUPS) {
+			return;
+		}
+
 		// Move the board group down if it is able to
 		if (Time.time - prevFallTime > Constants.MINO_FALL_TIME_ACCELERATED) {
 			CanMove = Move(Vector3.down);

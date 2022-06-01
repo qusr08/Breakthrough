@@ -42,4 +42,13 @@ public static class Utils {
 	public static bool IsEven (int value) {
 		return (value % 2 == 0);
 	}
+
+	public static List<Vector3> GetCardinalPositions (Vector3 position) {
+		return new List<Vector3>( ) {
+			position + Vector3.right,
+			position + Vector3.down,
+			position + Vector3.left,
+			position + Vector3.up
+		};
+	}
 }
