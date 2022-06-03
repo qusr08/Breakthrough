@@ -23,7 +23,7 @@ public static class Constants {
 
 	public const int BOOM_SURROUND_SIZE = 2;
 	public const int BOOM_DIRECTION_SIZE = 4;
-	public const float BOOM_ANIMATION_SPEED = 0.1f;
+	public const float BOOM_ANIMATION_SPEED = 0.05f;
 
 	public const float CLOSE_ENOUGH = 0.01f;
 }

@@ -42,6 +42,10 @@ public class Board : MonoBehaviour {
 				case BoardUpdateState.UPDATING_BOOM_BLOCKS:
 					UpdateExplodingBlockFrames( );
 
+					if (explodingBlockFrames.Count > 0) {
+						Debug.Log(explodingBlockFrames[0].Count);
+					}
+
 					break;
 				case BoardUpdateState.UPDATING_BLOCK_GROUPS:
 					UpdateBlockGroups( );
@@ -294,8 +298,10 @@ public class Board : MonoBehaviour {
 	}
 
 	private void RemoveBlockFromBoard (Vector3 position) {
-		Block block = GetBlockAtPosition(position);
+		RemoveBlockFromBoard(GetBlockAtPosition(position));
+	}
 
+	private void RemoveBlockFromBoard (Block block) {
 		// Make sure the block exists
 		if (block == null) {
 			return;

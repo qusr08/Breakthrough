@@ -87,21 +87,21 @@ public class Block : MonoBehaviour {
 	public bool IsWithinRange (Vector3 position) {
 		bool negative = (Direction == BlockDirection.LEFT || Direction == BlockDirection.DOWN);
 		// Calculate the bounds of this block
-		int minX = -1, maxX = -1, minY = -1, maxY = -1;
+		float minX = -1, maxX = -1, minY = -1, maxY = -1;
 
 		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
 		switch (Type) {
 			case BlockType.BOOM_DIRECTION:
 				if (Utils.IsEven((int) Direction)) { // Horizontal
-					minX = (int) Position.x + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
-					maxX = (int) Position.x + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
-					minY = (int) Position.y - 1;
-					maxY = (int) Position.y + 1;
+					minX = Position.x + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
+					maxX = Position.x + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
+					minY = Position.y - 1;
+					maxY = Position.y + 1;
 				} else { // Vertical
-					minX = (int) Position.x - 1;
-					maxX = (int) Position.x + 1;
-					minY = (int) Position.y + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
-					maxY = (int) Position.y + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
+					minX = Position.x - 1;
+					maxX = Position.x + 1;
+					minY = Position.y + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
+					maxY = Position.y + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
 				}
 
 				break;
@@ -109,21 +109,21 @@ public class Block : MonoBehaviour {
 				if (Utils.IsEven((int) Direction)) { // Horizontal
 					minX = 0;
 					maxX = Constants.BOARD_WIDTH;
-					minY = (int) Position.y;
-					maxY = (int) Position.y;
+					minY = Position.y;
+					maxY = Position.y;
 				} else { // Vertical
-					minX = (int) Position.x;
-					maxX = (int) Position.x;
+					minX = Position.x;
+					maxX = Position.x;
 					minY = 0;
 					maxY = Constants.BOARD_HEIGHT;
 				}
 
 				break;
 			case BlockType.BOOM_SURROUND:
-				minX = (int) Position.x - Constants.BOOM_SURROUND_SIZE;
-				maxX = (int) Position.x + Constants.BOOM_SURROUND_SIZE;
-				minY = (int) Position.y - Constants.BOOM_SURROUND_SIZE;
-				maxY = (int) Position.y + Constants.BOOM_SURROUND_SIZE;
+				minX = Position.x - Constants.BOOM_SURROUND_SIZE;
+				maxX = Position.x + Constants.BOOM_SURROUND_SIZE;
+				minY = Position.y - Constants.BOOM_SURROUND_SIZE;
+				maxY = Position.y + Constants.BOOM_SURROUND_SIZE;
 
 				break;
 		}
