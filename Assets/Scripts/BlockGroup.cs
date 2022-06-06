@@ -30,6 +30,7 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	private void Start ( ) {
+		CanMove = true;
 		moveTo = transform.position;
 	}
 

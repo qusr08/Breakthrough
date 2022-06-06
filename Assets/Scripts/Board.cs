@@ -2,22 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-/*
- * NOTE: THERE IS SOME ERROR WITH BOOM BLOCKS NOT EXPLODING CORRECTLY
- * 
- * I THINK IT HAS SOMETHING TO DO WITH THE BLOCK GROUPS, BUT I AM UNSURE
- * 
- * ALL THREE BOOM BLOCKS ARE EFFECTED
- */
+// TODO: Clean up code overall in this file
 
 public enum BoardUpdateState {
 	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
 }
 
 public class Board : MonoBehaviour {
-	[SerializeField] private GameObject blockPrefab;
+	[SerializeField] private GameObject wallBlockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
 	[SerializeField] private GameObject[ ] minoPrefabs;
 	[Space]
@@ -42,19 +35,9 @@ public class Board : MonoBehaviour {
 				case BoardUpdateState.UPDATING_BOOM_BLOCKS:
 					UpdateExplodingBlockFrames( );
 
-					if (explodingBlockFrames.Count > 0) {
-						Debug.Log(explodingBlockFrames[0].Count);
-					}
-
 					break;
 				case BoardUpdateState.UPDATING_BLOCK_GROUPS:
 					UpdateBlockGroups( );
-
-					explodingBlockFrames.Clear( );
-
-					foreach (BlockGroup blockGroup in GetComponentsInChildren<BlockGroup>( )) {
-						blockGroup.CanMove = true;
-					}
 
 					break;
 			}
@@ -127,6 +110,8 @@ public class Board : MonoBehaviour {
 					// If there are no more boom blocks to explode, switch the update state
 					if (explodingBlockFrames.Count == 0) {
 						BoardUpdateState = BoardUpdateState.UPDATING_BLOCK_GROUPS;
+
+						explodingBlockFrames.Clear( );
 					}
 
 					prevExplodeTime = Time.time;
@@ -153,7 +138,7 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	public void GenerateRandomMino ( ) {
+	private void GenerateRandomMino ( ) {
 		// The spawn position is going to be near the top middle of the board
 		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
@@ -162,12 +147,18 @@ public class Board : MonoBehaviour {
 	}
 
 	private void GenerateWall ( ) {
-		for (int i = 0; i < Constants.BOARD_WIDTH; i++) {
-			for (int j = Constants.BOARD_BOTTOM_PADDING; j < Constants.BOARD_WALL_HEIGHT + Constants.BOARD_BOTTOM_PADDING; j++) {
-				Block block = Instantiate(blockPrefab, new Vector3(i, j), Quaternion.identity).GetComponent<Block>( );
-				block.SetColor(BlockColor.COAL);
+		float[ , ] wallValues = Utils.RandomPerlinNoiseGrid(Constants.BOARD_WIDTH, Constants.BOARD_WALL_HEIGHT, Constants.BOARD_WALL_GEN_SMOOTHNESS, 4);
 
-				AddBlockToBoard(block);
+		for (int i = 0; i < Constants.BOARD_WIDTH; i++) {
+			for (int j = 0; j < Constants.BOARD_WALL_HEIGHT; j++) {
+				int perlinValue = (int) wallValues[i, j];
+
+				if (perlinValue > 0) {
+					Block block = Instantiate(wallBlockPrefab, new Vector3(i, j + Constants.BOARD_BOTTOM_PADDING), Quaternion.identity).GetComponent<Block>( );
+					block.Health = perlinValue;
+
+					AddBlockToBoard(block);
+				}
 			}
 		}
 	}
@@ -310,7 +301,7 @@ public class Board : MonoBehaviour {
 		// Make sure the block group that the block was a part of is marked as modified
 		block.BlockGroup.IsModified = true;
 
-		DestroyImmediate(block.gameObject);
+		block.Health--;
 	}
 
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {
@@ -332,7 +323,7 @@ public class Board : MonoBehaviour {
 		return null;
 	}
 
-	public List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
+	private List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
 		List<BlockGroup> surroundingGroups = new List<BlockGroup>( );
 
 		foreach (Block neighborBlock in GetSurroundingBlocks(block.Position)) {
@@ -349,7 +340,7 @@ public class Board : MonoBehaviour {
 		return surroundingGroups;
 	}
 
-	public List<Block> GetSurroundingBlocks (Vector3 position, bool excludeNullBlocks = true) {
+	private List<Block> GetSurroundingBlocks (Vector3 position, bool excludeNullBlocks = true) {
 		List<Block> surroundingBlocks = new List<Block>( );
 
 		foreach (Vector3 cardinalPosition in Utils.GetCardinalPositions(position)) {

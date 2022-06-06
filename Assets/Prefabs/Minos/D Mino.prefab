@@ -121,6 +121,10 @@ PrefabInstance:
       propertyPath: PercentBomb
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
 --- !u!4 &1250583270787213743 stripped
@@ -198,6 +202,10 @@ PrefabInstance:
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: PercentBomb
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -277,6 +285,10 @@ PrefabInstance:
       propertyPath: PercentBomb
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
 --- !u!4 &5220260353653298059 stripped
@@ -354,6 +366,10 @@ PrefabInstance:
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: PercentBomb
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -433,6 +449,10 @@ PrefabInstance:
       propertyPath: PercentBomb
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
 --- !u!4 &5963732550028552026 stripped
@@ -510,6 +530,10 @@ PrefabInstance:
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: PercentBomb
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: _blockColor
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}

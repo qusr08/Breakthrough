@@ -51,4 +51,20 @@ public static class Utils {
 			position + Vector3.up
 		};
 	}
+
+	public static float[ , ] RandomPerlinNoiseGrid (int width, int height, float step, float scale) {
+		float[ , ] noise = new float[width, height];
+		float seed = Random.Range(-100f, 100f);
+
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				float x = seed + (i * step);
+				float y = seed + (j * step);
+
+				noise[i, j] = Mathf.PerlinNoise(x, y) * scale;
+			}
+		}
+
+		return noise;
+	}
 }

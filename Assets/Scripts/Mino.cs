@@ -30,13 +30,13 @@ public class Mino : MonoBehaviour {
 			// Set that block to be a random type of boom block
 			switch (Random.Range(0, 3)) {
 				case 0:
-					block.SetType(BlockType.BOOM_DIRECTION);
+					block.BlockType = BlockType.BOOM_DIRECTION;
 					break;
 				case 1:
-					block.SetType(BlockType.BOOM_SURROUND);
+					block.BlockType = BlockType.BOOM_SURROUND;
 					break;
 				case 2:
-					block.SetType(BlockType.BOOM_LINE);
+					block.BlockType = BlockType.BOOM_LINE;
 					break;
 			}
 		}
@@ -148,7 +148,7 @@ public class Mino : MonoBehaviour {
 		rotateTo += Vector3.forward * degRotation;
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
-			block.SetDirection((BlockDirection) (((int) block.Direction - Constants.MINO_ROTATE_DIRECTION) % 4));
+			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - Constants.MINO_ROTATE_DIRECTION) % 4);
 		}
 
 		return true;

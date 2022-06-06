@@ -4,11 +4,11 @@ using UnityEditor;
 using UnityEngine;
 
 public enum BlockColor {
-	YELLOW, COAL, DARK_BLUE, TEAL, DARK_PINK, ORANGE, GREEN, LIGHT_BLUE, PURPLE, LIGHT_PINK
+	DARK_PURPLE, DARK_COAL, DARK_BLUE, TEAL, DARK_PINK, ORANGE, GREEN, LIGHT_BLUE, LIGHT_PURPLE, LIGHT_PINK, MEDIUM_COAL, LIGHT_COAL
 }
 
 public enum BlockType {
-	NONE, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND
+	NONE, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND, CRACK_STAGE_1, CRACK_STAGE_2
 }
 
 public enum BlockDirection {
@@ -16,15 +16,66 @@ public enum BlockDirection {
 }
 
 public class Block : MonoBehaviour {
-	[SerializeField] private Sprite[ ] colors;
-	[SerializeField] private Sprite[ ] icons;
+	[SerializeField] protected Sprite[ ] colors;
+	[SerializeField] protected Sprite[ ] icons;
 	[Space]
-	[SerializeField] private SpriteRenderer spriteRenderer;
-	[SerializeField] private SpriteRenderer iconSpriteRenderer;
+	[SerializeField] protected SpriteRenderer spriteRenderer;
+	[SerializeField] protected SpriteRenderer iconSpriteRenderer;
 	[Space]
-	[SerializeField] public BlockColor Color = BlockColor.COAL;
-	[SerializeField] public BlockType Type = BlockType.NONE;
-	[SerializeField] public BlockDirection Direction = BlockDirection.RIGHT;
+	[SerializeField] protected BlockColor _blockColor = BlockColor.DARK_COAL;
+	[SerializeField] protected BlockType _blockType = BlockType.NONE;
+	[SerializeField] protected BlockDirection _blockDirection = BlockDirection.RIGHT;
+	[SerializeField] protected int _health = 1;
+
+	public BlockColor BlockColor {
+		get {
+			return _blockColor;
+		}
+
+		set {
+			_blockColor = value;
+
+			spriteRenderer.sprite = colors[(int) _blockColor];
+		}
+	}
+
+	public BlockType BlockType {
+		get {
+			return _blockType;
+		}
+
+		set {
+			_blockType = value;
+
+			iconSpriteRenderer.sprite = icons[(int) _blockType];
+		}
+	}
+
+	public BlockDirection BlockDirection {
+		get {
+			return _blockDirection;
+		}
+
+		set {
+			_blockDirection = value;
+
+			// transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * Constants.MINO_ROTATE_DIRECTION * 90);
+		}
+	}
+
+	public virtual int Health {
+		get {
+			return _health;
+		}
+
+		set {
+			_health = value;
+
+			if (_health <= 0) {
+				DestroyImmediate(gameObject);
+			}
+		}
+	}
 
 	public Vector3 Position {
 		get {
@@ -44,7 +95,7 @@ public class Block : MonoBehaviour {
 
 	public bool IsBoomBlock {
 		get {
-			return (Type != BlockType.NONE);
+			return (BlockType != BlockType.NONE);
 		}
 	}
 
@@ -59,40 +110,26 @@ public class Block : MonoBehaviour {
 		}
 #endif
 
-		SetColor(Color);
-		SetType(Type);
+		BlockColor = _blockColor;
+		BlockType = _blockType;
 	}
 
 	private void Start ( ) {
-		SetDirection((BlockDirection) Random.Range(0, 4));
+		BlockDirection = (BlockDirection) Random.Range(0, 4);
 
 		transform.localScale = new Vector3(Constants.MINO_TILE_SCALE, Constants.MINO_TILE_SCALE, 1);
-		transform.eulerAngles = new Vector3(0, 0, (int) Direction * Constants.MINO_ROTATE_DIRECTION * 90);
-	}
-
-	public void SetColor (BlockColor color) {
-		Color = color;
-		spriteRenderer.sprite = colors[(int) Color];
-	}
-
-	public void SetType (BlockType type) {
-		Type = type;
-		iconSpriteRenderer.sprite = icons[(int) Type];
-	}
-
-	public void SetDirection (BlockDirection direction) {
-		Direction = direction;
+		transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * Constants.MINO_ROTATE_DIRECTION * 90);
 	}
 
 	public bool IsWithinRange (Vector3 position) {
-		bool negative = (Direction == BlockDirection.LEFT || Direction == BlockDirection.DOWN);
+		bool negative = (BlockDirection == BlockDirection.LEFT || BlockDirection == BlockDirection.DOWN);
 		// Calculate the bounds of this block
 		float minX = -1, maxX = -1, minY = -1, maxY = -1;
 
 		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
-		switch (Type) {
+		switch (BlockType) {
 			case BlockType.BOOM_DIRECTION:
-				if (Utils.IsEven((int) Direction)) { // Horizontal
+				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = Position.x + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
 					maxX = Position.x + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
 					minY = Position.y - 1;
@@ -106,7 +143,7 @@ public class Block : MonoBehaviour {
 
 				break;
 			case BlockType.BOOM_LINE:
-				if (Utils.IsEven((int) Direction)) { // Horizontal
+				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = 0;
 					maxX = Constants.BOARD_WIDTH;
 					minY = Position.y;

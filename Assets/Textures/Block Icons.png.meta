@@ -20,6 +20,12 @@ TextureImporter:
   - first:
       213: -8494576548519730528
     second: Block Icons_2
+  - first:
+      213: 6991391508621923385
+    second: Block Icons_3
+  - first:
+      213: 894105402191158637
+    second: Block Icons_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -179,6 +185,48 @@ TextureImporter:
       bones: []
       spriteID: 0a22e14a2a33d1a80800000000000000
       internalID: -8494576548519730528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Block Icons_3
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 0
+        width: 400
+        height: 400
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 934971df889660160800000000000000
+      internalID: 6991391508621923385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Block Icons_4
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 0
+        width: 400
+        height: 400
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6d9c594020886c00800000000000000
+      internalID: 894105402191158637
       vertices: []
       indices: 
       edges: []
