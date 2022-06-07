@@ -27,6 +27,7 @@ public class Block : MonoBehaviour {
 	[SerializeField] private BlockType _blockType = BlockType.NONE;
 	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
 	[SerializeField] private int _health = 1;
+	[SerializeField] private Texture2D colorTexture;
 
 	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.LIGHT_COAL, BlockColor.MEDIUM_COAL, BlockColor.DARK_COAL };
 
@@ -39,6 +40,15 @@ public class Block : MonoBehaviour {
 			_blockColor = value;
 
 			spriteRenderer.sprite = colors[(int) _blockColor];
+
+			// TODO: Make this less laggy
+			int textureX = (int) spriteRenderer.sprite.rect.x;
+			int textureY = (int) spriteRenderer.sprite.rect.y;
+			int textureWidth = (int) spriteRenderer.sprite.rect.width;
+			int textureHeight = (int) spriteRenderer.sprite.rect.height;
+			colorTexture = new Texture2D(textureWidth, textureHeight);
+			colorTexture.SetPixels(spriteRenderer.sprite.texture.GetPixels(textureX, textureY, textureWidth, textureHeight));
+			colorTexture.Apply( );
 		}
 	}
 	public BlockType BlockType {
@@ -176,8 +186,9 @@ public class Block : MonoBehaviour {
 	}
 
 	private void SpawnBlockParticles ( ) {
-		BlockParticleSystem blockParticles = Instantiate(blockParticlesPrefab, transform.position, Quaternion.identity).GetComponent<BlockParticleSystem>( );
-		blockParticles.SetSprite(spriteRenderer.sprite);
+		ParticleSystem blockParticles = Instantiate(blockParticlesPrefab, transform.position, Quaternion.identity).GetComponent<ParticleSystem>( );
+		blockParticles.GetComponent<ParticleSystemRenderer>( ).material.SetTexture("_MainTex", colorTexture);
+
 		blockParticles.Play( );
 	}
 }

@@ -124,6 +124,7 @@ MonoBehaviour:
   _blockType: 0
   _blockDirection: 0
   _health: 1
+  colorTexture: {fileID: 0}
 --- !u!61 &4643309964704893963
 BoxCollider2D:
   m_ObjectHideFlags: 0
