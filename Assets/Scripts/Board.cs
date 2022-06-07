@@ -10,7 +10,7 @@ public enum BoardUpdateState {
 }
 
 public class Board : MonoBehaviour {
-	[SerializeField] private GameObject wallBlockPrefab;
+	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
 	[SerializeField] private GameObject[ ] minoPrefabs;
 	[Space]
@@ -154,7 +154,7 @@ public class Board : MonoBehaviour {
 				int perlinValue = (int) wallValues[i, j];
 
 				if (perlinValue > 0) {
-					Block block = Instantiate(wallBlockPrefab, new Vector3(i, j + Constants.BOARD_BOTTOM_PADDING), Quaternion.identity).GetComponent<Block>( );
+					Block block = Instantiate(blockPrefab, new Vector3(i, j + Constants.BOARD_BOTTOM_PADDING), Quaternion.identity).GetComponent<Block>( );
 					block.Health = perlinValue;
 
 					AddBlockToBoard(block);
@@ -207,7 +207,7 @@ public class Board : MonoBehaviour {
 				if (mergeToGroupIndex < 0) {
 					mergeToGroupIndex = i;
 				} else {
-					BlockGroup.MergeToBlockGroup(blockGroups[i], blockGroups[mergeToGroupIndex]);
+					blockGroups[i].MergeToBlockGroup(blockGroups[mergeToGroupIndex]);
 				}
 			}
 		}
@@ -288,11 +288,11 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	private void RemoveBlockFromBoard (Vector3 position) {
+	public void RemoveBlockFromBoard (Vector3 position) {
 		RemoveBlockFromBoard(GetBlockAtPosition(position));
 	}
 
-	private void RemoveBlockFromBoard (Block block) {
+	public void RemoveBlockFromBoard (Block block, bool ignoreHealth = false) {
 		// Make sure the block exists
 		if (block == null) {
 			return;
@@ -301,7 +301,7 @@ public class Board : MonoBehaviour {
 		// Make sure the block group that the block was a part of is marked as modified
 		block.BlockGroup.IsModified = true;
 
-		block.Health--;
+		block.Health -= (ignoreHealth ? block.Health : 1);
 	}
 
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {

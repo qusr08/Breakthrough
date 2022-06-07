@@ -16,16 +16,19 @@ public enum BlockDirection {
 }
 
 public class Block : MonoBehaviour {
-	[SerializeField] protected Sprite[ ] colors;
-	[SerializeField] protected Sprite[ ] icons;
+	[SerializeField] private GameObject blockParticlesPrefab;
+	[SerializeField] private Sprite[ ] colors;
+	[SerializeField] private Sprite[ ] icons;
 	[Space]
-	[SerializeField] protected SpriteRenderer spriteRenderer;
-	[SerializeField] protected SpriteRenderer iconSpriteRenderer;
+	[SerializeField] private SpriteRenderer spriteRenderer;
+	[SerializeField] private SpriteRenderer iconSpriteRenderer;
 	[Space]
-	[SerializeField] protected BlockColor _blockColor = BlockColor.DARK_COAL;
-	[SerializeField] protected BlockType _blockType = BlockType.NONE;
-	[SerializeField] protected BlockDirection _blockDirection = BlockDirection.RIGHT;
-	[SerializeField] protected int _health = 1;
+	[SerializeField] private BlockColor _blockColor = BlockColor.DARK_COAL;
+	[SerializeField] private BlockType _blockType = BlockType.NONE;
+	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
+	[SerializeField] private int _health = 1;
+
+	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.LIGHT_COAL, BlockColor.MEDIUM_COAL, BlockColor.DARK_COAL };
 
 	public BlockColor BlockColor {
 		get {
@@ -38,7 +41,6 @@ public class Block : MonoBehaviour {
 			spriteRenderer.sprite = colors[(int) _blockColor];
 		}
 	}
-
 	public BlockType BlockType {
 		get {
 			return _blockType;
@@ -50,7 +52,6 @@ public class Block : MonoBehaviour {
 			iconSpriteRenderer.sprite = icons[(int) _blockType];
 		}
 	}
-
 	public BlockDirection BlockDirection {
 		get {
 			return _blockDirection;
@@ -62,21 +63,25 @@ public class Block : MonoBehaviour {
 			// transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * Constants.MINO_ROTATE_DIRECTION * 90);
 		}
 	}
-
-	public virtual int Health {
+	public int Health {
 		get {
 			return _health;
 		}
 
 		set {
+			if (value < _health) {
+				SpawnBlockParticles( );
+			}
+
 			_health = value;
 
 			if (_health <= 0) {
 				DestroyImmediate(gameObject);
+			} else {
+				BlockColor = wallColorStages[_health - 1];
 			}
 		}
 	}
-
 	public Vector3 Position {
 		get {
 			return transform.position;
@@ -86,13 +91,11 @@ public class Block : MonoBehaviour {
 			transform.position = value;
 		}
 	}
-
 	public BlockGroup BlockGroup {
 		get {
 			return transform.parent.GetComponent<BlockGroup>( );
 		}
 	}
-
 	public bool IsBoomBlock {
 		get {
 			return (BlockType != BlockType.NONE);
@@ -100,9 +103,9 @@ public class Block : MonoBehaviour {
 	}
 
 #if UNITY_EDITOR
-	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-	protected void _OnValidate ( ) {
+	private void _OnValidate ( ) {
 #if UNITY_EDITOR
 		EditorApplication.delayCall -= _OnValidate;
 		if (this == null) {
@@ -170,5 +173,11 @@ public class Block : MonoBehaviour {
 		bool inY = (position.y >= minY && position.y <= maxY);
 
 		return (inX && inY);
+	}
+
+	private void SpawnBlockParticles ( ) {
+		BlockParticleSystem blockParticles = Instantiate(blockParticlesPrefab, transform.position, Quaternion.identity).GetComponent<BlockParticleSystem>( );
+		blockParticles.SetSprite(spriteRenderer.sprite);
+		blockParticles.Play( );
 	}
 }

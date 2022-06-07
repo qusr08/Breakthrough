@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392859e2e06cbea4988d8adea7b0b4aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockParticlesPrefab: {fileID: 2993162176935200072, guid: a38fee3d5f1afa14fa65d0e0d95dd0de, type: 3}
   colors:
   - {fileID: -5289665525090968965, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
   - {fileID: -2551702780114040751, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
