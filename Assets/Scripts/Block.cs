@@ -128,6 +128,8 @@ public class Block : MonoBehaviour {
 	}
 
 	private void Start ( ) {
+		BlockColor = _blockColor;
+		BlockType = _blockType;
 		BlockDirection = (BlockDirection) Random.Range(0, 4);
 
 		transform.localScale = new Vector3(Constants.MINO_TILE_SCALE, Constants.MINO_TILE_SCALE, 1);
