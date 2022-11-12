@@ -100,7 +100,7 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	public void MergeToBlockGroup (BlockGroup blockGroup) {
-		// TODO: Make it so the smaller group merges with the bigger group to save processing time
+		/// TODO: Make it so the smaller group merges with the bigger group to save processing time
 
 		while (Size > 0) {
 			this[0].transform.SetParent(blockGroup.transform, true);

@@ -46,8 +46,8 @@ public class Mino : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		// TODO: Make it so a mino is not placed if it is moving/rotating
-		//		     Probably have to alter prevTime or something to prevent that from happening
+		/// TODO: Make it so a mino is not placed if it is moving/rotating
+		///		     Probably have to alter prevTime or something to prevent that from happening
 
 		// Smoothly transition the position and rotation of the mino
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
@@ -132,8 +132,8 @@ public class Mino : MonoBehaviour {
 	}
 
 	private bool Rotate (float degRotation) {
-		// TODO: Move mino to satisfy a rotation
-		//		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
+		/// TODO: Move mino to satisfy a rotation
+		///		     This could be used for something like t spins, but also just in general is a good thing to have to make the gameplay experience better
 
 		// Check to see if any of the blocks that are part of this mino collide with other blocks that are part of the board already
 		// If they do, then this mino cannot rotate in that direction

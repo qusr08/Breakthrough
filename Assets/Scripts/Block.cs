@@ -8,7 +8,7 @@ public enum BlockColor {
 }
 
 public enum BlockType {
-	NONE, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND, CRACK_STAGE_1, CRACK_STAGE_2
+	NORMAL, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND, CRACK_STAGE_1, CRACK_STAGE_2
 }
 
 public enum BlockDirection {
@@ -24,7 +24,7 @@ public class Block : MonoBehaviour {
 	[SerializeField] private SpriteRenderer iconSpriteRenderer;
 	[Space]
 	[SerializeField] private BlockColor _blockColor = BlockColor.DARK_COAL;
-	[SerializeField] private BlockType _blockType = BlockType.NONE;
+	[SerializeField] private BlockType _blockType = BlockType.NORMAL;
 	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
 	[SerializeField] private int _health = 1;
 	[SerializeField] private Texture2D colorTexture;
@@ -41,7 +41,7 @@ public class Block : MonoBehaviour {
 
 			spriteRenderer.sprite = colors[(int) _blockColor];
 
-			// TODO: Make this less laggy
+			/// TODO: Make this less laggy
 			int textureX = (int) spriteRenderer.sprite.rect.x;
 			int textureY = (int) spriteRenderer.sprite.rect.y;
 			int textureWidth = (int) spriteRenderer.sprite.rect.width;
@@ -108,7 +108,7 @@ public class Block : MonoBehaviour {
 	}
 	public bool IsBoomBlock {
 		get {
-			return (BlockType != BlockType.NONE);
+			return (BlockType != BlockType.NORMAL);
 		}
 	}
 

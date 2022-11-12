@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-// TODO: Clean up code overall in this file
+/// TODO: Clean up code overall in this file
 
 public enum BoardUpdateState {
 	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
@@ -16,7 +16,7 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 
-	// TODO: Change this to some sort of tree list to make it easier to handle
+	/// TODO: Change this to some sort of tree list to make it easier to handle
 	private List<List<List<Vector3>>> explodingBlockFrames;
 	private float prevExplodeTime;
 
@@ -68,7 +68,7 @@ public class Board : MonoBehaviour {
 		Camera.main.orthographicSize = (Constants.BOARD_HEIGHT + Constants.BOARD_CAMERA_PADDING) / 2f;
 		Camera.main.transform.position = new Vector3(positionX, positionY, Camera.main.transform.position.z);
 
-		// TODO: Set the UI element sizes when the board is resized
+		/// TODO: Set the UI element sizes when the board is resized
 	}
 
 	private void Awake ( ) {
@@ -80,13 +80,11 @@ public class Board : MonoBehaviour {
 
 		BoardUpdateState = BoardUpdateState.PLACING_MINO;
 
-		// TODO: Add game loop
+		/// TODO: Add game loop
 	}
 
 	private void Update ( ) {
 		switch (BoardUpdateState) {
-			case BoardUpdateState.PLACING_MINO:
-				break;
 			case BoardUpdateState.UPDATING_BOOM_BLOCKS:
 				// If a certain amount of time has passed, destroy the next frame of blocks
 				if (Time.time - prevExplodeTime > Constants.BOOM_ANIMATION_SPEED) {
@@ -138,7 +136,12 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Generate a random Mino at the top of the game board.
+	/// </summary>
 	private void GenerateRandomMino ( ) {
+		/// TODO: Make getting specific transform positions on the board cleaner in code
+
 		// The spawn position is going to be near the top middle of the board
 		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
@@ -196,6 +199,32 @@ public class Board : MonoBehaviour {
 		} while (foundExplodedBlock);
 	}
 
+	private bool AddExplodingBlock (Vector3 position, int blockFramesIndex, int frameIndex) {
+		// Check to see if the block has already been added to a frame
+		foreach (List<Vector3> frame in explodingBlockFrames[blockFramesIndex]) {
+			if (frame.Contains(position)) {
+				return false;
+			}
+		}
+
+		// Check to see if the position is within the range of the boom block
+		if (!GetBlockAtPosition(explodingBlockFrames[blockFramesIndex][0][0]).IsWithinRange(position)) {
+			return false;
+		}
+
+		// Make sure the block frame list is big enough for the frame index
+		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
+			explodingBlockFrames[blockFramesIndex].Add(new List<Vector3>( ));
+		}
+		explodingBlockFrames[blockFramesIndex][frameIndex].Add(position);
+
+		return true;
+	}
+
+	private void AddBoomBlock (Block block) {
+		explodingBlockFrames.Add(new List<List<Vector3>>( ) { new List<Vector3>( ) { block.Position } });
+	}
+
 	private void UpdateBlockGroups ( ) {
 		// Get the current block groups on the board
 		BlockGroup[ ] blockGroups = GetComponentsInChildren<BlockGroup>( );
@@ -227,32 +256,10 @@ public class Board : MonoBehaviour {
 		Destroy(blockGroups[mergeToGroupIndex].gameObject);
 	}
 
-	private bool AddExplodingBlock (Vector3 position, int blockFramesIndex, int frameIndex) {
-		// Check to see if the block has already been added to a frame 
-		foreach (List<Vector3> frame in explodingBlockFrames[blockFramesIndex]) {
-			if (frame.Contains(position)) {
-				return false;
-			}
-		}
-
-		// Check to see if the position is within the range of the boom block
-		if (!GetBlockAtPosition(explodingBlockFrames[blockFramesIndex][0][0]).IsWithinRange(position)) {
-			return false;
-		}
-
-		// Make sure the block frame list is big enough for the frame index
-		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
-			explodingBlockFrames[blockFramesIndex].Add(new List<Vector3>( ));
-		}
-		explodingBlockFrames[blockFramesIndex][frameIndex].Add(position);
-
-		return true;
-	}
-
-	private void AddBoomBlock (Block block) {
-		explodingBlockFrames.Add(new List<List<Vector3>>( ) { new List<Vector3>( ) { block.Position } });
-	}
-
+	/// <summary>
+	/// Add a Mino object to the game board.
+	/// </summary>
+	/// <param name="mino"></param>
 	public void AddMinoToBoard (Mino mino) {
 		// Add all blocks that are part of the mino to the board
 		while (mino.transform.childCount > 0) {
