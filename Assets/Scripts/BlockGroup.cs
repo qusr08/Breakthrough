@@ -26,8 +26,12 @@ public class BlockGroup : MonoBehaviour {
 		}
 	}
 
-	private void Awake ( ) {
+	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
+	}
+
+	private void Awake ( ) {
+		OnValidate( );
 	}
 
 	private void Start ( ) {

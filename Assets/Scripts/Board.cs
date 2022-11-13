@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-/// TODO: Clean up code overall in this file
-
 public enum BoardUpdateState {
 	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
 }
@@ -15,8 +13,15 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject[ ] minoPrefabs;
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
+	[SerializeField] private BoardArea gameOverArea;
+	[SerializeField] private BoardArea breakthroughArea;
+	[SerializeField] public Mino ActiveMino = null;
 
 	/// TODO: Change this to some sort of tree list to make it easier to handle
+	// A 3D list for tracking the blocks that will be exploding as a result of placed boom blocks
+	// The first list tracks each boom block
+	// The second list is each frame of the boom block exploding
+	// The third list is each position that will be destroyed during that frame
 	private List<List<List<Vector3>>> explodingBlockFrames;
 	private float prevExplodeTime;
 
@@ -137,7 +142,7 @@ public class Board : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Generate a random Mino at the top of the game board.
+	/// Generate a random Mino at the top of the game board
 	/// </summary>
 	private void GenerateRandomMino ( ) {
 		/// TODO: Make getting specific transform positions on the board cleaner in code
@@ -146,7 +151,7 @@ public class Board : MonoBehaviour {
 		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
 
 		// Spawn a random type of mino
-		Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity);
+		ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
 	}
 
 	private void GenerateWall ( ) {
@@ -177,17 +182,26 @@ public class Board : MonoBehaviour {
 			foundExplodedBlock = false;
 
 			// Loops through each boom block that has been added to the board
+			// As a new Mino was added to the board, all Boom Blocks to be exploded were added to the list
 			for (int i = 0; i < explodingBlockFrames.Count; i++) {
 				// Some boom blocks may have longer frame sequences
+				// If the current boom block being checked has no more frames (as in it has been fully exploded),
+				//		do not try to get more frames for it
 				if (explodingBlockFrames[i].Count <= frameIndex) {
 					continue;
 				}
 
-				// Loops through each block that will explode on the current frame
+				// Loops through each boom block that will explode on the current frame
 				foreach (Vector3 position in explodingBlockFrames[i][frameIndex]) {
-					// Add all neighboring blocks to this current block to the next frame
+					// Add all neighboring blocks to this current boom block to the next frame
 					foreach (Vector3 neighborPosition in Utils.GetCardinalPositions(position)) {
+						/// TODO: Add a check to stop the frame if there are no more blocks to be exploded
+						///			If there is just a long string where no blocks are destroyed, there is no need to pause the game and wait
+						///			This happens a lot with vertical line boom blocks
+
 						// If a neighbor is found, then there will be a next frame of the explosion
+						// The neighbor block might be null, but the position is still within range of the boom block so it counts
+						// Otherwise blocks across a gap will not be affected by the boom block which is not the behavior desired
 						if (AddExplodingBlock(neighborPosition, i, frameIndex + 1)) {
 							foundExplodedBlock = true;
 						}
@@ -201,6 +215,7 @@ public class Board : MonoBehaviour {
 
 	private bool AddExplodingBlock (Vector3 position, int blockFramesIndex, int frameIndex) {
 		// Check to see if the block has already been added to a frame
+		// This makes sure that a loop does not occur of block positions being repeatedly destroyed
 		foreach (List<Vector3> frame in explodingBlockFrames[blockFramesIndex]) {
 			if (frame.Contains(position)) {
 				return false;
@@ -208,6 +223,7 @@ public class Board : MonoBehaviour {
 		}
 
 		// Check to see if the position is within the range of the boom block
+		// The first block in the first frame of the exploding blocks is always going to be the starting boom block
 		if (!GetBlockAtPosition(explodingBlockFrames[blockFramesIndex][0][0]).IsWithinRange(position)) {
 			return false;
 		}
@@ -257,13 +273,25 @@ public class Board : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Add a Mino object to the game board.
+	/// Add a Mino object to the game board
 	/// </summary>
-	/// <param name="mino"></param>
-	public void AddMinoToBoard (Mino mino) {
+	/// <param name="mino">The Mino to add</param>
+	public void AddLandedMinoToBoard (Mino mino) {
+		if (breakthroughArea.IsMinoInArea) {
+			Debug.Log("Breakthrough!");
+		}
+
+		if (gameOverArea.IsMinoInArea) {
+			Debug.Log("Game Over!");
+		}
+
 		// Add all blocks that are part of the mino to the board
 		while (mino.transform.childCount > 0) {
 			AddBlockToBoard(mino.transform.GetChild(0).GetComponent<Block>( ));
+		}
+
+		if (mino == ActiveMino) {
+			ActiveMino = null;
 		}
 
 		Destroy(mino.gameObject);
@@ -271,6 +299,11 @@ public class Board : MonoBehaviour {
 		BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
 	}
 
+	/// <summary>
+	/// Add a block to the game board
+	/// </summary>
+	/// <param name="block">The block to be added</param>
+	/// <param name="excludeCurrentBlockGroup">Whether or not the exclude the block's current block group when checking for surrounding block groups</param>
 	private void AddBlockToBoard (Block block, bool excludeCurrentBlockGroup = false) {
 		// Make sure the block exists
 		if (block == null) {
@@ -282,8 +315,11 @@ public class Board : MonoBehaviour {
 
 		// If the block has no surrounding block groups, create a new one
 		if (blockGroups.Count == 0) {
+			// Create a new blockgroup gameobject
 			BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform.position, Quaternion.identity).GetComponent<BlockGroup>( );
+			// Set the parent of the blockgroup gameobject to this board gameobject
 			blockGroup.transform.SetParent(transform, true);
+			// Set the block parent to the new blockgroup gameobject
 			block.transform.SetParent(blockGroup.transform, true);
 		} else {
 			// If the block has one or more block groups surrounding it, merge those groups together and add it to the merged block group
@@ -330,6 +366,12 @@ public class Board : MonoBehaviour {
 		return null;
 	}
 
+	/// <summary>
+	/// Get the surrounding block groups to a current block
+	/// </summary>
+	/// <param name="block">The block to check around</param>
+	/// <param name="excludeCurrentBlockGroup">Whether or not the exclude the block's current block group when checking for surrounding block groups</param>
+	/// <returns>A list of all surrounding block groups</returns>
 	private List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
 		List<BlockGroup> surroundingGroups = new List<BlockGroup>( );
 
@@ -347,6 +389,12 @@ public class Board : MonoBehaviour {
 		return surroundingGroups;
 	}
 
+	/// <summary>
+	/// Get all surrounding blocks to a position vector
+	/// </summary>
+	/// <param name="position">The position to check around</param>
+	/// <param name="excludeNullBlocks">Whether or not to exclude null values from the returned list</param>
+	/// <returns>A list of all surrounding blocks to the position vector</returns>
 	private List<Block> GetSurroundingBlocks (Vector3 position, bool excludeNullBlocks = true) {
 		List<Block> surroundingBlocks = new List<Block>( );
 

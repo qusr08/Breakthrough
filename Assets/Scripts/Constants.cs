@@ -5,11 +5,14 @@ using UnityEngine;
 public static class Constants {
 	public const int BOARD_WIDTH = 16;
 	public const int BOARD_HEIGHT = 28;
-	public const int BOARD_TOP_PADDING = 4;
+	public const int BOARD_TOP_PADDING = 2;
 	public const int BOARD_BOTTOM_PADDING = 2;
 	public const int BOARD_CAMERA_PADDING = 3;
 	public const int BOARD_WALL_HEIGHT = 7; // Varies with level
 	public const float BOARD_WALL_GEN_SMOOTHNESS = 0.4f;
+
+	public const float BOARD_AREA_LINE_HEIGHT = 0.25f;
+	public const float BOARD_AREA_TINT_ALPHA = 0.1f;
 
 	public const float MINO_PERCENT_BOOM = 0.6f; // Might vary with level
 	public const float MINO_FALL_TIME = 1.0f; // Varies with level

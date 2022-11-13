@@ -5,23 +5,37 @@ using UnityEngine;
 public class Mino : MonoBehaviour {
 	[SerializeField] private Board board;
 
-	private bool canMove;
+	// Whether or not the Mino can move
+	public bool CanMove;
 
+	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
+	// The previous time that this Mino moved left or right on the game board
 	private float prevMoveTime;
+	// The previous time that this Mino rotated on the game board
 	private float prevRotateTime;
-	private float placeTime;
+	// A timer to determine when the Mino should be placed
+	// When it reaches 0 the Mino gets placed on the board
+	// It can be reset by either moving or rotating the Mino
+	private float placeTimer;
 
+	// Vectors to move or rotate the Mino to
 	private Vector3 moveTo;
 	private Vector3 moveVelocity;
 	private Vector3 rotateTo;
 	private Vector3 rotateVelocity;
 
-	private void Awake ( ) {
+	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 	}
 
+	private void Awake ( ) {
+		OnValidate( );
+	}
+
 	private void Start ( ) {
+		/// TODO: Make multiple boom blocks able to spawn
+
 		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
 		if (Random.Range(0f, 1f) < Constants.MINO_PERCENT_BOOM) {
 			// Get a random child block of the mino
@@ -41,7 +55,7 @@ public class Mino : MonoBehaviour {
 			}
 		}
 
-		canMove = true;
+		CanMove = true;
 		moveTo = transform.position;
 	}
 
@@ -53,18 +67,18 @@ public class Mino : MonoBehaviour {
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
 		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, Constants.MINO_DAMP_SPEED);
 
-		// If the mino is placed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
-		if (!canMove) {
+		// If the mino landed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
+		if (!CanMove) {
 			// Debug.Log($"position: {moveTo} == {transform.position} | rotation: {rotateTo} == {transform.eulerAngles}");
 			// Debug.Log($"position {Utils.CompareVectors(moveTo, transform.position)} | rotation: {Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)}");
 
-			if (Utils.CompareVectors(moveTo, transform.position) && Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)) {
+			if (Utils.CompareVectors(moveTo, transform.position) && Utils.CompareDegreeAngleVectors(rotateTo, transform.eulerAngles)) {
 				// The position and rotation of the mino might be a little off, so make sure it is exact before the mino is deactivated
 				transform.eulerAngles = rotateTo;
 				transform.position = moveTo;
 
-				// Add the blocks to the board
-				board.AddMinoToBoard(this);
+				// Add the Mino to the game board
+				board.AddLandedMinoToBoard(this);
 			}
 
 			return;
@@ -73,7 +87,7 @@ public class Mino : MonoBehaviour {
 		// Get the horizontal and vertical inputs
 		float hori = Input.GetAxisRaw("Horizontal");
 		float vert = Input.GetAxisRaw("Vertical");
-		placeTime -= Time.deltaTime;
+		placeTimer -= Time.deltaTime;
 
 		// Move the mino left and right
 		if (hori == 0) {
@@ -87,7 +101,7 @@ public class Mino : MonoBehaviour {
 				} else {
 					prevMoveTime = Time.time - Constants.MINO_MOVE_TIME_ACCELERATED;
 				}
-				placeTime = Constants.MINO_PLACE_TIME;
+				placeTimer = Constants.MINO_PLACE_TIME;
 			}
 		}
 
@@ -96,7 +110,7 @@ public class Mino : MonoBehaviour {
 			prevRotateTime = 0;
 		} else if (vert > 0 && Time.time - prevRotateTime > Constants.MINO_ROTATE_TIME) {
 			if (Rotate(Constants.MINO_ROTATE_DIRECTION * 90)) {
-				placeTime = Constants.MINO_PLACE_TIME;
+				placeTimer = Constants.MINO_PLACE_TIME;
 				prevRotateTime = Time.time;
 			}
 		}
@@ -107,10 +121,10 @@ public class Mino : MonoBehaviour {
 				prevFallTime = Time.time;
 
 				if (vert < 0) {
-					placeTime = Constants.MINO_PLACE_TIME;
+					placeTimer = Constants.MINO_PLACE_TIME;
 				}
-			} else if (placeTime <= 0) {
-				canMove = false;
+			} else if (placeTimer <= 0) {
+				CanMove = false;
 			}
 		}
 	}
