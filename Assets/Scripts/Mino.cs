@@ -3,10 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Mino : MonoBehaviour {
-	[SerializeField] private Board board;
+	public const float PERCENT_BOOM = 0.6f; // Might vary with level
+	public const float FALL_TIME = 1.0f; // Varies with level
+	public const float FALL_TIME_ACCELERATED = FALL_TIME / 20f;
+	public const float MOVE_TIME = 0.15f;
+	public const float MOVE_TIME_ACCELERATED = MOVE_TIME / 2f;
+	public const float ROTATE_TIME = 0.25f;
+	public const float PLACE_TIME = 0.75f;
+	public const float ROTATE_DIRECTION = -1; // Clockwise
+	public const float TILE_SCALE = 0.95f;
+	public const float DAMP_SPEED = 0.04f;
 
-	// Whether or not the Mino can move
-	public bool CanMove;
+	[Header("Scene GameObjects")]
+	[SerializeField] private Board board;
+	[Header("Properties")]
+	[Tooltip("Whether or not the Mino can move.")]
+	[SerializeField] public bool CanMove;
 
 	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
@@ -35,9 +47,11 @@ public class Mino : MonoBehaviour {
 
 	private void Start ( ) {
 		/// TODO: Make multiple boom blocks able to spawn
+		/// TODO: Make percentage chance to spawn with a boom block change over time to make it fair
+		///			Guarentee the player will have a boom block in X minos
 
 		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
-		if (Random.Range(0f, 1f) < Constants.MINO_PERCENT_BOOM) {
+		if (Random.Range(0f, 1f) < PERCENT_BOOM) {
 			// Get a random child block of the mino
 			Block block = GetComponentsInChildren<Block>( )[Random.Range(0, transform.childCount)];
 
@@ -64,8 +78,8 @@ public class Mino : MonoBehaviour {
 		///		     Probably have to alter prevTime or something to prevent that from happening
 
 		// Smoothly transition the position and rotation of the mino
-		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
-		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, Constants.MINO_DAMP_SPEED);
+		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, DAMP_SPEED);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, DAMP_SPEED);
 
 		// If the mino landed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
 		if (!CanMove) {
@@ -92,36 +106,36 @@ public class Mino : MonoBehaviour {
 		// Move the mino left and right
 		if (hori == 0) {
 			prevMoveTime = 0;
-		} else if (Time.time - prevMoveTime > Constants.MINO_MOVE_TIME) {
+		} else if (Time.time - prevMoveTime > MOVE_TIME) {
 			if (Move(Vector3.right * hori)) {
 				// Make the first horizontal movement of the player be a longer delay in between movements
 				// This prevents the player having to quickly tap the left and right buttons to move one board space
 				if (prevMoveTime == 0) {
 					prevMoveTime = Time.time;
 				} else {
-					prevMoveTime = Time.time - Constants.MINO_MOVE_TIME_ACCELERATED;
+					prevMoveTime = Time.time - MOVE_TIME_ACCELERATED;
 				}
-				placeTimer = Constants.MINO_PLACE_TIME;
+				placeTimer = PLACE_TIME;
 			}
 		}
 
 		// Rotate the mino
 		if (vert == 0) {
 			prevRotateTime = 0;
-		} else if (vert > 0 && Time.time - prevRotateTime > Constants.MINO_ROTATE_TIME) {
-			if (Rotate(Constants.MINO_ROTATE_DIRECTION * 90)) {
-				placeTimer = Constants.MINO_PLACE_TIME;
+		} else if (vert > 0 && Time.time - prevRotateTime > ROTATE_TIME) {
+			if (Rotate(ROTATE_DIRECTION * 90)) {
+				placeTimer = PLACE_TIME;
 				prevRotateTime = Time.time;
 			}
 		}
 
 		// Have the mino automatically fall downwards, or fall faster downwards according to player input
-		if (Time.time - prevFallTime > (vert < 0 ? Constants.MINO_FALL_TIME_ACCELERATED : Constants.MINO_FALL_TIME)) {
+		if (Time.time - prevFallTime > (vert < 0 ? FALL_TIME_ACCELERATED : FALL_TIME)) {
 			if (Move(Vector3.down)) {
 				prevFallTime = Time.time;
 
 				if (vert < 0) {
-					placeTimer = Constants.MINO_PLACE_TIME;
+					placeTimer = PLACE_TIME;
 				}
 			} else if (placeTimer <= 0) {
 				CanMove = false;
@@ -162,7 +176,7 @@ public class Mino : MonoBehaviour {
 		rotateTo += Vector3.forward * degRotation;
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
-			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - Constants.MINO_ROTATE_DIRECTION) % 4);
+			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - ROTATE_DIRECTION) % 4);
 		}
 
 		return true;

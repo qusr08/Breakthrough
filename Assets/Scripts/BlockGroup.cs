@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockGroup : MonoBehaviour {
+	[Header("Scene GameObjects")]
 	[SerializeField] private Board board;
-	[Space]
+	[Header("Properties")]
 	[SerializeField] public bool IsModified;
 	[SerializeField] public bool CanMove;
 	[SerializeField] public bool CanFallBelow;
@@ -41,7 +42,7 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Constants.MINO_DAMP_SPEED);
+		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, Mino.DAMP_SPEED);
 
 		if (board.BoardUpdateState != BoardUpdateState.UPDATING_BLOCK_GROUPS) {
 			return;
@@ -53,7 +54,7 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		// Move the board group down if it is able to
-		if (Time.time - prevFallTime > Constants.MINO_FALL_TIME_ACCELERATED) {
+		if (Time.time - prevFallTime > Mino.FALL_TIME_ACCELERATED) {
 			CanMove = Move(Vector3.down);
 
 			if (CanMove) {
@@ -78,13 +79,13 @@ public class BlockGroup : MonoBehaviour {
 			}
 
 			// If this block group can't fall below the bottom of the board but is trying to
-			if (!CanFallBelow && toPosition.y < Constants.BOARD_BOTTOM_PADDING) {
+			if (!CanFallBelow && toPosition.y < board.BottomPadding) {
 				// The block group can't move down then
 				isValidMove = false;
 			}
 
 			// If the current position of the block is below the bottom of the board
-			if (currPosition.y < Constants.BOARD_BOTTOM_PADDING) {
+			if (currPosition.y < board.BottomPadding) {
 				// Remove the block from the board
 				board.RemoveBlockFromBoard(this[i], true);
 			}
@@ -95,7 +96,7 @@ public class BlockGroup : MonoBehaviour {
 			moveTo += direction;
 
 			// If this block group makes a successful move that is not below the bottom of the board, then it can fall below the board
-			if (!CanFallBelow && moveTo.y >= Constants.BOARD_BOTTOM_PADDING) {
+			if (!CanFallBelow && moveTo.y >= board.BottomPadding) {
 				CanFallBelow = true;
 			}
 		}

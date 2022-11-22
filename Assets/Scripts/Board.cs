@@ -8,24 +8,32 @@ public enum BoardUpdateState {
 }
 
 public class Board : MonoBehaviour {
+	[Header("Prefabs")]
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
 	[SerializeField] private GameObject[ ] minoPrefabs;
-	[Space]
+	[Header("Components")]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private BoardArea gameOverArea;
 	[SerializeField] private BoardArea breakthroughArea;
+	[Header("Properties")]
+	[SerializeField] public int Width = 16;
+	[SerializeField] public int Height = 28;
+	[SerializeField] public int TopPadding = 2;
+	[SerializeField] public int BottomPadding = 2;
+	[SerializeField] public int CameraPadding = 3;
+	[SerializeField] public float BoomBlockAnimationSpeed = 0.05f;
+	[Space]
+	[SerializeField] private BoardUpdateState _boardUpdateState;
 	[SerializeField] public Mino ActiveMino = null;
+	
+	/// TODO: Have these change over time to increase the difficulty
+	private int wallHeight = 7;
+	private float wallSmoothness = 0.4f;
 
-	/// TODO: Change this to some sort of tree list to make it easier to handle
-	// A 3D list for tracking the blocks that will be exploding as a result of placed boom blocks
-	// The first list tracks each boom block
-	// The second list is each frame of the boom block exploding
-	// The third list is each position that will be destroyed during that frame
-	private List<List<List<Vector3>>> explodingBlockFrames;
-	private float prevExplodeTime;
+	private List<BoomBlockFrames> boomBlockFrames;
+	private float frameTimer = 0;
 
-	private BoardUpdateState _boardUpdateState;
 	public BoardUpdateState BoardUpdateState {
 		get {
 			return _boardUpdateState;
@@ -38,8 +46,6 @@ public class Board : MonoBehaviour {
 
 					break;
 				case BoardUpdateState.UPDATING_BOOM_BLOCKS:
-					UpdateExplodingBlockFrames( );
-
 					break;
 				case BoardUpdateState.UPDATING_BLOCK_GROUPS:
 					UpdateBlockGroups( );
@@ -64,20 +70,20 @@ public class Board : MonoBehaviour {
 
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		// This makes it easier when converting from piece transform position to a board array index
-		spriteRenderer.size = new Vector2(Constants.BOARD_WIDTH, Constants.BOARD_HEIGHT);
-		float positionX = (Constants.BOARD_WIDTH / 2) - (Constants.BOARD_WIDTH % 2 == 0 ? 0.5f : 0f);
-		float positionY = (Constants.BOARD_HEIGHT / 2) - (Constants.BOARD_HEIGHT % 2 == 0 ? 0.5f : 0f);
+		spriteRenderer.size = new Vector2(Width, Height);
+		float positionX = (Width / 2) - (Width % 2 == 0 ? 0.5f : 0f);
+		float positionY = (Height / 2) - (Height % 2 == 0 ? 0.5f : 0f);
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the camera orthographic size and position so it fits the entire board
-		Camera.main.orthographicSize = (Constants.BOARD_HEIGHT + Constants.BOARD_CAMERA_PADDING) / 2f;
+		Camera.main.orthographicSize = (Height + CameraPadding) / 2f;
 		Camera.main.transform.position = new Vector3(positionX, positionY, Camera.main.transform.position.z);
 
 		/// TODO: Set the UI element sizes when the board is resized
 	}
 
 	private void Awake ( ) {
-		explodingBlockFrames = new List<List<List<Vector3>>>( );
+		boomBlockFrames = new List<BoomBlockFrames>( );
 	}
 
 	private void Start ( ) {
@@ -91,33 +97,25 @@ public class Board : MonoBehaviour {
 	private void Update ( ) {
 		switch (BoardUpdateState) {
 			case BoardUpdateState.UPDATING_BOOM_BLOCKS:
+				frameTimer -= Time.deltaTime;
 				// If a certain amount of time has passed, destroy the next frame of blocks
-				if (Time.time - prevExplodeTime > Constants.BOOM_ANIMATION_SPEED) {
+				if (frameTimer < 0) {
 					// Loop through each of the boom blocks explosion frames
-					for (int i = explodingBlockFrames.Count - 1; i >= 0; i--) {
-						// Remove each block in the frame
-						while (explodingBlockFrames[i][0].Count > 0) {
-							RemoveBlockFromBoard(explodingBlockFrames[i][0][0]);
-							explodingBlockFrames[i][0].RemoveAt(0);
-						}
-
-						// Remove the current frame
-						explodingBlockFrames[i].RemoveAt(0);
+					for (int i = boomBlockFrames.Count - 1; i >= 0; i--) {
+						boomBlockFrames[i].DestroyFirstFrame( );
 
 						// If there are no more frames in the current boom block frame list, remove it from the main list
-						if (explodingBlockFrames[i].Count == 0) {
-							explodingBlockFrames.RemoveAt(i);
+						if (boomBlockFrames[i].Count == 0) {
+							boomBlockFrames.RemoveAt(i);
 						}
 					}
 
 					// If there are no more boom blocks to explode, switch the update state
-					if (explodingBlockFrames.Count == 0) {
+					if (boomBlockFrames.Count == 0) {
 						BoardUpdateState = BoardUpdateState.UPDATING_BLOCK_GROUPS;
-
-						explodingBlockFrames.Clear( );
 					}
 
-					prevExplodeTime = Time.time;
+					frameTimer = BoomBlockAnimationSpeed;
 				}
 
 				break;
@@ -141,28 +139,15 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	/// <summary>
-	/// Generate a random Mino at the top of the game board
-	/// </summary>
-	private void GenerateRandomMino ( ) {
-		/// TODO: Make getting specific transform positions on the board cleaner in code
-
-		// The spawn position is going to be near the top middle of the board
-		Vector3 spawnPosition = new Vector3((Constants.BOARD_WIDTH / 2) - 0.5f, Constants.BOARD_HEIGHT - Constants.BOARD_TOP_PADDING - 0.5f);
-
-		// Spawn a random type of mino
-		ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
-	}
-
 	private void GenerateWall ( ) {
-		float[ , ] wallValues = Utils.RandomPerlinNoiseGrid(Constants.BOARD_WIDTH, Constants.BOARD_WALL_HEIGHT, Constants.BOARD_WALL_GEN_SMOOTHNESS, 4);
+		float[ , ] wallValues = Utils.RandomPerlinNoiseGrid(Width, wallHeight, wallSmoothness, 4);
 
-		for (int i = 0; i < Constants.BOARD_WIDTH; i++) {
-			for (int j = 0; j < Constants.BOARD_WALL_HEIGHT; j++) {
+		for (int i = 0; i < Width; i++) {
+			for (int j = 0; j < wallHeight; j++) {
 				int perlinValue = (int) wallValues[i, j];
 
 				if (perlinValue > 0) {
-					Block block = Instantiate(blockPrefab, new Vector3(i, j + Constants.BOARD_BOTTOM_PADDING), Quaternion.identity).GetComponent<Block>( );
+					Block block = Instantiate(blockPrefab, new Vector3(i, j + BottomPadding), Quaternion.identity).GetComponent<Block>( );
 					block.Health = perlinValue;
 
 					AddBlockToBoard(block);
@@ -171,74 +156,44 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	private void UpdateExplodingBlockFrames ( ) {
-		// Whether or not a new block to be exploded was found
-		bool foundExplodedBlock;
-		// The index of the current frame within a block frame list
-		int frameIndex = 0;
+	/// <summary>
+	/// Generate a random Mino at the top of the game board
+	/// </summary>
+	private void GenerateRandomMino ( ) {
+		/// TODO: Make getting specific transform positions on the board cleaner in code
 
-		// Construct the frames of each boom block animation
-		do {
-			foundExplodedBlock = false;
+		// The spawn position is going to be near the top middle of the board
+		Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - TopPadding - 0.5f);
 
-			// Loops through each boom block that has been added to the board
-			// As a new Mino was added to the board, all Boom Blocks to be exploded were added to the list
-			for (int i = 0; i < explodingBlockFrames.Count; i++) {
-				// Some boom blocks may have longer frame sequences
-				// If the current boom block being checked has no more frames (as in it has been fully exploded),
-				//		do not try to get more frames for it
-				if (explodingBlockFrames[i].Count <= frameIndex) {
-					continue;
-				}
-
-				// Loops through each boom block that will explode on the current frame
-				foreach (Vector3 position in explodingBlockFrames[i][frameIndex]) {
-					// Add all neighboring blocks to this current boom block to the next frame
-					foreach (Vector3 neighborPosition in Utils.GetCardinalPositions(position)) {
-						/// TODO: Add a check to stop the frame if there are no more blocks to be exploded
-						///			If there is just a long string where no blocks are destroyed, there is no need to pause the game and wait
-						///			This happens a lot with vertical line boom blocks
-
-						// If a neighbor is found, then there will be a next frame of the explosion
-						// The neighbor block might be null, but the position is still within range of the boom block so it counts
-						// Otherwise blocks across a gap will not be affected by the boom block which is not the behavior desired
-						if (AddExplodingBlock(neighborPosition, i, frameIndex + 1)) {
-							foundExplodedBlock = true;
-						}
-					}
-				}
-			}
-
-			frameIndex++;
-		} while (foundExplodedBlock);
+		// Spawn a random type of mino
+		ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
 	}
 
-	private bool AddExplodingBlock (Vector3 position, int blockFramesIndex, int frameIndex) {
-		// Check to see if the block has already been added to a frame
-		// This makes sure that a loop does not occur of block positions being repeatedly destroyed
-		foreach (List<Vector3> frame in explodingBlockFrames[blockFramesIndex]) {
-			if (frame.Contains(position)) {
-				return false;
-			}
+	/// <summary>
+	/// Add a Mino object to the game board
+	/// </summary>
+	/// <param name="mino">The Mino to add</param>
+	public void AddLandedMinoToBoard (Mino mino) {
+		// Add all blocks that are part of the mino to the board
+		while (mino.transform.childCount > 0) {
+			AddBlockToBoard(mino.transform.GetChild(0).GetComponent<Block>( ));
 		}
 
-		// Check to see if the position is within the range of the boom block
-		// The first block in the first frame of the exploding blocks is always going to be the starting boom block
-		if (!GetBlockAtPosition(explodingBlockFrames[blockFramesIndex][0][0]).IsWithinRange(position)) {
-			return false;
+		if (mino == ActiveMino) {
+			ActiveMino = null;
 		}
 
-		// Make sure the block frame list is big enough for the frame index
-		while (explodingBlockFrames[blockFramesIndex].Count <= frameIndex) {
-			explodingBlockFrames[blockFramesIndex].Add(new List<Vector3>( ));
-		}
-		explodingBlockFrames[blockFramesIndex][frameIndex].Add(position);
+		Destroy(mino.gameObject);
 
-		return true;
+		BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
 	}
 
-	private void AddBoomBlock (Block block) {
-		explodingBlockFrames.Add(new List<List<Vector3>>( ) { new List<Vector3>( ) { block.Position } });
+	/// <summary>
+	/// Add a boom block that will be exploded.
+	/// </summary>
+	/// <param name="boomBlock">The boom block to add</param>
+	private void AddBoomBlock (Block boomBlock) {
+		boomBlockFrames.Add(new BoomBlockFrames(this, boomBlock));
 	}
 
 	private void UpdateBlockGroups ( ) {
@@ -270,33 +225,6 @@ public class Board : MonoBehaviour {
 
 		// Destroy this group once all blocks have been moved
 		Destroy(blockGroups[mergeToGroupIndex].gameObject);
-	}
-
-	/// <summary>
-	/// Add a Mino object to the game board
-	/// </summary>
-	/// <param name="mino">The Mino to add</param>
-	public void AddLandedMinoToBoard (Mino mino) {
-		if (breakthroughArea.IsMinoInArea) {
-			Debug.Log("Breakthrough!");
-		}
-
-		if (gameOverArea.IsMinoInArea) {
-			Debug.Log("Game Over!");
-		}
-
-		// Add all blocks that are part of the mino to the board
-		while (mino.transform.childCount > 0) {
-			AddBlockToBoard(mino.transform.GetChild(0).GetComponent<Block>( ));
-		}
-
-		if (mino == ActiveMino) {
-			ActiveMino = null;
-		}
-
-		Destroy(mino.gameObject);
-
-		BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
 	}
 
 	/// <summary>
@@ -350,7 +278,7 @@ public class Board : MonoBehaviour {
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {
 		Block block = GetBlockAtPosition(position);
 
-		bool isInBounds = (position.x >= 0 && position.x < Constants.BOARD_WIDTH && position.y >= 0 && position.y < Constants.BOARD_HEIGHT);
+		bool isInBounds = (position.x >= 0 && position.x < Width && position.y >= 0 && position.y < Height);
 		bool isBlockAtPosition = (block != null);
 		bool hasParentTransform = (parent != null && block != null && block.transform.parent == parent);
 

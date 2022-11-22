@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Sprites;
 using UnityEngine;
 
 public enum BlockColor {
@@ -16,18 +17,25 @@ public enum BlockDirection {
 }
 
 public class Block : MonoBehaviour {
+	[Header("Scene GameObjects")]
+	[SerializeField] private Board board;
+	[SerializeField] private GameManager gameManager;
+	[Header("Prefabs")]
 	[SerializeField] private GameObject blockParticlesPrefab;
-	[SerializeField] private Sprite[ ] colors;
-	[SerializeField] private Sprite[ ] icons;
-	[Space]
+	[Header("Components")]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private SpriteRenderer iconSpriteRenderer;
+	[Header("Properties")]
+	[SerializeField] public int SurroundBoomBlockSize = 2;
+	[SerializeField] public int DirectionalBoomBlockSize = 3;
 	[Space]
+	[SerializeField] private Sprite[ ] colors;
+	[SerializeField] private Sprite[ ] icons;
 	[SerializeField] private BlockColor _blockColor = BlockColor.DARK_COAL;
 	[SerializeField] private BlockType _blockType = BlockType.NORMAL;
 	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
 	[SerializeField] private int _health = 1;
-	[SerializeField] private Texture2D colorTexture;
+	[SerializeField] private Color spriteTextureColor;
 
 	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.LIGHT_COAL, BlockColor.MEDIUM_COAL, BlockColor.DARK_COAL };
 
@@ -41,14 +49,11 @@ public class Block : MonoBehaviour {
 
 			spriteRenderer.sprite = colors[(int) _blockColor];
 
-			/// TODO: Make this less laggy
 			int textureX = (int) spriteRenderer.sprite.rect.x;
 			int textureY = (int) spriteRenderer.sprite.rect.y;
 			int textureWidth = (int) spriteRenderer.sprite.rect.width;
 			int textureHeight = (int) spriteRenderer.sprite.rect.height;
-			colorTexture = new Texture2D(textureWidth, textureHeight);
-			colorTexture.SetPixels(spriteRenderer.sprite.texture.GetPixels(textureX, textureY, textureWidth, textureHeight));
-			colorTexture.Apply( );
+			spriteTextureColor = spriteRenderer.sprite.texture.GetPixel(textureX + (textureWidth / 2), textureY + (textureHeight / 2));
 		}
 	}
 	public BlockType BlockType {
@@ -70,7 +75,7 @@ public class Block : MonoBehaviour {
 		set {
 			_blockDirection = value;
 
-			// transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * Constants.MINO_ROTATE_DIRECTION * 90);
+			// transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * MINO_ROTATE_DIRECTION * 90);
 		}
 	}
 	public int Health {
@@ -86,6 +91,7 @@ public class Block : MonoBehaviour {
 			_health = value;
 
 			if (_health <= 0) {
+				gameManager.AddPoints(Position, gameManager.PointsPerDestroyedBlock);
 				DestroyImmediate(gameObject);
 			} else {
 				BlockColor = wallColorStages[_health - 1];
@@ -123,17 +129,22 @@ public class Block : MonoBehaviour {
 		}
 #endif
 
+		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
+
 		BlockColor = _blockColor;
 		BlockType = _blockType;
 	}
 
+	private void Awake ( ) {
+		OnValidate( );
+	}
+
 	private void Start ( ) {
-		BlockColor = _blockColor;
-		BlockType = _blockType;
 		BlockDirection = (BlockDirection) Random.Range(0, 4);
 
-		transform.localScale = new Vector3(Constants.MINO_TILE_SCALE, Constants.MINO_TILE_SCALE, 1);
-		transform.eulerAngles = new Vector3(0, 0, (int) _blockDirection * Constants.MINO_ROTATE_DIRECTION * 90);
+		transform.localScale = new Vector3(Mino.TILE_SCALE, Mino.TILE_SCALE, 1);
+		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * Mino.ROTATE_DIRECTION * 90);
 	}
 
 	public bool IsWithinRange (Vector3 position) {
@@ -145,37 +156,39 @@ public class Block : MonoBehaviour {
 		switch (BlockType) {
 			case BlockType.BOOM_DIRECTION:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
-					minX = Position.x + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
-					maxX = Position.x + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
-					minY = Position.y - 1;
-					maxY = Position.y + 1;
+					int layerSize = (int) Mathf.Abs(Position.x - position.x);
+					minX = Position.x + (negative ? -DirectionalBoomBlockSize : 1);
+					maxX = Position.x + (negative ? -1 : DirectionalBoomBlockSize);
+					minY = Position.y - layerSize;
+					maxY = Position.y + layerSize;
 				} else { // Vertical
-					minX = Position.x - 1;
-					maxX = Position.x + 1;
-					minY = Position.y + (negative ? -Constants.BOOM_DIRECTION_SIZE : 1);
-					maxY = Position.y + (negative ? -1 : Constants.BOOM_DIRECTION_SIZE);
+					int layerSize = (int) Mathf.Abs(Position.y - position.y);
+					minX = Position.x - layerSize;
+					maxX = Position.x + layerSize;
+					minY = Position.y + (negative ? -DirectionalBoomBlockSize : 1);
+					maxY = Position.y + (negative ? -1 : DirectionalBoomBlockSize);
 				}
 
 				break;
 			case BlockType.BOOM_LINE:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = 0;
-					maxX = Constants.BOARD_WIDTH;
+					maxX = board.Width;
 					minY = Position.y;
 					maxY = Position.y;
 				} else { // Vertical
 					minX = Position.x;
 					maxX = Position.x;
 					minY = 0;
-					maxY = Constants.BOARD_HEIGHT;
+					maxY = board.Height;
 				}
 
 				break;
 			case BlockType.BOOM_SURROUND:
-				minX = Position.x - Constants.BOOM_SURROUND_SIZE;
-				maxX = Position.x + Constants.BOOM_SURROUND_SIZE;
-				minY = Position.y - Constants.BOOM_SURROUND_SIZE;
-				maxY = Position.y + Constants.BOOM_SURROUND_SIZE;
+				minX = Position.x - SurroundBoomBlockSize;
+				maxX = Position.x + SurroundBoomBlockSize;
+				minY = Position.y - SurroundBoomBlockSize;
+				maxY = Position.y + SurroundBoomBlockSize;
 
 				break;
 		}
@@ -189,8 +202,10 @@ public class Block : MonoBehaviour {
 
 	private void SpawnBlockParticles ( ) {
 		ParticleSystem blockParticles = Instantiate(blockParticlesPrefab, transform.position, Quaternion.identity).GetComponent<ParticleSystem>( );
-		blockParticles.GetComponent<ParticleSystemRenderer>( ).material.SetTexture("_MainTex", colorTexture);
-
+		ParticleSystem.MainModule blockParticlesMainModule = blockParticles.main;
+		
+		blockParticlesMainModule.startColor = spriteTextureColor;
+		
 		blockParticles.Play( );
 	}
 }

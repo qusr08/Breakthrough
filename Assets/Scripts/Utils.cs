@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class Utils {
+	public const float CLOSE_ENOUGH = 0.01f;
+
 	/// <summary>
 	/// SmoothDamp function for rotation vectors
 	/// https://forum.unity.com/threads/quaternion-smoothdamp.793533/
@@ -40,7 +42,7 @@ public static class Utils {
 	/// <param name="vector2">The second position vector</param>
 	/// <returns>Whether the two position vectors are close enough to each other</returns>
 	public static bool CompareVectors (Vector3 vector1, Vector3 vector2) {
-		return ((vector1 - vector2).magnitude < Constants.CLOSE_ENOUGH);
+		return ((vector1 - vector2).magnitude < CLOSE_ENOUGH);
 	}
 
 	/// <summary>
