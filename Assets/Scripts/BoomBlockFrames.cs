@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BoomBlockFrames {
 	private Board board;
+	private GameManager gameManager;
 	private Block boomBlock;
+	private PointsPopup pointsPopup = null;
 
 	/// <summary>
 	/// A list of all the positions that will be exploded when triggered.
@@ -25,8 +27,9 @@ public class BoomBlockFrames {
 		}
 	}
 
-	public BoomBlockFrames (Board board, Block boomBlock) {
+	public BoomBlockFrames (Board board, GameManager gameManager, Block boomBlock) {
 		this.board = board;
+		this.gameManager = gameManager;
 		this.boomBlock = boomBlock;
 
 		CalculateFrames( );
@@ -134,7 +137,17 @@ public class BoomBlockFrames {
 	public void DestroyFirstFrame ( ) {
 		// Remove each block in the frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
-			board.RemoveBlockFromBoard(frames[0][i]);
+			// If the block at the frame position was physically destroyed, update the points popup
+			// Sometimes (in the case with wall blocks) the block will lose health but won't be destroyed
+			if (board.RemoveBlockFromBoard(frames[0][i])) {
+				// If the points popup has not been created yet, create it
+				// Otherwise just add to the points it shows
+				if (pointsPopup == null) {
+					pointsPopup = gameManager.CreatePointsPopup(frames[0][i], "Destroyed Block", gameManager.PointsPerDestroyedBlock);
+				} else {
+					pointsPopup.Points += gameManager.PointsPerDestroyedBlock;
+				}
+			}
 		}
 
 		// Remove the first frame

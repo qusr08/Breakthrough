@@ -8,28 +8,36 @@ public enum BoardUpdateState {
 }
 
 public class Board : MonoBehaviour {
+	[Header("Scene GameObject")]
+	[SerializeField] private GameManager gameManager;
+	[SerializeField] private BoardArea gameOverArea;
+	[SerializeField] private BoardArea breakthroughArea;
 	[Header("Prefabs")]
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
 	[SerializeField] private GameObject[ ] minoPrefabs;
 	[Header("Components")]
-	[SerializeField] private SpriteRenderer spriteRenderer;
-	[SerializeField] private BoardArea gameOverArea;
-	[SerializeField] private BoardArea breakthroughArea;
+	[SerializeField] private SpriteRenderer boardSpriteRenderer;
+	[SerializeField] private SpriteRenderer borderSpriteRenderer;
+	[SerializeField] private RectTransform gameCanvasRectTransform;
 	[Header("Properties")]
-	[SerializeField] public int Width = 16;
-	[SerializeField] public int Height = 28;
-	[SerializeField] public int TopPadding = 2;
-	[SerializeField] public int BottomPadding = 2;
-	[SerializeField] public int CameraPadding = 3;
-	[SerializeField] public float BoomBlockAnimationSpeed = 0.05f;
+	[SerializeField] [Range(4f, 32f)] public int Width = 16;
+	[SerializeField] [Range(20f, 40f)] public int Height = 28;
+	[SerializeField] [Range(0f, 10f)] public int TopPadding = 2;
+	[SerializeField] [Range(0f, 10f)] public int BottomPadding = 2;
+	[SerializeField] [Range(0f, 20f)] public float CameraPadding = 3;
+	[SerializeField] [Range(0f, 5f)] private float borderThickness = 0.75f;
+	/// TODO: Figure out how this number is achieved
+	[SerializeField] [Min(0f)] private float gameCanvasScale = 0.028703f;
+	[SerializeField] [Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
 	[SerializeField] private BoardUpdateState _boardUpdateState;
 	[SerializeField] public Mino ActiveMino = null;
-	
+
 	/// TODO: Have these change over time to increase the difficulty
 	private int wallHeight = 7;
-	private float wallSmoothness = 0.4f;
+	private float wallRoughness = 0.4f;
+	private float wallElevation = 0f;
 
 	private List<BoomBlockFrames> boomBlockFrames;
 	private float frameTimer = 0;
@@ -68,9 +76,15 @@ public class Board : MonoBehaviour {
 		}
 #endif
 
+		gameManager = FindObjectOfType<GameManager>( );
+
+		boardSpriteRenderer = GetComponent<SpriteRenderer>( );
+		borderSpriteRenderer = transform.Find("Border").GetComponent<SpriteRenderer>( );
+		gameCanvasRectTransform = transform.Find("Game Canvas").GetComponent<RectTransform>( );
+
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		// This makes it easier when converting from piece transform position to a board array index
-		spriteRenderer.size = new Vector2(Width, Height);
+		boardSpriteRenderer.size = new Vector2(Width, Height);
 		float positionX = (Width / 2) - (Width % 2 == 0 ? 0.5f : 0f);
 		float positionY = (Height / 2) - (Height % 2 == 0 ? 0.5f : 0f);
 		transform.position = new Vector3(positionX, positionY);
@@ -79,10 +93,21 @@ public class Board : MonoBehaviour {
 		Camera.main.orthographicSize = (Height + CameraPadding) / 2f;
 		Camera.main.transform.position = new Vector3(positionX, positionY, Camera.main.transform.position.z);
 
+		// Set the size of the border
+		borderSpriteRenderer.size = new Vector2(Width + (borderThickness * 2), Height + (borderThickness * 2));
+
+		// Set game canvas dimensions
+		gameCanvasRectTransform.localPosition = Vector3.zero;
+		gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 0);
+		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2)) / gameCanvasScale);
+		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (borderThickness * 2)) / gameCanvasScale);
+
 		/// TODO: Set the UI element sizes when the board is resized
 	}
 
 	private void Awake ( ) {
+		OnValidate( );
+
 		boomBlockFrames = new List<BoomBlockFrames>( );
 	}
 
@@ -139,13 +164,19 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Generate the wall that appears in the level
+	/// </summary>
 	private void GenerateWall ( ) {
-		float[ , ] wallValues = Utils.RandomPerlinNoiseGrid(Width, wallHeight, wallSmoothness, 4);
+		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
 
 		for (int i = 0; i < Width; i++) {
 			for (int j = 0; j < wallHeight; j++) {
-				int perlinValue = (int) wallValues[i, j];
+				// Make sure the perlin noise value can be converted to a wall block
+				int perlinValue = (int) Mathf.Clamp(Mathf.Round(wallValues[i, j]), 0, 3);
 
+				// If the perlin noise value is greater than 0, a wall block will spawn
+				// If it is less than or equal to 0, there will be a gap in the wall at that point
 				if (perlinValue > 0) {
 					Block block = Instantiate(blockPrefab, new Vector3(i, j + BottomPadding), Quaternion.identity).GetComponent<Block>( );
 					block.Health = perlinValue;
@@ -193,7 +224,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="boomBlock">The boom block to add</param>
 	private void AddBoomBlock (Block boomBlock) {
-		boomBlockFrames.Add(new BoomBlockFrames(this, boomBlock));
+		boomBlockFrames.Add(new BoomBlockFrames(this, gameManager, boomBlock));
 	}
 
 	private void UpdateBlockGroups ( ) {
@@ -259,20 +290,28 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	public void RemoveBlockFromBoard (Vector3 position) {
-		RemoveBlockFromBoard(GetBlockAtPosition(position));
+	public bool RemoveBlockFromBoard (Vector3 position) {
+		return RemoveBlockFromBoard(GetBlockAtPosition(position));
 	}
 
-	public void RemoveBlockFromBoard (Block block, bool ignoreHealth = false) {
+	public bool RemoveBlockFromBoard (Block block, bool ignoreHealth = false) {
 		// Make sure the block exists
 		if (block == null) {
-			return;
+			return false;
 		}
 
 		// Make sure the block group that the block was a part of is marked as modified
 		block.BlockGroup.IsModified = true;
 
 		block.Health -= (ignoreHealth ? block.Health : 1);
+
+		// If the health has reached 0, then it has been destroyed
+		// If the block is null here then the block was destroyed
+		if (block == null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {

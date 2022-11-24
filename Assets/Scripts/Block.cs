@@ -91,7 +91,6 @@ public class Block : MonoBehaviour {
 			_health = value;
 
 			if (_health <= 0) {
-				gameManager.AddPoints(Position, gameManager.PointsPerDestroyedBlock);
 				DestroyImmediate(gameObject);
 			} else {
 				BlockColor = wallColorStages[_health - 1];
