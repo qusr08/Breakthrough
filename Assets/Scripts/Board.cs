@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,8 +11,13 @@ public enum BoardUpdateState {
 public class Board : MonoBehaviour {
 	[Header("Scene GameObject")]
 	[SerializeField] private GameManager gameManager;
+	[Space]
 	[SerializeField] private BoardArea gameOverArea;
 	[SerializeField] private BoardArea breakthroughArea;
+	[Space]
+	[SerializeField] private TextMeshProUGUI totalPointsTextMesh;
+	[SerializeField] private TextMeshProUGUI levelPointsTextMesh;
+	[SerializeField] private TextMeshProUGUI breakthroughsTextMesh;
 	[Header("Prefabs")]
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
@@ -75,12 +81,6 @@ public class Board : MonoBehaviour {
 			return;
 		}
 #endif
-
-		gameManager = FindObjectOfType<GameManager>( );
-
-		boardSpriteRenderer = GetComponent<SpriteRenderer>( );
-		borderSpriteRenderer = transform.Find("Border").GetComponent<SpriteRenderer>( );
-		gameCanvasRectTransform = transform.Find("Game Canvas").GetComponent<RectTransform>( );
 
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		// This makes it easier when converting from piece transform position to a board array index

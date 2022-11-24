@@ -180,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 17,528,013
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cc2152da86bff0546b9897131722d454, type: 2}
   m_sharedMaterial: {fileID: 2770325615869912016, guid: cc2152da86bff0546b9897131722d454, type: 2}
@@ -284,7 +284,7 @@ RectTransform:
   m_GameObject: {fileID: 62430286}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9998711, y: 0.9998711, z: 0.9998711}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1357138077}
   m_RootOrder: 2
@@ -425,8 +425,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -119.72998, y: 25}
-  m_SizeDelta: {x: 239.45, y: 50}
+  m_AnchoredPosition: {x: -140, y: 40}
+  m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &392355022
 MonoBehaviour:
@@ -475,8 +475,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -511,7 +511,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 10, y: 10, z: 10, w: 10}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -735,7 +735,7 @@ RectTransform:
   m_GameObject: {fileID: 685800255}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9998711, y: 0.9998711, z: 0.9998711}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1357138077}
   m_RootOrder: 4
@@ -1033,7 +1033,7 @@ RectTransform:
   m_GameObject: {fileID: 1183871148}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9998711, y: 0.9998711, z: 0.9998711}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1357138077}
   m_RootOrder: 3
@@ -1063,7 +1063,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 6,012
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cc2152da86bff0546b9897131722d454, type: 2}
   m_sharedMaterial: {fileID: 2770325615869912016, guid: cc2152da86bff0546b9897131722d454, type: 2}
@@ -1249,7 +1249,7 @@ RectTransform:
   m_GameObject: {fileID: 1239844314}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9998711, y: 0.9998711, z: 0.9998711}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1357138077}
   m_RootOrder: 5
@@ -1279,7 +1279,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 23
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cc2152da86bff0546b9897131722d454, type: 2}
   m_sharedMaterial: {fileID: 2770325615869912016, guid: cc2152da86bff0546b9897131722d454, type: 2}
@@ -1724,6 +1724,9 @@ MonoBehaviour:
   gameManager: {fileID: 833555035}
   gameOverArea: {fileID: 0}
   breakthroughArea: {fileID: 0}
+  totalPointsTextMesh: {fileID: 38316504}
+  levelPointsTextMesh: {fileID: 1183871150}
+  breakthroughsTextMesh: {fileID: 1239844316}
   blockPrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
   blockGroupPrefab: {fileID: 8478777859116991009, guid: 6280865aa4e29264b8d65953181e9dc7, type: 3}
   minoPrefabs:
