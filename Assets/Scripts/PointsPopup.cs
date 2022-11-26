@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/*
+
 public class PointsPopup : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private TextMeshPro textMesh;
@@ -73,10 +75,10 @@ public class PointsPopup : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-
-
 		if (Time.time - startTime >= Lifetime) {
 			Destroy(gameObject);
 		}
 	}
 }
+
+*/

@@ -6,7 +6,7 @@ public class BoomBlockFrames {
 	private Board board;
 	private GameManager gameManager;
 	private Block boomBlock;
-	private PointsPopup pointsPopup = null;
+	private BoardPointsEvent boardPointsEvent = null;
 
 	/// <summary>
 	/// A list of all the positions that will be exploded when triggered.
@@ -142,10 +142,10 @@ public class BoomBlockFrames {
 			if (board.RemoveBlockFromBoard(frames[0][i])) {
 				// If the points popup has not been created yet, create it
 				// Otherwise just add to the points it shows
-				if (pointsPopup == null) {
-					pointsPopup = gameManager.CreatePointsPopup(frames[0][i], "Destroyed Block", gameManager.PointsPerDestroyedBlock);
+				if (boardPointsEvent == null) {
+					boardPointsEvent = gameManager.CreateBoardPointsEvent("Block Destroyed", gameManager.PointsPerDestroyedBlock);
 				} else {
-					pointsPopup.Points += gameManager.PointsPerDestroyedBlock;
+					boardPointsEvent.Trigger( );
 				}
 			}
 		}

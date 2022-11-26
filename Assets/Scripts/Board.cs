@@ -14,10 +14,6 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField] private BoardArea gameOverArea;
 	[SerializeField] private BoardArea breakthroughArea;
-	[Space]
-	[SerializeField] private TextMeshProUGUI totalPointsTextMesh;
-	[SerializeField] private TextMeshProUGUI levelPointsTextMesh;
-	[SerializeField] private TextMeshProUGUI breakthroughsTextMesh;
 	[Header("Prefabs")]
 	[SerializeField] private GameObject blockPrefab;
 	[SerializeField] private GameObject blockGroupPrefab;
@@ -98,7 +94,7 @@ public class Board : MonoBehaviour {
 
 		// Set game canvas dimensions
 		gameCanvasRectTransform.localPosition = Vector3.zero;
-		gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 0);
+		gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 1);
 		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2)) / gameCanvasScale);
 		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (borderThickness * 2)) / gameCanvasScale);
 
