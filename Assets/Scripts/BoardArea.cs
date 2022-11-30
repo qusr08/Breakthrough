@@ -9,12 +9,12 @@ public class BoardArea : MonoBehaviour {
 	[SerializeField] private Transform lineTransform;
 	[SerializeField] private Transform tintedAreaTransform;
 	[Header("Properties")]
-	[SerializeField] [Range(0f, 1f)] private float lineThickness = 0.25f;
-	[SerializeField] [Range(0f, 1f)] private float areaOpacity = 0.1f;
+	[SerializeField, Range(0f, 1f)] private float lineThickness = 0.25f;
+	[SerializeField, Range(0f, 1f)] private float areaOpacity = 0.1f;
 	[Space]
 	[SerializeField] public Color Color;
 	[SerializeField] public bool IsAreaAbove;
-	[SerializeField] [Min(0)] public int Height;
+	[SerializeField, Min(0)] public int Height;
 
 	/// <summary>
 	/// Whether or not the active Mino is within the area

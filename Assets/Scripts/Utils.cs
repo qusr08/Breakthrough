@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -115,7 +116,7 @@ public static class Utils {
 	public static float[ , ] GeneratePerlinNoiseGrid (int width, int height, float roughness, float scale = 1, float elevation = 0) {
 		float[ , ] noise = new float[width, height];
 		// Get a random value to offset the perlin noise by to make sure the values are random
-		float seed = Random.Range(-100f, 100f);
+		float seed = UnityEngine.Random.Range(-100f, 100f);
 
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -129,5 +130,14 @@ public static class Utils {
 		}
 
 		return noise;
+	}
+
+	/// <summary>
+	/// Find the size of an enum.
+	/// </summary>
+	/// <param name="enumType">The type of the enum to check</param>
+	/// <returns>The size of the enum</returns>
+	public static int GetEnumSize (Type enumType) {
+		return Enum.GetNames(enumType).Length;
 	}
 }

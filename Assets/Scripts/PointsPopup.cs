@@ -11,21 +11,21 @@ public class PointsPopup : MonoBehaviour {
 	[Header("Properties")]
 	[SerializeField] public float Lifetime = 1f;
 	[Space]
-	[SerializeField] [Range(-10f, 10f)] private float moveY = 0f;
-	[SerializeField] [Range(-10f, 10f)] private float moveX = 0f;
-	[SerializeField] [Min(0f)] private float moveTime = 1f;
+	[SerializeField, Range(-10f, 10f)] private float moveY = 0f;
+	[SerializeField, Range(-10f, 10f)] private float moveX = 0f;
+	[SerializeField, Min(0f)] private float moveTime = 1f;
 	[Space]
-	[SerializeField] [Range(0f, 90f)] private float rotateFromAngleRange = 0f;
-	[SerializeField] [Range(0f, 90f)] private float rotateToAngleRange = 0f;
-	[SerializeField] [Min(0f)] private float rotateTime = 1f;
+	[SerializeField, Range(0f, 90f)] private float rotateFromAngleRange = 0f;
+	[SerializeField, Range(0f, 90f)] private float rotateToAngleRange = 0f;
+	[SerializeField, Min(0f)] private float rotateTime = 1f;
 	[Space]
-	[SerializeField] [Range(0f, 10f)] private float scaleFrom = 1f;
-	[SerializeField] [Range(0f, 10f)] private float scaleTo = 1f;
-	[SerializeField] [Min(0f)] private float scaleTime = 1f;
+	[SerializeField, Range(0f, 10f)] private float scaleFrom = 1f;
+	[SerializeField, Range(0f, 10f)] private float scaleTo = 1f;
+	[SerializeField, Min(0f)] private float scaleTime = 1f;
 	[Space]
-	[SerializeField] [Range(0f, 1f)] private float fadeFrom = 1f;
-	[SerializeField] [Range(0f, 1f)] private float fadeTo = 1f;
-	[SerializeField] [Min(0f)] private float fadeTime = 1f;
+	[SerializeField, Range(0f, 1f)] private float fadeFrom = 1f;
+	[SerializeField, Range(0f, 1f)] private float fadeTo = 1f;
+	[SerializeField, Min(0f)] private float fadeTime = 1f;
 	[Space]
 	[SerializeField] private int _points;
 	[SerializeField] public string Title;

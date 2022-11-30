@@ -23,15 +23,15 @@ public class Board : MonoBehaviour {
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
 	[SerializeField] private RectTransform gameCanvasRectTransform;
 	[Header("Properties")]
-	[SerializeField] [Range(4f, 32f)] public int Width = 16;
-	[SerializeField] [Range(20f, 40f)] public int Height = 28;
-	[SerializeField] [Range(0f, 10f)] public int TopPadding = 2;
-	[SerializeField] [Range(0f, 10f)] public int BottomPadding = 2;
-	[SerializeField] [Range(0f, 20f)] public float CameraPadding = 3;
-	[SerializeField] [Range(0f, 5f)] private float borderThickness = 0.75f;
+	[SerializeField, Range(4f, 32f)] public int Width = 16;
+	[SerializeField, Range(20f, 40f)] public int Height = 28;
+	[SerializeField, Range(0f, 10f)] public int TopPadding = 2;
+	[SerializeField, Range(0f, 10f)] public int BottomPadding = 2;
+	[SerializeField, Range(0f, 20f)] public float CameraPadding = 3;
+	[SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
 	/// TODO: Figure out how this number is achieved
-	[SerializeField] [Min(0f)] private float gameCanvasScale = 0.028703f;
-	[SerializeField] [Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
+	[SerializeField, Min(0f)] private float gameCanvasScale = 0.028703f;
+	[SerializeField, Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
 	[SerializeField] private BoardUpdateState _boardUpdateState;
 	[SerializeField] public Mino ActiveMino = null;

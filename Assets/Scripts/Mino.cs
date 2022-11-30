@@ -16,9 +16,10 @@ public class Mino : MonoBehaviour {
 
 	[Header("Scene GameObjects")]
 	[SerializeField] private Board board;
+	[SerializeField] private GameManager gameManager;
 	[Header("Properties")]
 	[Tooltip("Whether or not the Mino can move.")]
-	[SerializeField] public bool CanMove;
+	[SerializeField] public bool HasLanded;
 
 	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
@@ -39,6 +40,7 @@ public class Mino : MonoBehaviour {
 
 	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
 	}
 
 	private void Awake ( ) {
@@ -69,20 +71,17 @@ public class Mino : MonoBehaviour {
 			}
 		}
 
-		CanMove = true;
+		HasLanded = true;
 		moveTo = transform.position;
 	}
 
 	private void Update ( ) {
-		/// TODO: Make it so a mino is not placed if it is moving/rotating
-		///		     Probably have to alter prevTime or something to prevent that from happening
-
 		// Smoothly transition the position and rotation of the mino
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, DAMP_SPEED);
 		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, DAMP_SPEED);
 
 		// If the mino landed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
-		if (!CanMove) {
+		if (!HasLanded) {
 			// Debug.Log($"position: {moveTo} == {transform.position} | rotation: {rotateTo} == {transform.eulerAngles}");
 			// Debug.Log($"position {Utils.CompareVectors(moveTo, transform.position)} | rotation: {Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)}");
 
@@ -134,11 +133,13 @@ public class Mino : MonoBehaviour {
 			if (Move(Vector3.down)) {
 				prevFallTime = Time.time;
 
+				// If the player is fast dropping the mino, make sure to give points and reset the place timer
 				if (vert < 0) {
 					placeTimer = PLACE_TIME;
+					// gameManager.TriggerPointsEvent(PointsEventType.FAST_DROP);
 				}
 			} else if (placeTimer <= 0) {
-				CanMove = false;
+				HasLanded = false;
 			}
 		}
 	}

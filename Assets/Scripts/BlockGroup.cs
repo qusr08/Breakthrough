@@ -5,6 +5,7 @@ using UnityEngine;
 public class BlockGroup : MonoBehaviour {
 	[Header("Scene GameObjects")]
 	[SerializeField] private Board board;
+	[SerializeField] private GameManager gameManager;
 	[Header("Properties")]
 	[SerializeField] public bool IsModified;
 	[SerializeField] public bool CanMove;
@@ -29,6 +30,7 @@ public class BlockGroup : MonoBehaviour {
 
 	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
 	}
 
 	private void Awake ( ) {
@@ -88,6 +90,7 @@ public class BlockGroup : MonoBehaviour {
 			if (currPosition.y < board.BottomPadding) {
 				// Remove the block from the board
 				board.RemoveBlockFromBoard(this[i], true);
+				gameManager.TriggerPointsEvent(PointsEventType.DROPPED_BLOCK);
 			}
 		}
 
