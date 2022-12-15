@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Sprites;
 using UnityEngine;
 
 public enum BlockColor {
@@ -136,7 +135,11 @@ public class Block : MonoBehaviour {
 	}
 
 	private void Awake ( ) {
+#if UNITY_EDITOR
 		OnValidate( );
+#else
+		_OnValidate( );
+#endif
 	}
 
 	private void Start ( ) {

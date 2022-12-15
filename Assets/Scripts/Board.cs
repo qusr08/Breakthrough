@@ -102,7 +102,11 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Awake ( ) {
+#if UNITY_EDITOR
 		OnValidate( );
+#else
+		_OnValidate( );
+#endif
 
 		boomBlockFrames = new List<BoomBlockFrames>( );
 	}
