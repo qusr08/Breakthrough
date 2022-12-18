@@ -314,6 +314,15 @@ public class Board : MonoBehaviour {
 		return false;
 	}
 
+	/// <summary>
+	/// Check to see if a position:
+	/// (1) is in the bounds of the board
+	/// (2) is not already occupied by a block
+	/// (3) if the block at the position has the specified parent transform
+	/// </summary>
+	/// <param name="position">The position to check</param>
+	/// <param name="parent">The parent transform to check</param>
+	/// <returns>Returns 'true' if the position is valid</returns>
 	public bool IsPositionValid (Vector3 position, Transform parent = null) {
 		Block block = GetBlockAtPosition(position);
 

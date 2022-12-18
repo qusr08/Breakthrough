@@ -234,7 +234,7 @@ MonoBehaviour:
   m_fontSizeMax: 40
   m_fontStyle: 1
   m_HorizontalAlignment: 4
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -278,6 +278,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4764229572853234536}
   - component: {fileID: 4764229572853234537}
+  - component: {fileID: 5121941579545307370}
   m_Layer: 5
   m_Name: Board UI Label
   m_TagString: Untagged
@@ -324,7 +325,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
+  m_Spacing: -15
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -332,3 +333,22 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5121941579545307370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4764229572853234535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74f1358230fae6b4a83c2eb2600f5184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Label: {fileID: 4764229571657600017}
+  Value: {fileID: 4764229572178145932}
+  textBaseCharacterSpacing: 0
+  textBaseFontSize: 40
+  textAnimCharacterSpacing: 20
+  textAnimFontSize: 50
+  textSmoothing: 0.15

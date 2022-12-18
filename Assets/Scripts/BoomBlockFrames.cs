@@ -136,10 +136,10 @@ public class BoomBlockFrames {
 	public void DestroyFirstFrame ( ) {
 		// Remove each block in the frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
-			// If the block at the frame position was physically destroyed, update the points popup
-			// Sometimes (in the case with wall blocks) the block will lose health but won't be destroyed
-			if (board.RemoveBlockFromBoard(frames[0][i])) {
-				gameManager.TriggerPointsEvent(PointsEventType.DESTROYED_BLOCK);
+			Block block = null;
+			if ((block = board.GetBlockAtPosition(frames[0][i])) != null) {
+				gameManager.AddBoardPoints(gameManager.PointsPerDestroyedBlock, PointsEffectType.PARTICLE, block.BlockColor);
+				board.RemoveBlockFromBoard(frames[0][i]);
 			}
 		}
 

@@ -31,19 +31,17 @@ public class PointsPopup : MonoBehaviour {
 	[SerializeField] public string Title;
 
 	private float startTime = 0;
-	
+
 	private float TimeElapsed {
 		get {
 			return (Time.time - startTime);
 		}
 	}
-
 	private float MoveProgress {
 		get {
 			return (TimeElapsed / moveTime);
 		}
 	}
-
 	public int Points {
 		get {
 			return _points;
