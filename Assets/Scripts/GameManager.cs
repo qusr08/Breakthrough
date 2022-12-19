@@ -9,10 +9,12 @@ public enum PointsEffectType {
 }
 
 public class GameManager : MonoBehaviour {
+	[Header("Prefabs")]
+	[SerializeField] private GameObject boardUIParticlePrefab;
 	[Header("Scene GameObjects")]
-	[SerializeField] private BoardUILabel totalPointsUILabel;
-	[SerializeField] private BoardUILabel boardPointsUILabel;
-	[SerializeField] private BoardUILabel breakthroughsUILabel;
+	[SerializeField] public BoardUILabel TotalPointsUILabel;
+	[SerializeField] public BoardUILabel BoardPointsUILabel;
+	[SerializeField] public BoardUILabel BreakthroughsUILabel;
 	[Header("Properties")]
 	[SerializeField] private int _boardPoints;
 	[SerializeField] private int _totalPoints;
@@ -22,7 +24,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] public int PointsPerDroppedBlock = 12;
 	[SerializeField] public int PointsPerBreakthrough = 600;
 	[SerializeField] public int PointsPerDestroyedMino = 60;
-	[SerializeField] public int PointsPerFastDrop = 2;
+	// [SerializeField] public int PointsPerFastDrop = 2;
 
 	public int BoardPoints {
 		get {
@@ -32,7 +34,7 @@ public class GameManager : MonoBehaviour {
 		set {
 			_boardPoints = value;
 
-			boardPointsUILabel.Value.text = _boardPoints.ToString( );
+			BoardPointsUILabel.Value.text = _boardPoints.ToString( );
 		}
 	}
 	public int TotalPoints {
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour {
 		set {
 			_totalPoints = value;
 
-			totalPointsUILabel.Value.text = _totalPoints.ToString( );
+			TotalPointsUILabel.Value.text = _totalPoints.ToString( );
 		}
 	}
 	public int Breakthroughs {
@@ -54,12 +56,19 @@ public class GameManager : MonoBehaviour {
 		set {
 			_breakthroughs = value;
 
-			breakthroughsUILabel.Value.text = _breakthroughs.ToString( );
+			BreakthroughsUILabel.Value.text = _breakthroughs.ToString( );
 		}
 	}
 
-	public void AddBoardPoints (int points, PointsEffectType pointsEffectType = PointsEffectType.NONE, BlockColor blockColor = BlockColor.DARK_COAL) {
+	public void AddBoardPoints (int points, PointsEffectType pointsEffectType = PointsEffectType.NONE, Block pointsEffectBlock = null) {
 		BoardPoints += points;
+
+		BoardPointsUILabel.TriggerTextAnimation( );
+
+		// If a block has not been specified, do not do any effects because there is not starting position
+		if (pointsEffectBlock == null) {
+			return;
+		}
 
 		switch (pointsEffectType) {
 			case PointsEffectType.NONE:
@@ -70,6 +79,10 @@ public class GameManager : MonoBehaviour {
 				break;
 		}
 
-		boardPointsUILabel.TriggerTextAnimation( );
+		// BoardUIParticle boardUIParticle = Instantiate(boardUIParticlePrefab, pointsEffectBlock.Position, Quaternion.identity).GetComponent<BoardUIParticle>( );
+		// boardUIParticle.ToPosition = BoardPointsUILabel.transform.position;
+		// boardUIParticle.FromPosition = pointsEffectBlock.Position;
+		// boardUIParticle.SetSprite(pointsEffectBlock.Sprite);
+		// boardUIParticle.IsInitialized = true;
 	}
 }

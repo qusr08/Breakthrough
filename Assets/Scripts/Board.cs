@@ -41,8 +41,12 @@ public class Board : MonoBehaviour {
 	private float wallRoughness = 0.4f;
 	private float wallElevation = 0f;
 
+	// Used for tracking the boom block explosions
 	private List<BoomBlockFrames> boomBlockFrames;
 	private float frameTimer = 0;
+
+	// Used for tracking what minos are left on the board
+	private List<List<Block>> minoBlocks;
 
 	public BoardUpdateState BoardUpdateState {
 		get {
@@ -109,6 +113,7 @@ public class Board : MonoBehaviour {
 #endif
 
 		boomBlockFrames = new List<BoomBlockFrames>( );
+		minoBlocks = new List<List<Block>>( );
 	}
 
 	private void Start ( ) {
@@ -205,11 +210,20 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="mino">The Mino to add</param>
 	public void AddLandedMinoToBoard (Mino mino) {
+		// Create a new index for this mino to track which blocks of it are left on the board
+		minoBlocks.Add(new List<Block>( ));
+
 		// Add all blocks that are part of the mino to the board
 		while (mino.transform.childCount > 0) {
-			AddBlockToBoard(mino.transform.GetChild(0).GetComponent<Block>( ));
+			// Get a block from the mino
+			Block block = mino.transform.GetChild(0).GetComponent<Block>( );
+			
+			// Add the block to the board
+			minoBlocks[minoBlocks.Count - 1].Add(block);
+			AddBlockToBoard(block);
 		}
 
+		// If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
 		if (mino == ActiveMino) {
 			ActiveMino = null;
 		}

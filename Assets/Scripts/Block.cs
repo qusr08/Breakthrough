@@ -8,7 +8,7 @@ public enum BlockColor {
 }
 
 public enum BlockType {
-	NORMAL, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND, CRACK_STAGE_1, CRACK_STAGE_2
+	NORMAL, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND
 }
 
 public enum BlockDirection {
@@ -113,6 +113,11 @@ public class Block : MonoBehaviour {
 	public bool IsBoomBlock {
 		get {
 			return (BlockType != BlockType.NORMAL);
+		}
+	}
+	public Sprite Sprite {
+		get {
+			return spriteRenderer.sprite;
 		}
 	}
 

@@ -544,9 +544,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalPointsUILabel: {fileID: 1748895535}
-  boardPointsUILabel: {fileID: 398148345}
-  breakthroughsUILabel: {fileID: 996214769}
+  boardUIParticlePrefab: {fileID: 2677172349218655181, guid: ce25b03eb4a3e1344804fdad0068e235, type: 3}
+  TotalPointsUILabel: {fileID: 1748895535}
+  BoardPointsUILabel: {fileID: 398148345}
+  BreakthroughsUILabel: {fileID: 996214769}
   _boardPoints: 0
   _totalPoints: 0
   _breakthroughs: 0
@@ -554,7 +555,6 @@ MonoBehaviour:
   PointsPerDroppedBlock: 12
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
-  PointsPerFastDrop: 2
 --- !u!4 &833555036
 Transform:
   m_ObjectHideFlags: 0
@@ -1149,9 +1149,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalPointsUILabel: {fileID: 0}
-  boardPointsUILabel: {fileID: 0}
-  breakthroughsUILabel: {fileID: 0}
+  boardUIParticlePrefab: {fileID: 0}
+  TotalPointsUILabel: {fileID: 0}
+  BoardPointsUILabel: {fileID: 0}
+  BreakthroughsUILabel: {fileID: 0}
   _boardPoints: 0
   _totalPoints: 0
   _breakthroughs: 0
@@ -1159,7 +1160,6 @@ MonoBehaviour:
   PointsPerDroppedBlock: 12
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
-  PointsPerFastDrop: 2
 --- !u!1 &1206732652
 GameObject:
   m_ObjectHideFlags: 0

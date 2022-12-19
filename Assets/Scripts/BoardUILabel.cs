@@ -4,15 +4,15 @@ using TMPro;
 using UnityEngine;
 
 public class BoardUILabel : MonoBehaviour {
-	[Header("Properties")]
+	[Header("Components")]
 	[SerializeField] public TextMeshProUGUI Label;
 	[SerializeField] public TextMeshProUGUI Value;
-	[Space]
+	[Header("Properties")]
 	[SerializeField] private float textBaseCharacterSpacing;
 	[SerializeField] private float textBaseFontSize;
 	[SerializeField] private float textAnimCharacterSpacing;
 	[SerializeField] private float textAnimFontSize;
-	[SerializeField] [Range(0f, 1f)] private float textSmoothing;
+	[SerializeField, Range(0f, 1f)] private float textSmoothing;
 
 	private Coroutine textCoroutine = null;
 
