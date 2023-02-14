@@ -19,9 +19,20 @@ public class BoardArea : MonoBehaviour {
 	[SerializeField] public bool IsAreaAbove;
 	[SerializeField, Min(1)] public int Height;
 
-	/// <summary>
-	/// Whether or not the active Mino is within the area
-	/// </summary>
+	public delegate void OnMinoEnterDelegate ( );
+	public OnMinoEnterDelegate OnMinoEnter = ( ) => { };
+
+	public delegate void OnMinoLeaveDelegate ( );
+	public OnMinoEnterDelegate OnMinoLeave = ( ) => { };
+
+	public delegate void OnMinoLandDelegate ( );
+	public OnMinoLandDelegate OnMinoLand = ( ) => { };
+
+	// Whether or not the mino was previously inside the area
+	// This is here to make sure the delegate methods are only called when the mino changes states, as in when it first enters or leaves
+	private bool wasMinoInArea;
+
+	// Whether or not the active Mino is within the area
 	public bool IsMinoInArea {
 		get {
 			// If there happens to be no Mino on the board, there will not be a Mino in the area
@@ -30,12 +41,26 @@ public class BoardArea : MonoBehaviour {
 			}
 
 			// Check the position of the Mino relative to the board area line
-			bool isMinoAboveLine = (board.ActiveMino.transform.position.y > transform.position.y);
-			if ((IsAreaAbove && isMinoAboveLine) || (!IsAreaAbove && !isMinoAboveLine)) {
+			bool isMinoAboveLine = (board.ActiveMino.BoundsMaxY > transform.position.y);
+			bool isMinoBelowLine = (board.ActiveMino.BoundsMinY < transform.position.y);
+			if ((IsAreaAbove && isMinoAboveLine) || (!IsAreaAbove && isMinoBelowLine)) {
 				return true;
 			}
 
 			return false;
+		}
+	}
+
+	// Whether or not the active mino has landed inside the area
+	public bool IsMinoLandedInArea {
+		get {
+			// If the mino is not in the area, then it definitely did not land in the area
+			if (!IsMinoInArea) {
+				return false;
+			}
+
+			// Return if the mino has landed or not
+			return board.ActiveMino.HasLanded;
 		}
 	}
 
@@ -81,5 +106,29 @@ public class BoardArea : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+	}
+
+	public void UpdateDelegates ( ) {
+		// If the mino is inside the board area, call some delegate methods
+		if (IsMinoInArea) {
+			// If the mino was not previously inside this board area, then it has just entered the board area
+			if (!wasMinoInArea) {
+				wasMinoInArea = true;
+
+				OnMinoEnter( );
+			}
+		} else {
+			// If the mino is no longer inside the board area but previously was, then it has left the board area
+			if (wasMinoInArea) {
+				wasMinoInArea = false;
+
+				OnMinoLeave( );
+			}
+		}
+
+		// If the mino lands inside this board area, call some delegate methods
+		if (IsMinoLandedInArea) {
+			OnMinoLand( );
+		}
 	}
 }

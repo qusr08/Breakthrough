@@ -114,6 +114,14 @@ public class Board : MonoBehaviour {
 
 		boomBlockFrames = new List<BoomBlockFrames>( );
 		minoBlocks = new List<List<Block>>( );
+
+		// Set board area delegate methods
+		breakthroughArea.OnMinoEnter += ( ) => {
+			Debug.Log("BREAKTHROUGH!!");
+		};
+		gameOverArea.OnMinoLand += ( ) => {
+			Debug.Log("GAME OVER");
+		};
 	}
 
 	private void Start ( ) {
@@ -270,6 +278,14 @@ public class Board : MonoBehaviour {
 
 		// Destroy this group once all blocks have been moved
 		Destroy(blockGroups[mergeToGroupIndex].gameObject);
+	}
+
+	/// <summary>
+	/// Update all board areas.
+	/// </summary>
+	public void UpdateBoardAreas ( ) {
+		breakthroughArea.UpdateDelegates( );
+		gameOverArea.UpdateDelegates( );
 	}
 
 	/// <summary>

@@ -72,6 +72,8 @@ public class BoomBlockFrames {
 			frameIndex++;
 		} while (foundBlockInRange);
 
+		/// TODO: This will be removed eventually as the player should see the full range of each boom block
+		///	- This is good for testing for now though because there is no visual indication of the boom blocks exploding.
 		CleanFrames( );
 	}
 

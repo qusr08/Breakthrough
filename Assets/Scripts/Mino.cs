@@ -18,8 +18,8 @@ public class Mino : MonoBehaviour {
 	[SerializeField] private Board board;
 	[SerializeField] private GameManager gameManager;
 	[Header("Properties")]
-	[Tooltip("Whether or not the Mino can move.")]
-	[SerializeField] public bool HasLanded;
+	[SerializeField, Tooltip("Whether or not the Mino can move.")] public bool HasLanded;
+	[SerializeField] public Bounds MinoBounds;
 
 	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
@@ -32,6 +32,42 @@ public class Mino : MonoBehaviour {
 	// It can be reset by either moving or rotating the Mino
 	private float placeTimer;
 
+	// If the mino needs to run some update code because its position has been changed
+	private bool needToUpdateAtDestination;
+	// If this mino is at the position and rotation it was set to move towards
+	private bool IsAtDestination {
+		get {
+			return (Utils.CompareVectors(moveTo, transform.position) && Utils.CompareDegreeAngleVectors(rotateTo, transform.eulerAngles) && needToUpdateAtDestination);
+		}
+	}
+
+	// Variables to get the bounds max and mins
+	// This can be used to check if a mino has entered or landed in a board area
+	public float BoundsMinY {
+		get {
+			// If the mino is rotated either 0 or 180 degrees, use the y value of the bounds
+			// If it is rotated 90 or 270 degrees, use the x values of the bounds
+			// For this we only want the lowest part of the bounds which could be either the x or y extents
+			if (transform.localEulerAngles.z % 180f == 0) {
+				return transform.position.y + MinoBounds.min.y;
+			} else {
+				return transform.position.y + MinoBounds.min.x;
+			}
+		}
+	}
+	public float BoundsMaxY {
+		get {
+			// If the mino is rotated either 0 or 180 degrees, use the y value of the bounds
+			// If it is rotated 90 or 270 degrees, use the x values of the bounds
+			// For this we only want the lowest part of the bounds which could be either the x or y extents
+			if (transform.localEulerAngles.z % 180f == 0) {
+				return transform.position.y + MinoBounds.max.y;
+			} else {
+				return transform.position.y + MinoBounds.max.x;
+			}
+		}
+	}
+
 	// Vectors to move or rotate the Mino to
 	private Vector3 moveTo;
 	private Vector3 moveVelocity;
@@ -41,6 +77,14 @@ public class Mino : MonoBehaviour {
 	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 		gameManager = FindObjectOfType<GameManager>( );
+
+		// Update the bounds of this mino based on the colliders of the child block objects
+		MinoBounds = new Bounds(transform.position, Vector3.zero);
+		foreach (Collider2D blockCollider2D in GetComponentsInChildren<Collider2D>( )) {
+			MinoBounds.Encapsulate(blockCollider2D.bounds);
+		}
+		// Keep the center of the bounds at (0, 0) so the max and minimum of the mino bounds can update as the position changes
+		MinoBounds.center = Vector3.zero;
 	}
 
 	private void Awake ( ) {
@@ -50,7 +94,7 @@ public class Mino : MonoBehaviour {
 	private void Start ( ) {
 		/// TODO: Make multiple boom blocks able to spawn
 		/// TODO: Make percentage chance to spawn with a boom block change over time to make it fair
-		///			Guarentee the player will have a boom block in X minos
+		///	- Guarentee the player will have a boom block in X minos
 
 		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
 		if (Random.Range(0f, 1f) < PERCENT_BOOM) {
@@ -71,7 +115,7 @@ public class Mino : MonoBehaviour {
 			}
 		}
 
-		HasLanded = true;
+		HasLanded = false;
 		moveTo = transform.position;
 	}
 
@@ -80,22 +124,28 @@ public class Mino : MonoBehaviour {
 		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, DAMP_SPEED);
 		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, DAMP_SPEED);
 
-		// If the mino landed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
-		if (!HasLanded) {
-			// Debug.Log($"position: {moveTo} == {transform.position} | rotation: {rotateTo} == {transform.eulerAngles}");
-			// Debug.Log($"position {Utils.CompareVectors(moveTo, transform.position)} | rotation: {Utils.CompareAngleVectors(rotateTo, transform.eulerAngles)}");
+		// If the mino has reached its destination point, run this code
+		// Since needToUpdateAtDestination is set to false within this code, this chunk of code will only run once and then waits for another change in destination for the mino
+		if (IsAtDestination) {
+			needToUpdateAtDestination = false;
 
-			if (Utils.CompareVectors(moveTo, transform.position) && Utils.CompareDegreeAngleVectors(rotateTo, transform.eulerAngles)) {
-				// The position and rotation of the mino might be a little off, so make sure it is exact before the mino is deactivated
-				transform.eulerAngles = rotateTo;
-				transform.position = moveTo;
+			// The position and rotation of the mino might be a little off, so make sure it is exact before the mino is deactivated
+			transform.eulerAngles = rotateTo;
+			transform.position = moveTo;
 
+			// Update the board areas
+			board.UpdateBoardAreas( );
+
+			// If the mino landed, wait for the position and rotation of it to be not transitioning anymore to spawn a new mino
+			if (HasLanded) {
 				// Add the Mino to the game board
 				board.AddLandedMinoToBoard(this);
-			}
 
-			return;
+				return;
+			}
 		}
+
+		/// TODO: Update to the new unity input system
 
 		// Get the horizontal and vertical inputs
 		float hori = Input.GetAxisRaw("Horizontal");
@@ -139,7 +189,8 @@ public class Mino : MonoBehaviour {
 					// gameManager.TriggerPointsEvent(PointsEventType.FAST_DROP);
 				}
 			} else if (placeTimer <= 0) {
-				HasLanded = false;
+				HasLanded = true;
+				needToUpdateAtDestination = true;
 			}
 		}
 	}
@@ -156,6 +207,8 @@ public class Mino : MonoBehaviour {
 		}
 
 		moveTo += direction;
+
+		needToUpdateAtDestination = true;
 
 		return true;
 	}
@@ -175,10 +228,13 @@ public class Mino : MonoBehaviour {
 		}
 
 		rotateTo += Vector3.forward * degRotation;
+
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
 			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - ROTATE_DIRECTION) % 4);
 		}
+
+		needToUpdateAtDestination = true;
 
 		return true;
 	}
