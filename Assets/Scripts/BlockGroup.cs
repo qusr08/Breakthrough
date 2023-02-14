@@ -89,7 +89,8 @@ public class BlockGroup : MonoBehaviour {
 			// If the current position of the block is below the bottom of the board
 			if (currPosition.y < board.BottomPadding) {
 				// Remove the block from the board
-				gameManager.AddBoardPoints(gameManager.PointsPerDroppedBlock, PointsEffectType.PARTICLE, this[i]);
+				// gameManager.AddBoardPoints(gameManager.PointsPerDroppedBlock, PointsEffectType.PARTICLE, this[i]);
+				gameManager.BoardPoints += gameManager.PointsPerDroppedBlock;
 				board.RemoveBlockFromBoard(this[i], true);
 			}
 		}

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class BoardArea : MonoBehaviour {
@@ -8,13 +9,15 @@ public class BoardArea : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private Transform lineTransform;
 	[SerializeField] private Transform tintedAreaTransform;
+	[SerializeField] private Sprite boardFillCircleBottom;
+	[SerializeField] private Sprite boardFillCircleTop;
 	[Header("Properties")]
 	[SerializeField, Range(0f, 1f)] private float lineThickness = 0.25f;
 	[SerializeField, Range(0f, 1f)] private float areaOpacity = 0.1f;
 	[Space]
 	[SerializeField] public Color Color;
 	[SerializeField] public bool IsAreaAbove;
-	[SerializeField, Min(0)] public int Height;
+	[SerializeField, Min(1)] public int Height;
 
 	/// <summary>
 	/// Whether or not the active Mino is within the area
@@ -36,7 +39,17 @@ public class BoardArea : MonoBehaviour {
 		}
 	}
 
-	private void OnValidate ( ) {
+#if UNITY_EDITOR
+	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+#endif
+	protected void _OnValidate ( ) {
+#if UNITY_EDITOR
+		EditorApplication.delayCall -= _OnValidate;
+		if (this == null) {
+			return;
+		}
+#endif
+
 		// Get gameobjects within the scene
 		board = FindObjectOfType<Board>( );
 		lineTransform = transform.Find("Line");
@@ -57,11 +70,16 @@ public class BoardArea : MonoBehaviour {
 
 		// Set the position and size of the tinted area
 		tintedAreaTransform.position = transform.position + Vector3.up * (IsAreaAbove ? (board.Height - Height) / 2.0f : Height / -2.0f);
-		tintedAreaTransform.localScale = new Vector3(board.Width, (IsAreaAbove ? board.Height - Height : Height), 1);
+		tintedAreaTransform.GetComponent<SpriteRenderer>( ).sprite = (IsAreaAbove ? boardFillCircleTop : boardFillCircleBottom);
+		tintedAreaTransform.GetComponent<SpriteRenderer>( ).size = new Vector2(board.Width, (IsAreaAbove ? board.Height - Height : Height));
 		tintedAreaTransform.GetComponent<SpriteRenderer>( ).color = new Color(Color.r, Color.g, Color.b, areaOpacity);
 	}
 
 	private void Awake ( ) {
+#if UNITY_EDITOR
 		OnValidate( );
+#else
+		_OnValidate( );
+#endif
 	}
 }

@@ -8,6 +8,7 @@ public enum PointsEffectType {
 	NONE, TEXT, PARTICLE
 }
 
+
 public class GameManager : MonoBehaviour {
 	[Header("Prefabs")]
 	[SerializeField] private GameObject boardUIParticlePrefab;
@@ -16,51 +17,42 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] public BoardUILabel BoardPointsUILabel;
 	[SerializeField] public BoardUILabel BreakthroughsUILabel;
 	[Header("Properties")]
-	[SerializeField] private int _boardPoints;
-	[SerializeField] private int _totalPoints;
-	[SerializeField] private int _breakthroughs;
-	[Space]
 	[SerializeField] public int PointsPerDestroyedBlock = 6;
 	[SerializeField] public int PointsPerDroppedBlock = 12;
 	[SerializeField] public int PointsPerBreakthrough = 600;
 	[SerializeField] public int PointsPerDestroyedMino = 60;
 	// [SerializeField] public int PointsPerFastDrop = 2;
+	[SerializeField] private List<PointsEvent> pointsEvents;
 
 	public int BoardPoints {
 		get {
-			return _boardPoints;
+			return int.Parse(BoardPointsUILabel.Value.text);
 		}
 
 		set {
-			_boardPoints = value;
-
-			BoardPointsUILabel.Value.text = _boardPoints.ToString( );
+			BoardPointsUILabel.Value.text = value.ToString( );
 		}
 	}
 	public int TotalPoints {
 		get {
-			return _totalPoints;
+			return int.Parse(TotalPointsUILabel.Value.text);
 		}
 
 		set {
-			_totalPoints = value;
-
-			TotalPointsUILabel.Value.text = _totalPoints.ToString( );
+			TotalPointsUILabel.Value.text = value.ToString( );
 		}
 	}
 	public int Breakthroughs {
 		get {
-			return _breakthroughs;
+			return int.Parse(BreakthroughsUILabel.Value.text);
 		}
 
 		set {
-			_breakthroughs = value;
-
-			BreakthroughsUILabel.Value.text = _breakthroughs.ToString( );
+			BreakthroughsUILabel.Value.text = value.ToString();
 		}
 	}
 
-	public void AddBoardPoints (int points, PointsEffectType pointsEffectType = PointsEffectType.NONE, Block pointsEffectBlock = null) {
+	/*public void AddBoardPoints (int points, PointsEffectType pointsEffectType = PointsEffectType.NONE, Block pointsEffectBlock = null) {
 		BoardPoints += points;
 
 		BoardPointsUILabel.TriggerTextAnimation( );
@@ -84,5 +76,5 @@ public class GameManager : MonoBehaviour {
 		// boardUIParticle.FromPosition = pointsEffectBlock.Position;
 		// boardUIParticle.SetSprite(pointsEffectBlock.Sprite);
 		// boardUIParticle.IsInitialized = true;
-	}
+	}*/
 }
