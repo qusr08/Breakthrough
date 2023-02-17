@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Mino : MonoBehaviour {
-	public const float PERCENT_BOOM = 0.6f; // Might vary with level
 	public const float FALL_TIME = 1.0f; // Varies with level
 	public const float FALL_TIME_ACCELERATED = FALL_TIME / 20f;
 	public const float MOVE_TIME = 0.15f;
@@ -20,6 +19,7 @@ public class Mino : MonoBehaviour {
 	[Header("Properties")]
 	[SerializeField, Tooltip("Whether or not the Mino can move.")] public bool HasLanded;
 	[SerializeField] public Bounds MinoBounds;
+	[SerializeField] public bool HasBoomBlock;
 
 	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
@@ -93,11 +93,9 @@ public class Mino : MonoBehaviour {
 
 	private void Start ( ) {
 		/// TODO: Make multiple boom blocks able to spawn
-		/// TODO: Make percentage chance to spawn with a boom block change over time to make it fair
-		///	- Guarentee the player will have a boom block in X minos
 
 		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
-		if (Random.Range(0f, 1f) < PERCENT_BOOM) {
+		if (Random.Range(0f, 1f) < board.CurrentBoomBlockSpawnPercentage) {
 			// Get a random child block of the mino
 			Block block = GetComponentsInChildren<Block>( )[Random.Range(0, transform.childCount)];
 
@@ -113,9 +111,19 @@ public class Mino : MonoBehaviour {
 					block.BlockType = BlockType.BOOM_LINE;
 					break;
 			}
-		}
 
-		HasLanded = false;
+			HasBoomBlock = true;
+        }
+
+
+        // Update whether or not the player is still in a drought of boom blocks
+        if (HasBoomBlock) {
+            board.BoomBlockDrought = 0;
+        } else {
+            board.BoomBlockDrought++;
+        }
+
+        HasLanded = false;
 		moveTo = transform.position;
 	}
 

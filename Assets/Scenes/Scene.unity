@@ -1977,6 +1977,8 @@ MonoBehaviour:
   BoomBlockAnimationSpeed: 0.05
   _boardUpdateState: 0
   ActiveMino: {fileID: 0}
+  boomBlockSpawnChance: 0.4
+  boomBlockGuarantee: 5
 --- !u!1001 &4764229571001218896
 PrefabInstance:
   m_ObjectHideFlags: 0

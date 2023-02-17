@@ -35,9 +35,12 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField] private BoardUpdateState _boardUpdateState;
 	[SerializeField] public Mino ActiveMino = null;
+	[SerializeField, Range(0f, 1f)] private float boomBlockSpawnChance = 0.4f;
+	[SerializeField, Min(0f)] private int boomBlockGuarantee = 5;
+	[HideInInspector] public int BoomBlockDrought = 0;
 
-	/// TODO: Have these change over time to increase the difficulty
-	private int wallHeight = 7;
+    /// TODO: Have these change over time to increase the difficulty
+    private int wallHeight = 7;
 	private float wallRoughness = 0.4f;
 	private float wallElevation = 0f;
 
@@ -47,6 +50,12 @@ public class Board : MonoBehaviour {
 
 	// Used for tracking what minos are left on the board
 	private List<List<Block>> minoBlocks;
+
+    public float CurrentBoomBlockSpawnPercentage {
+		get {
+			return ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockSpawnChance) + boomBlockSpawnChance;
+		}
+	}
 
 	public BoardUpdateState BoardUpdateState {
 		get {
