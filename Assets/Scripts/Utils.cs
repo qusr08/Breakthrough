@@ -116,7 +116,7 @@ public static class Utils {
 	public static float[ , ] GeneratePerlinNoiseGrid (int width, int height, float roughness, float scale = 1, float elevation = 0) {
 		float[ , ] noise = new float[width, height];
 		// Get a random value to offset the perlin noise by to make sure the values are random
-		float seed = UnityEngine.Random.Range(-100f, 100f);
+		float seed = UnityEngine.Random.Range(-100000f, 100000f);
 
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
