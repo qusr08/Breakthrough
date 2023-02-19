@@ -18,15 +18,84 @@
     </header>
     <main>
         <ul id="build-list">
-            <div class="build" version="1.7.0d" date="December 15th, 2022"></div>
-            <div class="build" version="1.6.0d" date="June 7th, 2022"></div>
-            <div class="build" version="1.5.0d" date="June 5th, 2022"></div>
-            <div class="build" version="1.4.0d" date="June 1st, 2022"></div>
-            <div class="build" version="1.3.0d" date="May 28th, 2022"></div>
-            <div class="build" version="1.2.1d" date="May 26th, 2022"></div>
-            <div class="build" version="1.2.0d" date="May 25th, 2022"></div>
-            <div class="build" version="1.1.0d" date="May 24th, 2022"></div>
-            <div class="build" version="1.0.0d" date="May 23th, 2022"></div>
+            <div class="build" tags="wip">
+                <ul>
+                    <li>Created board areas that detect when the player gets a game over or a breakthrough</li>
+                    <li>Added game difficulty scaling and basic game loop</li>
+                    <li>Minor visual improvements</li>
+                    <li>Improvements to UI</li>
+                </ul>
+            </div>
+            <div class="build" version="1.4.0a" date="December 15th, 2022" tags="latest alpha">
+                <ul>
+                    <li>Added basic in-game UI</li>
+                    <li>Added game font</li>
+                    <li>Created basic points events the pop up to tell the player what they got points for</li>
+                    <li>Fixed particle colors and changed how they react to gravity</li>
+                    <li>Changed the shape of the Directional Boom Block to better reflect the triangle shape it is represented with</li>
+                    <li>A lot of QOL improvements to code, and various optimizations</li>
+                </ul>
+            </div>
+            <div class="build" version="1.3.1a" date="June 7th, 2022" tags="alpha">
+                <ul>
+                    <li>Blocks are now destroyed when they fall below the wall into the Breakthrough area</li>
+                    <li>Added particle effects that appear when blocks are destroyed</li>
+                    <li>Fixed some lag issues</li>
+                </ul>
+            </div>
+            <div class="build" version="1.3.0a" date="June 5th, 2022" tags="alpha">
+                <ul>
+                    <li>Added non-uniform wall generation using Perlin Noise</li>
+                    <li>Some wall blocks now take a few hits from Boom Blocks to break</li>
+                    <li>Wall block health is shown by cracks that appear when a Boom Block explodes on it</li>
+                    <li>Minor optimizations to code</li>
+                </ul>
+            </div>
+            <div class="build" version="1.2.1a" date="June 1st, 2022" tags="alpha">
+                <ul>
+                    <li>Added Boom Block ripple effect when they are exploding</li>
+                    <li>Modified the colors of the Minos</li>
+                </ul>
+            </div>
+            <div class="build" version="1.2.0a" date="May 28th, 2022" tags="alpha">
+                <ul>
+                    <li>Blocks now react to gravity and fall if nothing is holding them up</li>
+                    <li>Improvements to how blocks are placed onto the board</li>
+                </ul>
+            </div>
+            <div class="build" version="1.1.2a" date="May 26th, 2022" tags="alpha">
+                <ul>
+                    <li>Changed some Mino shapes and colors to offer a better gameplay experience</li>
+                    <li>Slight changes to movement to make it easier for the player to control the Mino</li>
+                    <li>Pieces now wait until the player stops moving before they are placed</li>
+                </ul>
+            </div>
+            <div class="build" version="1.1.1a" date="May 25th, 2022" tags="alpha">
+                <ul>
+                    <li>Improved movement and made it smooth</li>
+                    <li>General optimizations to code</li>
+                </ul>
+            </div>
+            <div class="build" version="1.1.0a" date="May 24th, 2022" tags="alpha">
+                <ul>
+                    <li>Minos now push away from the wall when rotating</li>
+                    <li>Created basic wall generation</li>
+                    <li>Created boom blocks that explode when the piece lands</li>
+                    <ul>
+                        <li>Area Boom Block (Circle): Explodes the area around the block</li>
+                        <li>Line Boom Block (Line): Explodes a full line across the entire board, either vertical or horizontal</li>
+                        <li>Directional Boom Block (Triangle): Explodes a small rectangle in the direction that the arrow is pointing</li>
+                    </ul>
+                    <li>Improvements to the look of the board</li>
+                </ul>
+            </div>
+            <div class="build" version="1.0.0a" date="May 23th, 2022" tags="alpha">
+                <ul>
+                    <li>Created game board</li>
+                    <li>Created Minos</li>
+                    <li>Added simple piece moving, rotating, and placing</li>
+                </ul>
+            </div>
         </ul>
     </main>
 </body>

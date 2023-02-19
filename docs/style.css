@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;400&display=swap');
 :root {
     --color1: #A7C3CC;
-    --color2: #EFEFEF;
+    --color2: white;
     --color3: #121212;
     --spacing: 5px;
 }
@@ -14,8 +14,7 @@ body {
 }
 
 main {
-    padding-left: 25%;
-    padding-right: 25%;
+    margin: 0px 20%;
 }
 
 header {
@@ -24,8 +23,7 @@ header {
     color: var(--color1);
     display: flex;
     align-items: center;
-    padding-left: 25%;
-    padding-right: 25%;
+    justify-content: center;
 }
 
 p {
@@ -36,10 +34,13 @@ p {
     display: flex;
     flex-flow: column nowrap;
     gap: var(--spacing);
+    padding: 0px;
+    margin: var(--spacing);
 }
 
 .build {
-    background-color: white;
+    position: relative;
+    background-color: var(--color2);
     color: var(--color3);
     padding: var(--spacing);
     border-radius: var(--spacing);
@@ -48,17 +49,48 @@ p {
     gap: var(--spacing);
 }
 
+.tag-list {
+    position: absolute;
+    top: var(--spacing);
+    right: var(--spacing);
+    display: flex;
+    flex-flow: row nowrap;
+    gap: var(--spacing);
+}
+
 .tag {
     background-color: black;
     width: fit-content;
-    padding: var(--spacing);
+    padding: 0px var(--spacing);
     border-radius: var(--spacing);
     text-transform: lowercase;
+}
+
+.alpha {
+    background-color: #5b9264;
+    color: var(--color2);
+}
+
+.beta {
+    background-color: #a8a752;
+    color: var(--color2);
+}
+
+.wip {
+    background-color: #864781;
+    color: var(--color2);
+}
+
+.latest {
+    background-color: #a04747;
+    color: var(--color2);
 }
 
 a:link {
     color: inherit;
     transition: background-color 0.25s ease;
+    border-radius: var(--spacing);
+    padding: 0px var(--spacing);
 }
 
 a:visited {
@@ -78,4 +110,10 @@ a:hover {
 a:active {
     /* font-style: italic; */
     background-color: var(--color1);
+}
+
+@media screen and (max-width: 1000px) {
+    main {
+        margin:0px;
+    }
 }
