@@ -2,6 +2,8 @@
 :root {
     --color1: #A7C3CC;
     --color2: #EFEFEF;
+    --color3: #121212;
+    --spacing: 5px;
 }
 
 body {
@@ -26,22 +28,54 @@ header {
     padding-right: 25%;
 }
 
+p {
+    margin: 0;
+}
+
+#build-list {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: var(--spacing);
+}
+
+.build {
+    background-color: white;
+    color: var(--color3);
+    padding: var(--spacing);
+    border-radius: var(--spacing);
+    display: flex;
+    flex-flow: column nowrap;
+    gap: var(--spacing);
+}
+
+.tag {
+    background-color: black;
+    width: fit-content;
+    padding: var(--spacing);
+    border-radius: var(--spacing);
+    text-transform: lowercase;
+}
+
 a:link {
-    color: var(--color2);
+    color: inherit;
+    transition: background-color 0.25s ease;
 }
 
 a:visited {
-    color: var(--color2);
+    color: inherit;
 }
 
 a:focus {
-    font-weight: bold;
+    /* font-style: italic; */
+    background-color: var(--color1);
 }
 
 a:hover {
-    font-weight: bold;
+    /* font-style: italic; */
+    background-color: var(--color1);
 }
 
 a:active {
-    font-weight: bold;
+    /* font-style: italic; */
+    background-color: var(--color1);
 }
