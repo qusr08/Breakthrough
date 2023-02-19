@@ -48,10 +48,23 @@ public class Mino : MonoBehaviour {
 			// If the mino is rotated either 0 or 180 degrees, use the y value of the bounds
 			// If it is rotated 90 or 270 degrees, use the x values of the bounds
 			// For this we only want the lowest part of the bounds which could be either the x or y extents
-			if (transform.localEulerAngles.z % 180f == 0) {
-				return transform.position.y + MinoBounds.min.y;
+			// Monitor the z rotation as a mino is rotated in the inspector for more information
+
+			bool isNegative = transform.localEulerAngles.z < 0;
+			bool is180 = Mathf.RoundToInt(transform.localEulerAngles.z) % 180 == 0;
+
+			if (is180) {
+				if (isNegative) {
+					return transform.position.y + MinoBounds.max.y;
+				} else {
+					return transform.position.y + MinoBounds.min.y;
+				}
 			} else {
-				return transform.position.y + MinoBounds.min.x;
+				if (isNegative) {
+					return transform.position.y + MinoBounds.max.x;
+				} else {
+					return transform.position.y + MinoBounds.min.x;
+				}
 			}
 		}
 	}
@@ -60,10 +73,23 @@ public class Mino : MonoBehaviour {
 			// If the mino is rotated either 0 or 180 degrees, use the y value of the bounds
 			// If it is rotated 90 or 270 degrees, use the x values of the bounds
 			// For this we only want the lowest part of the bounds which could be either the x or y extents
-			if (transform.localEulerAngles.z % 180f == 0) {
-				return transform.position.y + MinoBounds.max.y;
+			// Monitor the z rotation as a mino is rotated in the inspector for more information
+
+			bool isNegative = transform.localEulerAngles.z < 0;
+			bool is180 = Mathf.RoundToInt(transform.localEulerAngles.z) % 180 == 0;
+
+			if (is180) {
+				if (isNegative) {
+					return transform.position.y + MinoBounds.min.y;
+				} else {
+					return transform.position.y + MinoBounds.max.y;
+				}
 			} else {
-				return transform.position.y + MinoBounds.max.x;
+				if (isNegative) {
+					return transform.position.y + MinoBounds.min.x;
+				} else {
+					return transform.position.y + MinoBounds.max.x;
+				}
 			}
 		}
 	}
@@ -83,8 +109,9 @@ public class Mino : MonoBehaviour {
 		foreach (Collider2D blockCollider2D in GetComponentsInChildren<Collider2D>( )) {
 			MinoBounds.Encapsulate(blockCollider2D.bounds);
 		}
-		// Keep the center of the bounds at (0, 0) so the max and minimum of the mino bounds can update as the position changes
-		MinoBounds.center = Vector3.zero;
+
+		// Keep the center at a relative position so we can use it to calculate the min and max of the mino bounds as it moves
+		MinoBounds.center -= transform.position;
 	}
 
 	private void Awake ( ) {

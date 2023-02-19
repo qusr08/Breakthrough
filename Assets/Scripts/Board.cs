@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 public enum BoardUpdateState {
-	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS
+	PLACING_MINO, UPDATING_BOOM_BLOCKS, UPDATING_BLOCK_GROUPS, PAUSED, BREAKTHROUGH, GAME_OVER
 }
 
 public class Board : MonoBehaviour {
@@ -29,20 +29,28 @@ public class Board : MonoBehaviour {
 	[SerializeField, Range(0f, 10f)] public int BottomPadding = 2;
 	[SerializeField, Range(0f, 20f)] public float CameraPadding = 3;
 	[SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
-	/// TODO: Figure out how this number is achieved
-	[SerializeField, Min(0f)] private float gameCanvasScale = 0.028703f;
+	[SerializeField, Min(0f)] private float gameCanvasScale = 0.028703f; /// TODO: Figure out how this number is achieved, I got no clue
 	[SerializeField, Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
 	[SerializeField] private BoardUpdateState _boardUpdateState;
 	[SerializeField] public Mino ActiveMino = null;
+	[Space]
+	[SerializeField] private float level = 0f;
+	[SerializeField] private int wallHeight = 0;
+	[SerializeField] private float wallRoughness = 0f;
+	[SerializeField] private float wallElevation = 0f;
+	[SerializeField, Min(0)] private int wallMaxHeight = 11;
+	[SerializeField, Min(0)] private int wallMinHeight = 2;
+	[SerializeField, Range(0f, 1f)] private float wallMaxRoughness = 2f;
+	[SerializeField, Range(0f, 1f)] private float wallMinRoughness = 0.1f;
+	[SerializeField, Range(0f, 1f)] private float wallMaxElevation = 1f;
+	[SerializeField, Range(0f, 1f)] private float wallMinElevation = 0.1f;
+	[Space]
 	[SerializeField, Range(0f, 1f)] private float boomBlockSpawnChance = 0.4f;
 	[SerializeField, Min(0f)] private int boomBlockGuarantee = 5;
 	[HideInInspector] public int BoomBlockDrought = 0;
 
-    /// TODO: Have these change over time to increase the difficulty
-    private int wallHeight = 7;
-	private float wallRoughness = 0.4f;
-	private float wallElevation = 0f;
+	/// TODO: Have these change over time to increase the difficulty
 
 	// Used for tracking the boom block explosions
 	private List<BoomBlockFrames> boomBlockFrames;
@@ -51,7 +59,7 @@ public class Board : MonoBehaviour {
 	// Used for tracking what minos are left on the board
 	private List<List<Block>> minoBlocks;
 
-    public float CurrentBoomBlockSpawnPercentage {
+	public float CurrentBoomBlockSpawnPercentage {
 		get {
 			return ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockSpawnChance) + boomBlockSpawnChance;
 		}
@@ -63,7 +71,13 @@ public class Board : MonoBehaviour {
 		}
 
 		set {
+			_boardUpdateState = value;
+
 			switch (value) {
+				case BoardUpdateState.BREAKTHROUGH:
+					Generate( );
+
+					break;
 				case BoardUpdateState.PLACING_MINO:
 					GenerateRandomMino( );
 
@@ -75,8 +89,6 @@ public class Board : MonoBehaviour {
 
 					break;
 			}
-
-			_boardUpdateState = value;
 		}
 	}
 
@@ -126,19 +138,21 @@ public class Board : MonoBehaviour {
 
 		// Set board area delegate methods
 		breakthroughArea.OnMinoEnter += ( ) => {
-			Debug.Log("BREAKTHROUGH!!");
+			Debug.Log("BREAKTHROUGH!");
+			BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
 		};
 		gameOverArea.OnMinoLand += ( ) => {
 			Debug.Log("GAME OVER");
+			BoardUpdateState = BoardUpdateState.GAME_OVER;
 		};
 	}
 
 	private void Start ( ) {
-		GenerateWall( );
+		wallHeight = wallMinHeight;
+		wallRoughness = wallMinRoughness;
+		wallElevation = wallMinElevation;
 
-		BoardUpdateState = BoardUpdateState.PLACING_MINO;
-
-		/// TODO: Add game loop
+		BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
 	}
 
 	private void Update ( ) {
@@ -189,9 +203,12 @@ public class Board : MonoBehaviour {
 	/// <summary>
 	/// Generate the wall that appears in the level
 	/// </summary>
-	private void GenerateWall ( ) {
-		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
+	private void Generate ( ) {
+		// Remove all previous blocks from the board
+		RemoveAllBlocksFromBoard( );
 
+		// Generate the wall
+		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
 		for (int i = 0; i < Width; i++) {
 			for (int j = 0; j < wallHeight; j++) {
 				// Make sure the perlin noise value can be converted to a wall block
@@ -207,6 +224,12 @@ public class Board : MonoBehaviour {
 				}
 			}
 		}
+
+		// Increase the difficulty of the game
+		UpdateDifficulty( );
+
+		// Update the state to start placing minos
+		BoardUpdateState = BoardUpdateState.PLACING_MINO;
 	}
 
 	/// <summary>
@@ -234,7 +257,7 @@ public class Board : MonoBehaviour {
 		while (mino.transform.childCount > 0) {
 			// Get a block from the mino
 			Block block = mino.transform.GetChild(0).GetComponent<Block>( );
-			
+
 			// Add the block to the board
 			minoBlocks[minoBlocks.Count - 1].Add(block);
 			AddBlockToBoard(block);
@@ -247,7 +270,11 @@ public class Board : MonoBehaviour {
 
 		Destroy(mino.gameObject);
 
-		BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
+		// Only start to update the boom blocks if the current state is not a breakthrough
+		// When the code is in a state of a breakthrough, all of the wall is being regenerated and it makes no sense to update boom blocks
+		if (BoardUpdateState != BoardUpdateState.BREAKTHROUGH) {
+			BoardUpdateState = BoardUpdateState.UPDATING_BOOM_BLOCKS;
+		}
 	}
 
 	/// <summary>
@@ -295,6 +322,14 @@ public class Board : MonoBehaviour {
 	public void UpdateBoardAreas ( ) {
 		breakthroughArea.UpdateDelegates( );
 		gameOverArea.UpdateDelegates( );
+	}
+
+	private void UpdateDifficulty ( ) {
+		// Increase the difficulty of the game
+		level += 0.16666666666f;
+		wallHeight = Mathf.Min(Mathf.RoundToInt(Mathf.Sqrt(4.5f * level) + wallMinHeight), wallMaxHeight);
+		wallRoughness = Mathf.Min(level * level * 0.006f + wallMinRoughness, wallMaxRoughness);
+		wallElevation = Mathf.Min(level * level * 0.02f + wallMinElevation, wallMaxElevation);
 	}
 
 	/// <summary>
@@ -351,6 +386,20 @@ public class Board : MonoBehaviour {
 		}
 
 		return false;
+	}
+
+	public void RemoveAllBlocksFromBoard ( ) {
+		// Get all block groups and minos in the scene
+		BlockGroup[ ] blockGroups = FindObjectsOfType<BlockGroup>( );
+		Mino[ ] minos = FindObjectsOfType<Mino>( );
+
+		// Destroy all of them
+		for (int i = blockGroups.Length - 1; i >= 0; i--) {
+			Destroy(blockGroups[i].gameObject);
+		}
+		for (int i = minos.Length - 1; i >= 0; i--) {
+			Destroy(minos[i].gameObject);
+		}
 	}
 
 	/// <summary>
