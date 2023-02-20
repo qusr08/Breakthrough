@@ -22,13 +22,14 @@ public class Board : MonoBehaviour {
 	[SerializeField] private SpriteRenderer boardSpriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
 	[SerializeField] private RectTransform gameCanvasRectTransform;
-	[Header("Properties")]
+    [SerializeField] private RectTransform leftListRectTransform;
+    [SerializeField] private RectTransform rightListRectTransform;
+    [Header("Properties")]
 	[SerializeField, Range(4f, 32f)] public int Width = 16;
 	[SerializeField, Range(20f, 40f)] public int Height = 28;
-	[SerializeField, Range(0f, 10f)] public int TopPadding = 2;
-	[SerializeField, Range(0f, 10f)] public int BottomPadding = 2;
 	[SerializeField, Range(0f, 20f)] public float CameraPadding = 3;
-	[SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
+    [SerializeField, Min(0f)] public float UIPadding = 0f;
+    [SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
 	[SerializeField, Min(0f)] private float gameCanvasScale = 0.028703f; /// TODO: Figure out how this number is achieved, I got no clue
 	[SerializeField, Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
@@ -49,8 +50,6 @@ public class Board : MonoBehaviour {
 	[SerializeField, Range(0f, 1f)] private float boomBlockSpawnChance = 0.4f;
 	[SerializeField, Min(0f)] private int boomBlockGuarantee = 5;
 	[HideInInspector] public int BoomBlockDrought = 0;
-
-	/// TODO: Have these change over time to increase the difficulty
 
 	// Used for tracking the boom block explosions
 	private List<BoomBlockFrames> boomBlockFrames;
@@ -92,6 +91,9 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	public BoardArea GameOverBoardArea { get => gameOverArea; }
+	public BoardArea BreakthroughBoardArea { get => breakthroughArea; }
+
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -120,11 +122,9 @@ public class Board : MonoBehaviour {
 		// Set game canvas dimensions
 		gameCanvasRectTransform.localPosition = Vector3.zero;
 		gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 1);
-		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2)) / gameCanvasScale);
+		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2) + UIPadding) / gameCanvasScale);
 		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (borderThickness * 2)) / gameCanvasScale);
-
-		/// TODO: Set the UI element sizes when the board is resized
-	}
+    }
 
 	private void Awake ( ) {
 #if UNITY_EDITOR
@@ -217,7 +217,7 @@ public class Board : MonoBehaviour {
 				// If the perlin noise value is greater than 0, a wall block will spawn
 				// If it is less than or equal to 0, there will be a gap in the wall at that point
 				if (perlinValue > 0) {
-					Block block = Instantiate(blockPrefab, new Vector3(i, j + BottomPadding), Quaternion.identity).GetComponent<Block>( );
+					Block block = Instantiate(blockPrefab, new Vector3(i, j + breakthroughArea.Height), Quaternion.identity).GetComponent<Block>( );
 					block.Health = perlinValue;
 
 					AddBlockToBoard(block);
@@ -239,7 +239,7 @@ public class Board : MonoBehaviour {
 		/// TODO: Make getting specific transform positions on the board cleaner in code
 
 		// The spawn position is going to be near the top middle of the board
-		Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - TopPadding - 0.5f);
+		Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) - 0.5f);
 
 		// Spawn a random type of mino
 		ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );

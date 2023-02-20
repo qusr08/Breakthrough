@@ -81,13 +81,13 @@ public class BlockGroup : MonoBehaviour {
 			}
 
 			// If this block group can't fall below the bottom of the board but is trying to
-			if (!CanFallBelow && toPosition.y < board.BottomPadding) {
+			if (!CanFallBelow && toPosition.y < board.BreakthroughBoardArea.Height) {
 				// The block group can't move down then
 				isValidMove = false;
 			}
 
 			// If the current position of the block is below the bottom of the board
-			if (currPosition.y < board.BottomPadding) {
+			if (currPosition.y < board.BreakthroughBoardArea.Height) {
 				// Remove the block from the board
 				// gameManager.AddBoardPoints(gameManager.PointsPerDroppedBlock, PointsEffectType.PARTICLE, this[i]);
 				gameManager.BoardPoints += gameManager.PointsPerDroppedBlock;
@@ -100,7 +100,7 @@ public class BlockGroup : MonoBehaviour {
 			moveTo += direction;
 
 			// If this block group makes a successful move that is not below the bottom of the board, then it can fall below the board
-			if (!CanFallBelow && moveTo.y >= board.BottomPadding) {
+			if (!CanFallBelow && moveTo.y >= board.BreakthroughBoardArea.Height) {
 				CanFallBelow = true;
 			}
 		}
