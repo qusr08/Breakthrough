@@ -91,6 +91,7 @@ public class BlockGroup : MonoBehaviour {
 				// Remove the block from the board
 				// gameManager.AddBoardPoints(gameManager.PointsPerDroppedBlock, PointsEffectType.PARTICLE, this[i]);
 				gameManager.BoardPoints += gameManager.PointsPerDroppedBlock;
+				Debug.Log("Points: Dropped block");
 				board.RemoveBlockFromBoard(this[i], true);
 			}
 		}

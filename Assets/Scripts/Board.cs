@@ -22,14 +22,14 @@ public class Board : MonoBehaviour {
 	[SerializeField] private SpriteRenderer boardSpriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
 	[SerializeField] private RectTransform gameCanvasRectTransform;
-    [SerializeField] private RectTransform leftListRectTransform;
-    [SerializeField] private RectTransform rightListRectTransform;
-    [Header("Properties")]
+	[SerializeField] private RectTransform leftListRectTransform;
+	[SerializeField] private RectTransform rightListRectTransform;
+	[Header("Properties")]
 	[SerializeField, Range(4f, 32f)] public int Width = 16;
 	[SerializeField, Range(20f, 40f)] public int Height = 28;
 	[SerializeField, Range(0f, 20f)] public float CameraPadding = 3;
-    [SerializeField, Min(0f)] public float UIPadding = 0f;
-    [SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
+	[SerializeField, Min(0f)] public float UIPadding = 0f;
+	[SerializeField, Range(0f, 5f)] private float borderThickness = 0.75f;
 	[SerializeField, Min(0f)] private float gameCanvasScale = 0.028703f; /// TODO: Figure out how this number is achieved, I got no clue
 	[SerializeField, Range(0.001f, 1f)] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
@@ -91,8 +91,12 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	public BoardArea GameOverBoardArea { get => gameOverArea; }
-	public BoardArea BreakthroughBoardArea { get => breakthroughArea; }
+	public BoardArea GameOverBoardArea {
+		get => gameOverArea;
+	}
+	public BoardArea BreakthroughBoardArea {
+		get => breakthroughArea;
+	}
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
@@ -124,7 +128,7 @@ public class Board : MonoBehaviour {
 		gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 1);
 		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2) + UIPadding) / gameCanvasScale);
 		gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (borderThickness * 2)) / gameCanvasScale);
-    }
+	}
 
 	private void Awake ( ) {
 #if UNITY_EDITOR
@@ -138,11 +142,15 @@ public class Board : MonoBehaviour {
 
 		// Set board area delegate methods
 		breakthroughArea.OnMinoEnter += ( ) => {
-			Debug.Log("BREAKTHROUGH!");
+			// Update points
+			gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
+			Debug.Log("Points: Breakthrough");
+			gameManager.TotalPoints += gameManager.BoardPoints;
+			gameManager.BoardPoints = 0;
+
 			BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
 		};
 		gameOverArea.OnMinoLand += ( ) => {
-			Debug.Log("GAME OVER");
 			BoardUpdateState = BoardUpdateState.GAME_OVER;
 		};
 	}
@@ -239,7 +247,7 @@ public class Board : MonoBehaviour {
 		/// TODO: Make getting specific transform positions on the board cleaner in code
 
 		// The spawn position is going to be near the top middle of the board
-		Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) - 0.5f);
+		Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) * 0.25f - 0.5f);
 
 		// Spawn a random type of mino
 		ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
@@ -250,8 +258,8 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="mino">The Mino to add</param>
 	public void AddLandedMinoToBoard (Mino mino) {
-		// Create a new index for this mino to track which blocks of it are left on the board
-		minoBlocks.Add(new List<Block>( ));
+		// Get an empty mino index to add this mino's blocks to
+		int emptyMinoIndex = GetFirstEmptyMinoIndex( );
 
 		// Add all blocks that are part of the mino to the board
 		while (mino.transform.childCount > 0) {
@@ -259,8 +267,9 @@ public class Board : MonoBehaviour {
 			Block block = mino.transform.GetChild(0).GetComponent<Block>( );
 
 			// Add the block to the board
-			minoBlocks[minoBlocks.Count - 1].Add(block);
+			minoBlocks[emptyMinoIndex].Add(block);
 			AddBlockToBoard(block);
+			block.MinoIndex = emptyMinoIndex;
 		}
 
 		// If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
@@ -364,10 +373,21 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Remove a block from the board
+	/// </summary>
+	/// <param name="position">The position of the block to try and remove</param>
+	/// <returns>Whether or not the block was removed</returns>
 	public bool RemoveBlockFromBoard (Vector3 position) {
 		return RemoveBlockFromBoard(GetBlockAtPosition(position));
 	}
 
+	/// <summary>
+	/// Remove a block from the board
+	/// </summary>
+	/// <param name="block">The block to remove</param>
+	/// <param name="ignoreHealth">Whether or not ignore the blocks health. If set to true, the block will definitely be destroyed no matter how damaged it is</param>
+	/// <returns>Whether or not the block was destroyed</returns>
 	public bool RemoveBlockFromBoard (Block block, bool ignoreHealth = false) {
 		// Make sure the block exists
 		if (block == null) {
@@ -377,11 +397,26 @@ public class Board : MonoBehaviour {
 		// Make sure the block group that the block was a part of is marked as modified
 		block.BlockGroup.IsModified = true;
 
+		int blockMinoIndex = block.MinoIndex;
+		int blockIndex = minoBlocks[blockMinoIndex].IndexOf(block);
+
 		block.Health -= (ignoreHealth ? block.Health : 1);
 
 		// If the health has reached 0, then it has been destroyed
 		// If the block is null here then the block was destroyed
 		if (block == null) {
+			// If the block has a mino index, it was once part of a mino
+			// If it does not have a mino index, then it was originally part of the wall
+			if (blockMinoIndex != -1 && blockIndex != -1) {
+				// If the block gets destroyed, a full mino may have also been destroyed
+				// Give the player some bonus points if this happens
+				minoBlocks[blockMinoIndex].RemoveAt(blockIndex);
+				if (minoBlocks[blockMinoIndex].Count == 0) {
+					gameManager.BoardPoints += gameManager.PointsPerDestroyedMino;
+					Debug.Log("Points: Full Mino");
+				}
+			}
+
 			return true;
 		}
 
@@ -472,5 +507,21 @@ public class Board : MonoBehaviour {
 		}
 
 		return surroundingBlocks;
+	}
+
+	/// <summary>
+	/// Get the first empty index in the minoBlocks array. If there are no empty indices, then a new one is created at the end.
+	/// </summary>
+	/// <returns>The first occurance of an empty index in the array</returns>
+	private int GetFirstEmptyMinoIndex ( ) {
+		// Create a new index for this mino to track which blocks of it are left on the board
+		for (int i = 0; i < minoBlocks.Count; i++) {
+			if (minoBlocks[i].Count == 0) {
+				return i;
+			}
+		}
+
+		minoBlocks.Add(new List<Block>( ));
+		return minoBlocks.Count - 1;
 	}
 }

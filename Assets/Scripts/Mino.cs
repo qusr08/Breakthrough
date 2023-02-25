@@ -222,6 +222,8 @@ public class Mino : MonoBehaviour {
 				if (vert < 0) {
 					placeTimer = PLACE_TIME;
 					// gameManager.TriggerPointsEvent(PointsEventType.FAST_DROP);
+					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
+					Debug.Log("Points: Fast drop");
 				}
 			} else if (placeTimer <= 0) {
 				HasLanded = true;

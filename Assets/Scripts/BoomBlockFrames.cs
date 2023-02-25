@@ -142,6 +142,7 @@ public class BoomBlockFrames {
 			if ((block = board.GetBlockAtPosition(frames[0][i])) != null) {
 				// gameManager.AddBoardPoints(gameManager.PointsPerDestroyedBlock, PointsEffectType.PARTICLE, block);
 				gameManager.BoardPoints += gameManager.PointsPerDestroyedBlock;
+				Debug.Log("Points: Destroyed block");
 				board.RemoveBlockFromBoard(frames[0][i]);
 			}
 		}

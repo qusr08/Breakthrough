@@ -35,6 +35,7 @@ public class Block : MonoBehaviour {
 	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
 	[SerializeField] private int _health = 1;
 	[SerializeField] private Color spriteTextureColor;
+	[SerializeField] private int minoIndex = -1;
 
 	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.LIGHT_COAL, BlockColor.MEDIUM_COAL, BlockColor.DARK_COAL };
 
@@ -119,6 +120,9 @@ public class Block : MonoBehaviour {
 		get {
 			return spriteRenderer.sprite;
 		}
+	}
+	public int MinoIndex {
+		get => minoIndex; set => minoIndex = value;
 	}
 
 #if UNITY_EDITOR

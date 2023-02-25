@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] public int PointsPerDroppedBlock = 12;
 	[SerializeField] public int PointsPerBreakthrough = 600;
 	[SerializeField] public int PointsPerDestroyedMino = 60;
-	// [SerializeField] public int PointsPerFastDrop = 2;
+	[SerializeField] public int PointsPerFastDrop = 2;
 	[SerializeField] private List<PointsEvent> pointsEvents;
 
 	public int BoardPoints {
