@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// THIS CLASS IS VERY NEARLY DEPRECIATED
+
 public class BoardUIParticle : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private SpriteRenderer spriteRenderer;

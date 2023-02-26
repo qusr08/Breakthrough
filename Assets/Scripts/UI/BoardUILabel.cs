@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+// THIS CLASS IS VERY NEARLY DEPRECIATED
+
 public class BoardUILabel : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] public TextMeshProUGUI Label;
