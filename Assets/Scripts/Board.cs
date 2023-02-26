@@ -268,8 +268,8 @@ public class Board : MonoBehaviour {
 
 			// Add the block to the board
 			minoBlocks[emptyMinoIndex].Add(block);
-			AddBlockToBoard(block);
 			block.MinoIndex = emptyMinoIndex;
+			AddBlockToBoard(block);
 		}
 
 		// If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
@@ -396,26 +396,24 @@ public class Board : MonoBehaviour {
 
 		// Make sure the block group that the block was a part of is marked as modified
 		block.BlockGroup.IsModified = true;
-
-		int blockMinoIndex = block.MinoIndex;
-		int blockIndex = minoBlocks[blockMinoIndex].IndexOf(block);
-
 		block.Health -= (ignoreHealth ? block.Health : 1);
 
-		// If the health has reached 0, then it has been destroyed
-		// If the block is null here then the block was destroyed
-		if (block == null) {
+		// If the health has reached 0, then the block will be destroyed
+		if (block.Health == 0) {
 			// If the block has a mino index, it was once part of a mino
 			// If it does not have a mino index, then it was originally part of the wall
-			if (blockMinoIndex != -1 && blockIndex != -1) {
+			if (block.MinoIndex != -1) {
 				// If the block gets destroyed, a full mino may have also been destroyed
 				// Give the player some bonus points if this happens
-				minoBlocks[blockMinoIndex].RemoveAt(blockIndex);
-				if (minoBlocks[blockMinoIndex].Count == 0) {
+				minoBlocks[block.MinoIndex].Remove(block);
+				if (minoBlocks[block.MinoIndex].Count == 0) {
 					gameManager.BoardPoints += gameManager.PointsPerDestroyedMino;
 					Debug.Log("Points: Full Mino");
 				}
 			}
+
+			// Destroy the block gameobject
+			DestroyImmediate(block.gameObject);
 
 			return true;
 		}

@@ -24,14 +24,15 @@ public class UIButton : MonoBehaviour {
 #endif
 
 		// Set the dimensions of the button
-		float width = pixelSize * dimensions.x;
-		float height = pixelSize * dimensions.y;
+		float width = (dimensions.x * pixelSize) + ((dimensions.x - 1) * spacing);
+		float height = (dimensions.y * pixelSize) + ((dimensions.y - 1) * spacing);
 		rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
 		rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
 
 		// Set the position of the button
-		Vector2 center = new Vector2();
-		rectTransform.localPosition = new Vector2(coordinates.x * (width + spacing), coordinates.y * (height + spacing));
+		float positionX = (pixelSize + spacing) * (coordinates.x + (dimensions.x * 0.5f - 0.5f));
+		float positionY = (pixelSize + spacing) * (coordinates.y - (dimensions.y * 0.5f - 0.5f));
+		rectTransform.localPosition = new Vector2(positionX, positionY);
 	}
 
 	private void Awake ( ) {

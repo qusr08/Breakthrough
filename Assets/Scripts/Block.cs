@@ -90,9 +90,7 @@ public class Block : MonoBehaviour {
 
 			_health = value;
 
-			if (_health <= 0) {
-				DestroyImmediate(gameObject);
-			} else {
+			if (_health > 0) {
 				BlockColor = wallColorStages[_health - 1];
 			}
 		}
