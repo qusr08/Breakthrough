@@ -80,14 +80,12 @@ public class BackgroundBlockSpawner : MonoBehaviour
         }
 
         // Set the block to have a random color
-        if (ColorUtility.TryParseHtmlString(colors[Random.Range(0, colors.Count)], out Color color))
-        {
-            color.a = alpha;
-            newBackgroundBlock.GetComponent<SpriteRenderer>().color = color;
-        }
+        Color color = Utils.GetColorFromHex(colors[Random.Range(0, colors.Count)]);
+		color.a = alpha;
+		newBackgroundBlock.GetComponent<SpriteRenderer>( ).color = color;
 
-        // Get a random position for the background block
-        Vector3 position;
+		// Get a random position for the background block
+		Vector3 position;
         if (spawnInside)
         {
             // Spawn the blocks anywhere inside the bounds

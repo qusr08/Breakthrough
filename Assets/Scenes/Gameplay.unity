@@ -1065,8 +1065,8 @@ SpriteRenderer:
   m_SortingLayerID: 205540463
   m_SortingLayer: 2
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 0d8ca2dd0d6dfd44a92ffbb905295565, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: f31eba1194ec1b04f90c2e8adefcf6d7, type: 3}
+  m_Color: {r: 0.654902, g: 0.7647059, b: 0.8, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
@@ -1410,7 +1410,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 38.140358, y: 26.106602, z: 0}
+    m_Extent: {x: 38.15456, y: 26.106602, z: 0}
   spawnRate: 2
   maxBlocks: 17
 --- !u!4 &1775966053

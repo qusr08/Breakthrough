@@ -50,6 +50,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 0}
+  gameManager: {fileID: 0}
+  HasLanded: 0
+  MinoBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 1.5, y: 0.5, z: 0}
+  HasBoomBlock: 0
 --- !u!1001 &1830994206148728340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -62,9 +68,17 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -114,6 +128,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -123,7 +141,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 0.78039217
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -144,9 +178,17 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -196,6 +238,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -205,7 +251,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 0.78039217
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -226,9 +288,17 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -278,6 +348,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -287,7 +361,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 0.78039217
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -308,9 +398,21 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -360,6 +462,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -369,7 +475,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -390,9 +512,17 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -442,6 +572,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -451,7 +585,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 0.78039217
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}
@@ -472,9 +622,17 @@ PrefabInstance:
       value: Block
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 46872884236254345, guid: b3831123d0cef534d8937e3c7d6d914d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.g
+      value: 0.25882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931900, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: m_Color.r
+      value: 0.78039217
+      objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931901, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -524,6 +682,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: board
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: color
       value: 9
       objectReference: {fileID: 0}
@@ -533,7 +695,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
       propertyPath: _blockColor
-      value: 4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130229828950931902, guid: d2b730b0859741245866fc9131da88ed, type: 3}
+      propertyPath: spriteTextureColor.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2b730b0859741245866fc9131da88ed, type: 3}

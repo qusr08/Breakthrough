@@ -140,4 +140,17 @@ public static class Utils {
 	public static int GetEnumSize (Type enumType) {
 		return Enum.GetNames(enumType).Length;
 	}
+
+	/// <summary>
+	/// Parse a hex color string to a color object
+	/// </summary>
+	/// <param name="hex">The hex string to parse. Make sure to include the '#' in front of the code.</param>
+	/// <returns>A color object of the parsed hex string. If there was an error parsing the string, the color white is returned.</returns>
+	public static Color GetColorFromHex (string hex) {
+		if (ColorUtility.TryParseHtmlString(hex, out Color color)) {
+			return color;
+		}
+
+		return Color.white;
+	}
 }

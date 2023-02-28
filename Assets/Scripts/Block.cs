@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 public enum BlockColor {
-	DARK_PURPLE, DARK_COAL, DARK_BLUE, TEAL, DARK_PINK, ORANGE, GREEN, LIGHT_BLUE, LIGHT_PURPLE, LIGHT_PINK, MEDIUM_COAL, LIGHT_COAL
+	DARK_PURPLE, DARK_BLUE, DARK_PINK, TEAL, ORANGE, GREEN, LIGHT_BLUE, LIGHT_PURPLE, LIGHT_PINK, WALL_1, WALL_2, WALL_3
 }
 
 public enum BlockType {
@@ -28,16 +28,15 @@ public class Block : MonoBehaviour {
 	[SerializeField] public int SurroundBoomBlockSize = 2;
 	[SerializeField] public int DirectionalBoomBlockSize = 3;
 	[Space]
-	[SerializeField] private Sprite[ ] colors;
+	[SerializeField] private string[ ] colors;
 	[SerializeField] private Sprite[ ] icons;
-	[SerializeField] private BlockColor _blockColor = BlockColor.DARK_COAL;
+	[SerializeField] private BlockColor _blockColor = BlockColor.WALL_3;
 	[SerializeField] private BlockType _blockType = BlockType.NORMAL;
 	[SerializeField] private BlockDirection _blockDirection = BlockDirection.RIGHT;
 	[SerializeField] private int _health = 1;
-	[SerializeField] private Color spriteTextureColor;
 	[SerializeField] private int minoIndex = -1;
 
-	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.LIGHT_COAL, BlockColor.MEDIUM_COAL, BlockColor.DARK_COAL };
+	private BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.WALL_1, BlockColor.WALL_2, BlockColor.WALL_3 };
 
 	public BlockColor BlockColor {
 		get {
@@ -47,13 +46,12 @@ public class Block : MonoBehaviour {
 		set {
 			_blockColor = value;
 
-			spriteRenderer.sprite = colors[(int) _blockColor];
+			spriteRenderer.color = Utils.GetColorFromHex(colors[(int) _blockColor]);
 
 			int textureX = (int) spriteRenderer.sprite.rect.x;
 			int textureY = (int) spriteRenderer.sprite.rect.y;
 			int textureWidth = (int) spriteRenderer.sprite.rect.width;
 			int textureHeight = (int) spriteRenderer.sprite.rect.height;
-			spriteTextureColor = spriteRenderer.sprite.texture.GetPixel(textureX + (textureWidth / 2), textureY + (textureHeight / 2));
 		}
 	}
 	public BlockType BlockType {
@@ -213,7 +211,7 @@ public class Block : MonoBehaviour {
 		ParticleSystem blockParticles = Instantiate(blockParticlesPrefab, transform.position, Quaternion.identity).GetComponent<ParticleSystem>( );
 		ParticleSystem.MainModule blockParticlesMainModule = blockParticles.main;
 		
-		blockParticlesMainModule.startColor = spriteTextureColor;
+		blockParticlesMainModule.startColor = spriteRenderer.color;
 		
 		blockParticles.Play( );
 	}
