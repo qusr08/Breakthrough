@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BackgroundBlockSpawner : MonoBehaviour
-{
+public class BackgroundBlockSpawner : MonoBehaviour {
+    [Header("Prefabs")]
     [SerializeField, Tooltip("The prefab for the background blocks that will spawn.")] private GameObject prefabBackgroundBlock;
-    [Space]
+    [Header("Background Block Variables")]
     [SerializeField, Min(0f), Tooltip("The maximum size that a background block can be.")] private float maxBlockSize;
     [SerializeField, Min(0f), Tooltip("The minimum size that a background block can be.")] private float minBlockSize;
     [SerializeField, Min(0f), Tooltip("The maximum speed that a background block can have.")] private float maxBlockSpeed;
@@ -20,90 +20,74 @@ public class BackgroundBlockSpawner : MonoBehaviour
     [SerializeField, Min(0f), Tooltip("The maximum amount of blocks that the can be spawned in.")] private int maxBlocks;
 
     private List<BackgroundBlock> disabledBackgroundBlocks;
-
     private float spawnTimer;
 
-    private int GetActiveBackgroundBlocks
-    {
-        get => transform.childCount - disabledBackgroundBlocks.Count;
-    }
+    private int GetActiveBackgroundBlocks { get => transform.childCount - disabledBackgroundBlocks.Count; }
 
-    private void OnValidate()
-    {
+    private void OnValidate ( ) {
         float boundsHeight = (maxBlockSize * Mathf.Sqrt(2)) + (Camera.main.orthographicSize * 2f);
         float boundsWidth = (maxBlockSize * Mathf.Sqrt(2)) + (Camera.main.aspect * Camera.main.orthographicSize * 2f);
-        BackgroundBlockBounds = new Bounds((Vector2)Camera.main.transform.position, new Vector2(boundsWidth, boundsHeight));
+        BackgroundBlockBounds = new Bounds((Vector2) Camera.main.transform.position, new Vector2(boundsWidth, boundsHeight));
     }
 
-    private void Awake()
-    {
-        OnValidate();
+    private void Awake ( ) {
+        OnValidate( );
     }
 
-    private void Start()
-    {
+    private void Start ( ) {
         spawnTimer = 0;
-        disabledBackgroundBlocks = new List<BackgroundBlock>();
+        disabledBackgroundBlocks = new List<BackgroundBlock>( );
 
-        for (int i = 0; i < maxBlocks; i++)
-        {
+        for (int i = 0; i < maxBlocks; i++) {
             SpawnBackgroundBlock(true);
         }
     }
 
-    private void Update()
-    {
+    private void Update ( ) {
         // If it is time to spawn a new background block and there are under the max amount of blocks currently active on the screen, then it is valid to spawn a new block
         spawnTimer += Time.deltaTime;
-        if (spawnTimer >= spawnRate && GetActiveBackgroundBlocks < maxBlocks)
-        {
-            SpawnBackgroundBlock();
+        if (spawnTimer >= spawnRate && GetActiveBackgroundBlocks < maxBlocks) {
+            SpawnBackgroundBlock( );
             spawnTimer -= spawnRate;
         }
     }
 
-    private void SpawnBackgroundBlock(bool spawnInside = false)
-    {
+    /// <summary>
+    /// Spawn a new background block
+    /// </summary>
+    /// <param name="spawnInside">Whether or not to spawn the background block in the inside of the bounds or along the edges of the bounds.</param>
+    private void SpawnBackgroundBlock (bool spawnInside = false) {
         BackgroundBlock newBackgroundBlock;
         // If there are some disabled background blocks, use them instead of spawning new ones
         // If there are no disabled blocks, however, then instantiate a new background block
-        if (disabledBackgroundBlocks.Count > 0)
-        {
+        if (disabledBackgroundBlocks.Count > 0) {
             newBackgroundBlock = disabledBackgroundBlocks[0];
             newBackgroundBlock.gameObject.SetActive(true);
             disabledBackgroundBlocks.RemoveAt(0);
-        }
-        else
-        {
-            newBackgroundBlock = Instantiate(prefabBackgroundBlock, Vector3.zero, Quaternion.identity).GetComponent<BackgroundBlock>();
+        } else {
+            newBackgroundBlock = Instantiate(prefabBackgroundBlock, Vector3.zero, Quaternion.identity).GetComponent<BackgroundBlock>( );
             newBackgroundBlock.BackgroundBlockSpawner = this;
         }
 
         // Set the block to have a random color
         Color color = Utils.GetColorFromHex(colors[Random.Range(0, colors.Count)]);
-		color.a = alpha;
-		newBackgroundBlock.GetComponent<SpriteRenderer>( ).color = color;
+        color.a = alpha;
+        newBackgroundBlock.GetComponent<SpriteRenderer>( ).color = color;
 
-		// Get a random position for the background block
-		Vector3 position;
-        if (spawnInside)
-        {
+        // Get a random position for the background block
+        Vector3 position;
+        if (spawnInside) {
             // Spawn the blocks anywhere inside the bounds
             float x = Random.Range(BackgroundBlockBounds.min.x, BackgroundBlockBounds.max.x);
             float y = Random.Range(BackgroundBlockBounds.min.y, BackgroundBlockBounds.max.y);
             position = new Vector3(x, y);
-        }
-        else
-        {
-            if (Random.Range(0, 2) == 0)
-            {
+        } else {
+            if (Random.Range(0, 2) == 0) {
                 // Spawn the block along either the left or right edge of the bounds (off screen)
                 float x = (Random.Range(0, 2) == 0 ? BackgroundBlockBounds.min.x : BackgroundBlockBounds.max.x);
                 float y = Random.Range(BackgroundBlockBounds.min.y, BackgroundBlockBounds.max.y);
                 position = new Vector3(x, y);
-            }
-            else
-            {
+            } else {
                 // Spawn the block along either the top or bottom edge of the bounds (off screen)
                 float y = (Random.Range(0, 2) == 0 ? BackgroundBlockBounds.min.y : BackgroundBlockBounds.max.y);
                 float x = Random.Range(BackgroundBlockBounds.min.x, BackgroundBlockBounds.max.x);
@@ -134,16 +118,15 @@ public class BackgroundBlockSpawner : MonoBehaviour
         float angularVelocity = Random.Range(minBlockRotateSpeed, maxBlockRotateSpeed);
 
         // Set the linear and angular velocity of the background block
-        newBackgroundBlock.GetComponent<Rigidbody2D>().velocity = velocity;
-        newBackgroundBlock.GetComponent<Rigidbody2D>().angularVelocity = angularVelocity;
+        newBackgroundBlock.GetComponent<Rigidbody2D>( ).velocity = velocity;
+        newBackgroundBlock.GetComponent<Rigidbody2D>( ).angularVelocity = angularVelocity;
     }
 
     /// <summary>
     /// Disable a background block
     /// </summary>
     /// <param name="backgroundBlock">The background block to disable</param>
-    public void DisableBackgroundBlock(BackgroundBlock backgroundBlock)
-    {
+    public void DisableBackgroundBlock (BackgroundBlock backgroundBlock) {
         disabledBackgroundBlocks.Add(backgroundBlock);
         backgroundBlock.gameObject.SetActive(false);
     }

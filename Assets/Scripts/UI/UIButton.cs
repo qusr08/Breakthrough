@@ -4,13 +4,13 @@ using UnityEditor;
 using UnityEngine;
 
 public class UIButton : MonoBehaviour {
-	[Header("Properties")]
+    [Header("Components")]
+    [SerializeField] private RectTransform rectTransform;
+    [Header("Properties")]
 	[SerializeField, Min(0f), Tooltip("The pixel dimensions (width and height) of the button.")] private float pixelSize;
 	[SerializeField, Tooltip("The dimensions of the button in grid sections.")] private Vector2Int dimensions;
 	[SerializeField, Min(0f), Tooltip("The spacing between buttons.")] private float spacing;
 	[SerializeField, Tooltip("The coordinates of the button around the center of its parent object. This factors in the spacing between buttons so it is better than setting the transform position directly.")] private Vector2Int coordinates;
-	[Header("Components")]
-	[SerializeField] private RectTransform rectTransform;
 
 #if UNITY_EDITOR
 	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;

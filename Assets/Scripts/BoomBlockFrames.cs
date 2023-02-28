@@ -138,11 +138,9 @@ public class BoomBlockFrames {
 	public void DestroyFirstFrame ( ) {
 		// Remove each block in the frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
-			Block block = null;
-			if ((block = board.GetBlockAtPosition(frames[0][i])) != null) {
-				// gameManager.AddBoardPoints(gameManager.PointsPerDestroyedBlock, PointsEffectType.PARTICLE, block);
+			if (board.GetBlockAtPosition(frames[0][i]) != null) {
 				gameManager.BoardPoints += gameManager.PointsPerDestroyedBlock;
-				Debug.Log("Points: Destroyed block");
+				// Debug.Log("Points: Destroyed block");
 				board.RemoveBlockFromBoard(frames[0][i]);
 			}
 		}

@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 1130229828950931901}
   - component: {fileID: 1130229828950931900}
   - component: {fileID: 4643309964704893963}
+  - component: {fileID: 3541818754807346855}
   - component: {fileID: 1130229828950931902}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,6 +112,27 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!50 &3541818754807346855
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130229828950931875}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!114 &1130229828950931902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,6 +150,7 @@ MonoBehaviour:
   blockParticlesPrefab: {fileID: 2993162176935200072, guid: a38fee3d5f1afa14fa65d0e0d95dd0de, type: 3}
   spriteRenderer: {fileID: 1130229828950931900}
   iconSpriteRenderer: {fileID: 1130229829663535140}
+  blockRigidbody2D: {fileID: 3541818754807346855}
   SurroundBoomBlockSize: 2
   DirectionalBoomBlockSize: 3
   colors:
@@ -153,6 +176,10 @@ MonoBehaviour:
   _blockDirection: 0
   _health: 1
   minoIndex: -1
+  minBlockVelocity: 1
+  maxBlockVelocity: 2
+  minBlockAngularVelocity: 5
+  maxBlockAngularVelocity: 10
 --- !u!1 &1130229829663535146
 GameObject:
   m_ObjectHideFlags: 0
@@ -163,7 +190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1130229829663535147}
   - component: {fileID: 1130229829663535140}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}

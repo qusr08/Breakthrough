@@ -13,13 +13,13 @@ public class Mino : MonoBehaviour {
 	public const float TILE_SCALE = 0.95f;
 	public const float DAMP_SPEED = 0.04f;
 
-	[Header("Scene GameObjects")]
+	[Header("Scene Objects")]
 	[SerializeField] private Board board;
 	[SerializeField] private GameManager gameManager;
 	[Header("Properties")]
 	[SerializeField, Tooltip("Whether or not the Mino can move.")] public bool HasLanded;
-	[SerializeField] public Bounds MinoBounds;
-	[SerializeField] public bool HasBoomBlock;
+	[SerializeField, Tooltip("The bounds of the Mino.")] public Bounds MinoBounds;
+	[SerializeField, Tooltip("Whether or not this Mino has a boom block on it or not.")] public bool HasBoomBlock;
 
 	// The previous time that this Mino moved downwards on the game board
 	private float prevFallTime;
@@ -221,9 +221,8 @@ public class Mino : MonoBehaviour {
 				// If the player is fast dropping the mino, make sure to give points and reset the place timer
 				if (vert < 0) {
 					placeTimer = PLACE_TIME;
-					// gameManager.TriggerPointsEvent(PointsEventType.FAST_DROP);
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
-					Debug.Log("Points: Fast drop");
+					// Debug.Log("Points: Fast drop");
 				}
 			} else if (placeTimer <= 0) {
 				HasLanded = true;

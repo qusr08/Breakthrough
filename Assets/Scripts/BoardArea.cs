@@ -12,12 +12,11 @@ public class BoardArea : MonoBehaviour {
 	[SerializeField] private Sprite boardFillCircleBottom;
 	[SerializeField] private Sprite boardFillCircleTop;
 	[Header("Properties")]
-	[SerializeField, Range(0f, 1f)] private float lineThickness = 0.25f;
-	[SerializeField, Range(0f, 1f)] private float areaOpacity = 0.1f;
-	[Space]
-	[SerializeField] public Color Color;
-	[SerializeField] public bool IsAreaAbove;
-	[SerializeField, Min(1)] public int Height;
+	[SerializeField, Range(0f, 1f), Tooltip("The thickness of the line that defines the board area.")] private float lineThickness = 0.25f;
+	[SerializeField, Range(0f, 1f), Tooltip("How transparent the board area is.")] private float areaOpacity = 0.1f;
+	[SerializeField, Tooltip("The color of the board area.")] public Color Color;
+	[SerializeField, Tooltip("Whether or not the board area is above or below the line.")] public bool IsAreaAbove;
+	[SerializeField, Min(1), Tooltip("The height of the board area.")] public int Height;
 
 	public delegate void OnMinoEnterDelegate ( );
 	public OnMinoEnterDelegate OnMinoEnter = ( ) => { };
@@ -108,7 +107,10 @@ public class BoardArea : MonoBehaviour {
 #endif
 	}
 
-	public void UpdateDelegates ( ) {
+    /// <summary>
+    /// Update all of the delegate methods and check for scenarios where they would be triggered
+    /// </summary>
+    public void UpdateDelegates ( ) {
 		// If the mino is inside the board area, call some delegate methods
 		if (IsMinoInArea) {
 			// If the mino was not previously inside this board area, then it has just entered the board area
