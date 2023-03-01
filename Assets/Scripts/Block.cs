@@ -202,9 +202,7 @@ public class Block : MonoBehaviour {
 	private void SpawnBlockDebris ( ) {
 		ParticleSystem blockDebris = Instantiate(prefabBlockDebris, transform.position, Quaternion.identity).GetComponent<ParticleSystem>( );
 		ParticleSystem.MainModule blockDebrisMainModule = blockDebris.main;
-
 		blockDebrisMainModule.startColor = spriteRenderer.color;
-
 		blockDebris.Play( );
 	}
 

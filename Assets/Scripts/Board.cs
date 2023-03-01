@@ -15,9 +15,10 @@ public class Board : MonoBehaviour {
     [SerializeField] private BoardArea gameOverArea;
     [SerializeField] private BoardArea breakthroughArea;
     [Header("Prefabs")]
-    [SerializeField] private GameObject blockPrefab;
-    [SerializeField] private GameObject blockGroupPrefab;
-    [SerializeField] private GameObject[ ] minoPrefabs;
+    [SerializeField] private GameObject prefabBlock;
+    [SerializeField] private GameObject prefabBlockGroup;
+    [SerializeField] private GameObject[ ] prefabMinos;
+    [SerializeField] private GameObject prefabBoomBlockDebris;
     [Header("Components")]
     [SerializeField] private SpriteRenderer boardSpriteRenderer;
     [SerializeField] private SpriteRenderer borderSpriteRenderer;
@@ -219,7 +220,7 @@ public class Board : MonoBehaviour {
                 // If the perlin noise value is greater than 0, a wall block will spawn
                 // If it is less than or equal to 0, there will be a gap in the wall at that point
                 if (perlinValue > 0) {
-                    Block block = Instantiate(blockPrefab, new Vector3(i, j + breakthroughArea.Height), Quaternion.identity).GetComponent<Block>( );
+                    Block block = Instantiate(prefabBlock, new Vector3(i, j + breakthroughArea.Height), Quaternion.identity).GetComponent<Block>( );
                     block.Health = perlinValue;
 
                     AddBlockToBoard(block);
@@ -244,7 +245,7 @@ public class Board : MonoBehaviour {
         Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) * 0.25f - 0.5f);
 
         // Spawn a random type of mino
-        ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
+        ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
     }
 
     /// <summary>
@@ -286,6 +287,18 @@ public class Board : MonoBehaviour {
     /// <param name="boomBlock">The boom block to add</param>
     private void AddBoomBlock (Block boomBlock) {
         boomBlockFrames.Add(new BoomBlockFrames(this, gameManager, boomBlock));
+    }
+
+    /// <summary>
+    /// Spawn boom block debris at a certain position
+    /// </summary>
+    /// <param name="position">The position to spawn the particle system at.</param>
+    /// <param name="color">The color of the particle system.</param>
+    public void SpawnBoomBlockDebris (Vector3 position, Color color) {
+        ParticleSystem boomBlockDebris = Instantiate(prefabBoomBlockDebris, position, Quaternion.identity).GetComponent<ParticleSystem>( );
+        ParticleSystem.MainModule boomBlockDebrisMainModule = boomBlockDebris.main;
+        boomBlockDebrisMainModule.startColor = color;
+        boomBlockDebris.Play( );
     }
 
     /// <summary>
@@ -358,7 +371,7 @@ public class Board : MonoBehaviour {
         // If the block has no surrounding block groups, create a new one
         if (blockGroups.Count == 0) {
             // Create a new blockgroup gameobject
-            BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform.position, Quaternion.identity).GetComponent<BlockGroup>( );
+            BlockGroup blockGroup = Instantiate(prefabBlockGroup, transform.position, Quaternion.identity).GetComponent<BlockGroup>( );
             // Set the parent of the blockgroup gameobject to this board gameobject
             blockGroup.transform.SetParent(transform, true);
             // Set the block parent to the new blockgroup gameobject

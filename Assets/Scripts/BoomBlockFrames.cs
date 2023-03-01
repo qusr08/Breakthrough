@@ -6,6 +6,7 @@ public class BoomBlockFrames {
 	private Board board;
 	private GameManager gameManager;
 	private Block boomBlock;
+	private Color color;
 
 	/// <summary>
 	/// A list of all the positions that will be exploded when triggered.
@@ -30,6 +31,9 @@ public class BoomBlockFrames {
 		this.board = board;
 		this.gameManager = gameManager;
 		this.boomBlock = boomBlock;
+
+		color = boomBlock.GetComponent<SpriteRenderer>().color;
+		color.a = 0.25f;
 
 		CalculateFrames( );
 	}
@@ -72,9 +76,8 @@ public class BoomBlockFrames {
 			frameIndex++;
 		} while (foundBlockInRange);
 
-		/// TODO: This will be removed eventually as the player should see the full range of each boom block
-		///	- This is good for testing for now though because there is no visual indication of the boom blocks exploding.
-		CleanFrames( );
+		// Remove any unnecessary frames at the end of the sequence that do not destroy any blocks (similar to how .trim() works with strings)
+		// CleanFrames( );
 	}
 
 	/// <summary>
@@ -138,11 +141,14 @@ public class BoomBlockFrames {
 	public void DestroyFirstFrame ( ) {
 		// Remove each block in the frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
-			if (board.GetBlockAtPosition(frames[0][i]) != null) {
+			// If the block was successfully removed, then give the player points
+			if (board.RemoveBlockFromBoard(frames[0][i])) {
 				gameManager.BoardPoints += gameManager.PointsPerDestroyedBlock;
 				// Debug.Log("Points: Destroyed block");
-				board.RemoveBlockFromBoard(frames[0][i]);
 			}
+
+			// Spawn in the boom block debris particle system
+			board.SpawnBoomBlockDebris(frames[0][i], color);
 		}
 
 		// Remove the first frame
