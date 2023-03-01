@@ -705,7 +705,6 @@ MonoBehaviour:
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
   PointsPerFastDrop: 2
-  pointsEvents: []
 --- !u!4 &833555036
 Transform:
   m_ObjectHideFlags: 0
@@ -993,7 +992,6 @@ MonoBehaviour:
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
   PointsPerFastDrop: 2
-  pointsEvents: []
 --- !u!1 &1206732652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1410,7 +1408,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 38.15456, y: 26.106602, z: 0}
+    m_Extent: {x: 31.27327, y: 26.106602, z: 0}
   spawnRate: 2
   maxBlocks: 17
 --- !u!4 &1775966053
