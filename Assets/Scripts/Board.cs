@@ -14,6 +14,9 @@ public class Board : MonoBehaviour {
     [SerializeField] private GameManager gameManager;
     [SerializeField] private BoardArea gameOverArea;
     [SerializeField] private BoardArea breakthroughArea;
+    [SerializeField] private RectTransform leftListRectTransform;
+    [SerializeField] private RectTransform rightListRectTransform;
+    [SerializeField] private GameOverBar gameOverBar;
     [Header("Prefabs")]
     [SerializeField] private GameObject prefabBlock;
     [SerializeField] private GameObject prefabBlockGroup;
@@ -23,14 +26,12 @@ public class Board : MonoBehaviour {
     [SerializeField] private SpriteRenderer boardSpriteRenderer;
     [SerializeField] private SpriteRenderer borderSpriteRenderer;
     [SerializeField] private RectTransform gameCanvasRectTransform;
-    [SerializeField] private RectTransform leftListRectTransform;
-    [SerializeField] private RectTransform rightListRectTransform;
     [Header("Properties")]
     [SerializeField, Range(4f, 32f), Tooltip("The width of the board (in blocks).")] public int Width = 16;
     [SerializeField, Range(20f, 40f), Tooltip("The height of the board (in blocks).")] public int Height = 28;
     [SerializeField, Range(0f, 20f), Tooltip("The padding between the board and the edge of the screen.")] public float CameraPadding = 3;
     [SerializeField, Min(0f), Tooltip("The padding between the board and the UI elements on the left and right.")] public float UIPadding = 0f;
-    [SerializeField, Range(0f, 5f), Tooltip("The thickness of the border around the board.")] private float borderThickness = 0.75f;
+    [SerializeField, Range(0f, 5f), Tooltip("The thickness of the border around the board.")] public float BorderThickness = 0.75f;
     [SerializeField, Min(0f), Tooltip("The scale of the game UI canvas to have it fit next to the board.")] private float gameCanvasScale = 0.028703f; /// TODO: Figure out how this number is achieved, I got no clue
 	[SerializeField, Range(0.001f, 1f), Tooltip("The speed at which boom block expolosions are animated.")] public float BoomBlockAnimationSpeed = 0.05f;
     [Space]
@@ -92,9 +93,9 @@ public class Board : MonoBehaviour {
     public BoardArea BreakthroughBoardArea { get => breakthroughArea; }
 
 #if UNITY_EDITOR
-    protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+    private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-    protected void _OnValidate ( ) {
+    private void _OnValidate ( ) {
 #if UNITY_EDITOR
         EditorApplication.delayCall -= _OnValidate;
         if (this == null) {
@@ -114,13 +115,16 @@ public class Board : MonoBehaviour {
         Camera.main.transform.position = new Vector3(positionX, positionY, Camera.main.transform.position.z);
 
         // Set the size of the border
-        borderSpriteRenderer.size = new Vector2(Width + (borderThickness * 2), Height + (borderThickness * 2));
+        borderSpriteRenderer.size = new Vector2(Width + (BorderThickness * 2), Height + (BorderThickness * 2));
 
         // Set game canvas dimensions
         gameCanvasRectTransform.localPosition = Vector3.zero;
         gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 1);
-        gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (borderThickness * 2) + UIPadding) / gameCanvasScale);
-        gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (borderThickness * 2)) / gameCanvasScale);
+        gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (BorderThickness * 2) + UIPadding) / gameCanvasScale);
+        gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (BorderThickness * 2)) / gameCanvasScale);
+
+        // Set the game over bar position and dimensions
+
     }
 
     private void Awake ( ) {
