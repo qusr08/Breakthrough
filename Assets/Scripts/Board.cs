@@ -122,9 +122,6 @@ public class Board : MonoBehaviour {
         gameCanvasRectTransform.localScale = new Vector3(gameCanvasScale, gameCanvasScale, 1);
         gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, (Width + (BorderThickness * 2) + UIPadding) / gameCanvasScale);
         gameCanvasRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (Height + (BorderThickness * 2)) / gameCanvasScale);
-
-        // Set the game over bar position and dimensions
-
     }
 
     private void Awake ( ) {
@@ -277,6 +274,9 @@ public class Board : MonoBehaviour {
         }
 
         Destroy(mino.gameObject);
+
+        // Increase the progress of the game over bar
+        gameOverBar.IncrementProgress( );
 
         // Only start to update the boom blocks if the current state is not a breakthrough
         // When the code is in a state of a breakthrough, all of the wall is being regenerated and it makes no sense to update boom blocks

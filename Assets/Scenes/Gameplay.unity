@@ -285,9 +285,12 @@ MonoBehaviour:
   board: {fileID: 2111922726}
   fillTransform: {fileID: 1884849779}
   fillSpriteRenderer: {fileID: 1884849780}
+  gameOverArea: {fileID: 370275327}
+  breakthroughArea: {fileID: 1770263713}
   spriteRenderer: {fileID: 73100741}
-  progress: 0.583
-  minFillHeight: 1
+  uiPadding: 0.75
+  progress: 0
+  minFillHeight: 0
 --- !u!1001 &370275326
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1510,7 +1513,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.05054, y: 23.985281, z: 0}
+    m_Extent: {x: 36.054035, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -1552,7 +1555,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1884849778}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.7529998, z: 0}
+  m_LocalPosition: {x: 0, y: -9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 73100742}
@@ -1603,7 +1606,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.75, y: 10.494}
+  m_Size: {x: 0.75, y: 0}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
