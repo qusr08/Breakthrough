@@ -27,6 +27,9 @@ public class BoardArea : MonoBehaviour {
 	public delegate void OnMinoLandDelegate ( );
 	public OnMinoLandDelegate OnMinoLand = ( ) => { };
 
+	public delegate void OnBlockEnterDelegate ( );
+	public OnBlockEnterDelegate OnBlockEnter = ( ) => { };
+
 	// Whether or not the mino was previously inside the area
 	// This is here to make sure the delegate methods are only called when the mino changes states, as in when it first enters or leaves
 	private bool wasMinoInArea;
@@ -40,9 +43,10 @@ public class BoardArea : MonoBehaviour {
 			}
 
 			// Check the position of the Mino relative to the board area line
-			bool isMinoAboveLine = (board.ActiveMino.BoundsMaxY > transform.position.y);
-			bool isMinoBelowLine = (board.ActiveMino.BoundsMinY < transform.position.y);
-			if ((IsAreaAbove && isMinoAboveLine) || (!IsAreaAbove && isMinoBelowLine)) {
+			if (IsAreaAbove && (board.ActiveMino.BoundsMaxY > transform.position.y)) {
+				return true;
+			}
+			if (!IsAreaAbove && (board.ActiveMino.BoundsMinY < transform.position.y)) {
 				return true;
 			}
 

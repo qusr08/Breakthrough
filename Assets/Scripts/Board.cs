@@ -134,7 +134,7 @@ public class Board : MonoBehaviour {
         boomBlockFrames = new List<BoomBlockFrames>( );
 
         // Set board area delegate methods
-        breakthroughArea.OnMinoEnter += ( ) => {
+        breakthroughArea.OnMinoLand += ( ) => {
             // Update points
             gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
             // Debug.Log("Points: Breakthrough");
@@ -547,4 +547,15 @@ public class Board : MonoBehaviour {
         minoBlocks.Add(new List<Block>( ));
         return minoBlocks.Count - 1;
     }
+
+    /*private List<Block> GetBlocksInRow (int row) {
+        // If the row is out of bounds, do not try and search for blocks in the row
+        if (row < 0 || row > Height) {
+            return null;
+        }
+
+        List<Block> blocks = new List<Block>( );
+
+        
+    }*/
 }
