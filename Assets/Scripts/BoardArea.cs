@@ -27,8 +27,8 @@ public class BoardArea : MonoBehaviour {
 	public delegate void OnMinoLandDelegate ( );
 	public OnMinoLandDelegate OnMinoLand = ( ) => { };
 
-	public delegate void OnBlockEnterDelegate ( );
-	public OnBlockEnterDelegate OnBlockEnter = ( ) => { };
+	public delegate void OnBoardUpdateDelegate ();
+	public OnBoardUpdateDelegate OnBoardUpdate = () => { };
 
 	// Whether or not the mino was previously inside the area
 	// This is here to make sure the delegate methods are only called when the mino changes states, as in when it first enters or leaves
@@ -136,5 +136,8 @@ public class BoardArea : MonoBehaviour {
 		if (IsMinoLandedInArea) {
 			OnMinoLand( );
 		}
+
+		// If the board has been updated, call this method
+		OnBoardUpdate( );
 	}
 }

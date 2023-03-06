@@ -3,16 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Mino : MonoBehaviour {
-	public const float FALL_TIME = 1.0f; // Varies with level
-	public const float FALL_TIME_ACCELERATED = FALL_TIME / 20f;
-	public const float MOVE_TIME = 0.15f;
-	public const float MOVE_TIME_ACCELERATED = MOVE_TIME / 2f;
-	public const float ROTATE_TIME = 0.25f;
-	public const float PLACE_TIME = 0.75f;
-	public const float ROTATE_DIRECTION = -1; // Clockwise
-	public const float TILE_SCALE = 0.95f;
-	public const float DAMP_SPEED = 0.04f;
-
 	[Header("Scene Objects")]
 	[SerializeField] private Board board;
 	[SerializeField] private GameManager gameManager;
@@ -142,22 +132,14 @@ public class Mino : MonoBehaviour {
 			HasBoomBlock = true;
         }
 
-
-        // Update whether or not the player is still in a drought of boom blocks
-        if (HasBoomBlock) {
-            board.BoomBlockDrought = 0;
-        } else {
-            board.BoomBlockDrought++;
-        }
-
         HasLanded = false;
 		moveTo = transform.position;
 	}
 
 	private void Update ( ) {
 		// Smoothly transition the position and rotation of the mino
-		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, DAMP_SPEED);
-		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, DAMP_SPEED);
+		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, gameManager.BlockAnimationSpeed);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, gameManager.BlockAnimationSpeed);
 
 		// If the mino has reached its destination point, run this code
 		// Since needToUpdateAtDestination is set to false within this code, this chunk of code will only run once and then waits for another change in destination for the mino
@@ -190,37 +172,37 @@ public class Mino : MonoBehaviour {
 		// Move the mino left and right
 		if (hori == 0) {
 			prevMoveTime = 0;
-		} else if (Time.time - prevMoveTime > MOVE_TIME) {
+		} else if (Time.time - prevMoveTime > gameManager.MoveTime) {
 			if (Move(Vector3.right * hori)) {
 				// Make the first horizontal movement of the player be a longer delay in between movements
 				// This prevents the player having to quickly tap the left and right buttons to move one board space
 				if (prevMoveTime == 0) {
 					prevMoveTime = Time.time;
 				} else {
-					prevMoveTime = Time.time - MOVE_TIME_ACCELERATED;
+					prevMoveTime = Time.time - gameManager.MoveTimeAccelerated;
 				}
-				placeTimer = PLACE_TIME;
+				placeTimer = gameManager.PlaceTime;
 			}
 		}
 
 		// Rotate the mino
 		if (vert == 0) {
 			prevRotateTime = 0;
-		} else if (vert > 0 && Time.time - prevRotateTime > ROTATE_TIME) {
-			if (Rotate(ROTATE_DIRECTION * 90)) {
-				placeTimer = PLACE_TIME;
+		} else if (vert > 0 && Time.time - prevRotateTime > gameManager.RotateTime) {
+			if (Rotate(gameManager.RotateDirection * 90)) {
+				placeTimer = gameManager.PlaceTime;
 				prevRotateTime = Time.time;
 			}
 		}
 
 		// Have the mino automatically fall downwards, or fall faster downwards according to player input
-		if (Time.time - prevFallTime > (vert < 0 ? FALL_TIME_ACCELERATED : FALL_TIME)) {
+		if (Time.time - prevFallTime > (vert < 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
 			if (Move(Vector3.down)) {
 				prevFallTime = Time.time;
 
 				// If the player is fast dropping the mino, make sure to give points and reset the place timer
 				if (vert < 0) {
-					placeTimer = PLACE_TIME;
+					placeTimer = gameManager.PlaceTime;
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
 					// Debug.Log("Points: Fast drop");
 				}
@@ -267,7 +249,7 @@ public class Mino : MonoBehaviour {
 
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
-			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - ROTATE_DIRECTION) % 4);
+			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - gameManager.RotateDirection) % 4);
 		}
 
 		needToUpdateAtDestination = true;

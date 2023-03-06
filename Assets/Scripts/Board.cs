@@ -51,7 +51,7 @@ public class Board : MonoBehaviour {
     [Space]
     [SerializeField, Range(0f, 1f), Tooltip("The base spawn chance for boom blocks.")] private float boomBlockSpawnChance = 0.4f;
     [SerializeField, Min(0f), Tooltip("How many Minos it will take to guarantee that the player gets a boom block on their Mino.")] private int boomBlockGuarantee = 5;
-    [HideInInspector] public int BoomBlockDrought = 0;
+    [HideInInspector] public int boomBlockDrought = 0;
 
     // Used for tracking the boom block explosions
     private List<BoomBlockFrames> boomBlockFrames;
@@ -60,7 +60,7 @@ public class Board : MonoBehaviour {
     // Used for tracking what minos are left on the board
     private List<List<Block>> minoBlocks;
 
-    public float CurrentBoomBlockSpawnPercentage { get => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockSpawnChance) + boomBlockSpawnChance; }
+    public float CurrentBoomBlockSpawnPercentage { get => ((float) boomBlockDrought / boomBlockGuarantee) * (1 - boomBlockSpawnChance) + boomBlockSpawnChance; }
 
     public BoardUpdateState BoardUpdateState {
         get {
@@ -133,7 +133,7 @@ public class Board : MonoBehaviour {
 
         boomBlockFrames = new List<BoomBlockFrames>( );
 
-        // Set board area delegate methods
+        /*// Set board area delegate methods
         breakthroughArea.OnMinoLand += ( ) => {
             // Update points
             gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
@@ -143,9 +143,11 @@ public class Board : MonoBehaviour {
 
             BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
         };
-        gameOverArea.OnMinoLand += ( ) => {
-            BoardUpdateState = BoardUpdateState.GAME_OVER;
-        };
+        gameOverArea.OnBoardUpdate += ( ) => {
+            if (GetBlocksInRow(gameOverArea.Height).Count > 0) {
+				BoardUpdateState = BoardUpdateState.GAME_OVER;
+			}
+        };*/
     }
 
     private void Start ( ) {
@@ -247,7 +249,14 @@ public class Board : MonoBehaviour {
 
         // Spawn a random type of mino
         ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
-    }
+
+		// Update whether or not the player is still in a drought of boom blocks
+		if (ActiveMino.HasBoomBlock) {
+			boomBlockDrought = 0;
+		} else {
+			boomBlockDrought++;
+		}
+	}
 
     /// <summary>
     /// Add a Mino object to the game board
@@ -388,7 +397,7 @@ public class Board : MonoBehaviour {
         if (block.IsBoomBlock) {
             AddBoomBlock(block);
         }
-    }
+	}
 
     /// <summary>
     /// Remove a block from the board
@@ -548,14 +557,21 @@ public class Board : MonoBehaviour {
         return minoBlocks.Count - 1;
     }
 
-    /*private List<Block> GetBlocksInRow (int row) {
+    public List<Block> GetBlocksInRow (int row) {
         // If the row is out of bounds, do not try and search for blocks in the row
         if (row < 0 || row > Height) {
             return null;
         }
 
+        // Find all of the blocks in the specified row
         List<Block> blocks = new List<Block>( );
+        for (int x = 0; x < Width; x++) {
+            Block block = GetBlockAtPosition(new Vector3(x, row));
+            if (block != null) {
+                blocks.Add(block);
+            }
+        }
 
-        
-    }*/
+        return blocks;
+    }
 }

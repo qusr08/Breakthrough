@@ -283,6 +283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 2111922726}
+  gameManager: {fileID: 833555035}
   fillTransform: {fileID: 1884849779}
   fillSpriteRenderer: {fileID: 1884849780}
   gameOverArea: {fileID: 370275327}
@@ -810,6 +811,13 @@ MonoBehaviour:
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
   PointsPerFastDrop: 2
+  FallTime: 1
+  MoveTime: 0.15
+  RotateTime: 0.25
+  PlaceTime: 0.75
+  RotateDirection: -1
+  BlockScale: 0.95
+  BlockAnimationSpeed: 0.04
 --- !u!4 &833555036
 Transform:
   m_ObjectHideFlags: 0
@@ -1097,6 +1105,13 @@ MonoBehaviour:
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
   PointsPerFastDrop: 2
+  FallTime: 1
+  MoveTime: 0.15
+  RotateTime: 0.25
+  PlaceTime: 0.75
+  RotateDirection: -1
+  BlockScale: 0.95
+  BlockAnimationSpeed: 0.04
 --- !u!1 &1206732652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1513,7 +1528,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.054035, y: 23.985281, z: 0}
+    m_Extent: {x: 36.053688, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -1763,7 +1778,7 @@ MonoBehaviour:
   wallMinElevation: 0.1
   boomBlockSpawnChance: 0.5
   boomBlockGuarantee: 5
-  BoomBlockDrought: 0
+  boomBlockDrought: 0
 --- !u!1001 &4764229571001218896
 PrefabInstance:
   m_ObjectHideFlags: 0

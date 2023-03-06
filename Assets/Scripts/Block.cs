@@ -134,8 +134,8 @@ public class Block : MonoBehaviour {
 	private void Start ( ) {
 		BlockDirection = (BlockDirection) Random.Range(0, 4);
 
-		transform.localScale = new Vector3(Mino.TILE_SCALE, Mino.TILE_SCALE, 1);
-		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * Mino.ROTATE_DIRECTION * 90);
+		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1);
+		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * gameManager.RotateDirection * 90);
 	}
 
 	/// <summary>
