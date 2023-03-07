@@ -22,6 +22,7 @@ public class Board : MonoBehaviour {
     [SerializeField] private GameObject prefabBlockGroup;
     [SerializeField] private GameObject[ ] prefabMinos;
     [SerializeField] private GameObject prefabBoomBlockDebris;
+    [SerializeField] private GameObject prefabTestBlockGroup;
     [Header("Components")]
     [SerializeField] private SpriteRenderer boardSpriteRenderer;
     [SerializeField] private SpriteRenderer borderSpriteRenderer;
@@ -247,8 +248,9 @@ public class Board : MonoBehaviour {
         // The spawn position is going to be near the top middle of the board
         Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) * 0.25f - 0.5f);
 
-        // Spawn a random type of mino
-        ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
+		// Spawn a random type of 
+		// ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
+		ActiveMino = Instantiate(prefabTestBlockGroup, spawnPosition, Quaternion.identity).GetComponent<Mino>( );
 
 		// Update whether or not the player is still in a drought of boom blocks
 		if (ActiveMino.HasBoomBlock) {

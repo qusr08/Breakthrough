@@ -142,24 +142,24 @@ public class BlockGroup : MonoBehaviour {
 			Vector3 currPosition = Utils.Vect3Round(moveTo + this[i].transform.localPosition);
 			Vector3 toPosition = currPosition + direction;
 
-			// Check to see if a block that is a part of this block group can't move down
-			if (!board.IsPositionValid(toPosition, transform)) {
-				// This means that the block group can't move down
-				return false;
-			}
-
 			// If this block group can't fall below the bottom of the board but is trying to
 			if (!CanFallIntoBreakthroughArea && toPosition.y < board.BreakthroughBoardArea.Height) {
 				// The block group can't move down then
 				return false;
 			}
 
-			// If the current position of the block is below the bottom of the board
-			if (currPosition.y < board.BreakthroughBoardArea.Height) {
-				// Remove the block from the board
-				gameManager.BoardPoints += gameManager.PointsPerDroppedBlock;
-				// Debug.Log("Points: Dropped block");
-				board.RemoveBlockFromBoard(this[i], true);
+			// Check to see if a block that is a part of this block group can't move down
+			if (!board.IsPositionValid(toPosition, transform)) {
+				// If the current position of the block is below the bottom of the board
+				if (currPosition.y < 0f) {
+					// Remove the block from the board
+					gameManager.BoardPoints += gameManager.PointsPerDroppedBlock;
+					// Debug.Log("Points: Dropped block");
+					board.RemoveBlockFromBoard(this[i], true);
+				} else {
+					// This means that the block group can't move down
+					return false;
+				}
 			}
 		}
 
