@@ -43,3 +43,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9307ebaaa837e3f458c85867df87f65d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  board: {fileID: 0}
+  gameManager: {fileID: 0}
+  IsModified: 0
+  CanMove: 0
+  CanFallIntoBreakthroughArea: 0
+  IsPlayerControlled: 0
+  BlockGroupBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}

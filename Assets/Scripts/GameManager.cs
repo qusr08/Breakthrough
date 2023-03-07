@@ -5,12 +5,9 @@ using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-    [Header("Prefabs")]
-    [SerializeField] private GameObject boardUIParticlePrefab;
 	[Header("Scene GameObjects")]
 	[SerializeField] public BoardUILabel TotalPointsUILabel;
 	[SerializeField] public BoardUILabel BoardPointsUILabel;
-	[SerializeField] public BoardUILabel BreakthroughsUILabel;
 	[Header("Points Values")]
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each destroyed block.")] public int PointsPerDestroyedBlock = 6;
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each block dropped into the breakthrough area.")] public int PointsPerDroppedBlock = 12;
@@ -39,9 +36,5 @@ public class GameManager : MonoBehaviour {
 	public int TotalPoints {
 		get => int.Parse(TotalPointsUILabel.Value.text);
 		set => TotalPointsUILabel.Value.text = value.ToString( );
-	}
-	public int Breakthroughs {
-		get => int.Parse(BreakthroughsUILabel.Value.text);
-		set => BreakthroughsUILabel.Value.text = value.ToString( );
 	}
 }

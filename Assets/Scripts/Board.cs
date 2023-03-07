@@ -22,7 +22,6 @@ public class Board : MonoBehaviour {
     [SerializeField] private GameObject prefabBlockGroup;
     [SerializeField] private GameObject[ ] prefabMinos;
     [SerializeField] private GameObject prefabBoomBlockDebris;
-    [SerializeField] private GameObject prefabTestBlockGroup;
     [Header("Components")]
     [SerializeField] private SpriteRenderer boardSpriteRenderer;
     [SerializeField] private SpriteRenderer borderSpriteRenderer;
@@ -37,7 +36,7 @@ public class Board : MonoBehaviour {
 	[SerializeField, Range(0.001f, 1f), Tooltip("The speed at which boom block expolosions are animated.")] public float BoomBlockAnimationSpeed = 0.05f;
     [Space]
     [SerializeField, Tooltip("The current state of the board updating.")] private BoardUpdateState _boardUpdateState;
-    [SerializeField, Tooltip("The current Mino that the player is controlling.")] public Mino ActiveMino = null;
+    [SerializeField, Tooltip("The current Mino that the player is controlling.")] public MinoBlockGroup ActiveMino = null;
     [Space]
     [SerializeField, Tooltip("The current level of the game.")] private float level = 0f;
     [SerializeField, Tooltip("The current height of the wall.")] private int wallHeight = 0;
@@ -188,7 +187,7 @@ public class Board : MonoBehaviour {
                 // Wait until all block groups have finished moving
                 bool blockGroupsCanMove = false;
                 foreach (BlockGroup blockGroup in GetComponentsInChildren<BlockGroup>( )) {
-                    if (blockGroup.CanMove) {
+                    if (blockGroup.CanMoveDownwards) {
                         blockGroupsCanMove = true;
 
                         break;
@@ -244,47 +243,45 @@ public class Board : MonoBehaviour {
     /// </summary>
     private void GenerateRandomMino ( ) {
         /// TODO: Make getting specific transform positions on the board cleaner in code
-
         // The spawn position is going to be near the top middle of the board
         Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) * 0.25f - 0.5f);
 
-		// Spawn a random type of 
-		// ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<Mino>( );
-		ActiveMino = Instantiate(prefabTestBlockGroup, spawnPosition, Quaternion.identity).GetComponent<Mino>( );
+        // Spawn a random type of mino
+        ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<MinoBlockGroup>( );
 
-		// Update whether or not the player is still in a drought of boom blocks
-		if (ActiveMino.HasBoomBlock) {
-			boomBlockDrought = 0;
-		} else {
-			boomBlockDrought++;
-		}
-	}
+        // Update whether or not the player is still in a drought of boom blocks
+        if (ActiveMino.HasBoomBlock) {
+            boomBlockDrought = 0;
+        } else {
+            boomBlockDrought++;
+        }
+    }
 
     /// <summary>
     /// Add a Mino object to the game board
     /// </summary>
     /// <param name="mino">The Mino to add</param>
-    public void AddLandedMinoToBoard (Mino mino) {
+    public void AddLandedMinoToBoard (MinoBlockGroup mino) {
         // Get an empty mino index to add this mino's blocks to
         int emptyMinoIndex = GetFirstEmptyMinoIndex( );
 
-        // Add all blocks that are part of the mino to the board
-        while (mino.transform.childCount > 0) {
-            // Get a block from the mino
-            Block block = mino.transform.GetChild(0).GetComponent<Block>( );
+        // Set the values of the blocks that are a part of this mino
+        for (int i = 0; i < mino.Size; i++) {
+            minoBlocks[emptyMinoIndex].Add(mino[i]);
+            mino[i].MinoIndex = emptyMinoIndex;
+        }
 
+        // Add all blocks that are part of the mino to the board
+        // Once one of the blocks from the minos has been added next to a block group, the entire mino will be transferred over to that block group
+        while (mino != null && mino.Size > 0) {
             // Add the block to the board
-            minoBlocks[emptyMinoIndex].Add(block);
-            block.MinoIndex = emptyMinoIndex;
-            AddBlockToBoard(block);
+            AddBlockToBoard(mino[0], true);
         }
 
         // If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
         if (mino == ActiveMino) {
             ActiveMino = null;
         }
-
-        Destroy(mino.gameObject);
 
         // Increase the progress of the game over bar
         gameOverBar.IncrementProgress( );
@@ -399,7 +396,7 @@ public class Board : MonoBehaviour {
         if (block.IsBoomBlock) {
             AddBoomBlock(block);
         }
-	}
+    }
 
     /// <summary>
     /// Remove a block from the board
@@ -455,7 +452,7 @@ public class Board : MonoBehaviour {
     public void RemoveAllBlocksFromBoard ( ) {
         // Get all block groups and minos in the scene
         BlockGroup[ ] blockGroups = FindObjectsOfType<BlockGroup>( );
-        Mino[ ] minos = FindObjectsOfType<Mino>( );
+        MinoBlockGroup[ ] minos = FindObjectsOfType<MinoBlockGroup>( );
 
         // Destroy all of those objects
         for (int i = blockGroups.Length - 1; i >= 0; i--) {

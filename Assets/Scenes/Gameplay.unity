@@ -803,10 +803,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardUIParticlePrefab: {fileID: 2677172349218655181, guid: ce25b03eb4a3e1344804fdad0068e235, type: 3}
   TotalPointsUILabel: {fileID: 1748895535}
   BoardPointsUILabel: {fileID: 398148345}
-  BreakthroughsUILabel: {fileID: 0}
   PointsPerDestroyedBlock: 6
   PointsPerDroppedBlock: 12
   PointsPerBreakthrough: 600
@@ -895,7 +893,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_text
-      value: 182321
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_fontStyle
@@ -1109,10 +1107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardUIParticlePrefab: {fileID: 0}
   TotalPointsUILabel: {fileID: 0}
   BoardPointsUILabel: {fileID: 0}
-  BreakthroughsUILabel: {fileID: 0}
   PointsPerDestroyedBlock: 6
   PointsPerDroppedBlock: 12
   PointsPerBreakthrough: 600
@@ -1540,7 +1536,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.03324, y: 23.985281, z: 0}
+    m_Extent: {x: 36.040836, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -1766,7 +1762,7 @@ MonoBehaviour:
   - {fileID: 1830994206690904804, guid: 2a40bf84d9fceaa418ca8937961614b6, type: 3}
   - {fileID: 1830994206690904804, guid: 80f33c43e6300d04f81962f8fa125a2a, type: 3}
   prefabBoomBlockDebris: {fileID: 6677756551578485433, guid: 860b8076e703df94aab363f1e0583412, type: 3}
-  prefabTestBlockGroup: {fileID: 6180489581525292300, guid: ed5e4c6d001938c4888609a81a98889c, type: 3}
+  prefabTestBlockGroup: {fileID: 1473269012922141469, guid: bcbeb47a73756c341be0909499b67b42, type: 3}
   boardSpriteRenderer: {fileID: 2111922724}
   borderSpriteRenderer: {fileID: 1206732654}
   gameCanvasRectTransform: {fileID: 427616023}
@@ -1849,7 +1845,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_text
-      value: 212392
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_HorizontalAlignment
