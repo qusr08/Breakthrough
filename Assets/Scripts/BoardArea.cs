@@ -22,14 +22,14 @@ public class BoardArea : MonoBehaviour {
 	[SerializeField, Min(0), Tooltip("The default height of the board area.")] public int DefaultHeight;
 
 	private float currentHeight;
-	[HideInInspector] public float ToCurrentHeight;
+	private float toCurrentHeight;
 	private float toCurrentHeightVelocity;
-
-	public delegate void OnUpdateDelegate ( );
-	public OnUpdateDelegate OnUpdate = ( ) => { };
 
 	public delegate void OnDestroyMinoDelegate ( );
 	public OnDestroyMinoDelegate OnDestroyMino = ( ) => { };
+
+	public delegate void OnHeightChangeDelegate ( );
+	public OnHeightChangeDelegate OnHeightChange = ( ) => { };
 
 	public float CurrentHeight {
 		get {
@@ -59,6 +59,20 @@ public class BoardArea : MonoBehaviour {
 			board.UpdateGameplayUI( );
 		}
 	}
+	public float ToCurrentHeight {
+		get {
+			return toCurrentHeight;
+		}
+
+		set {
+			// If the height has been changed, call its delegate method
+			if (toCurrentHeight != value) {
+				OnHeightChange( );
+			}
+
+			toCurrentHeight = value;
+		}
+	}
 
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
@@ -77,6 +91,7 @@ public class BoardArea : MonoBehaviour {
 		tintedAreaSpriteRenderer.color = new Color(Color.r, Color.g, Color.b, areaOpacity);
 
 		// Fully update the animations so they are visible
+		toCurrentHeight = DefaultHeight;
 		CurrentHeight = DefaultHeight;
 	}
 

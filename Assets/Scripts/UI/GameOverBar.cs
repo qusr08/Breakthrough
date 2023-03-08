@@ -68,6 +68,8 @@ public class GameOverBar : MonoBehaviour {
 		spriteRenderer.size = new Vector2(board.BorderThickness, 0.0f);
 		fillSpriteRenderer.size = new Vector2(board.BorderThickness, 0.0f);
 
+		RecalculateHeight( );
+
 		// Update the size of the game over bar
 		Progress = progress;
 
