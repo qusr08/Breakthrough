@@ -210,12 +210,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 0}
+  gameManager: {fileID: 0}
   lineTransform: {fileID: 1979040768145204345}
   tintedAreaTransform: {fileID: 1979040767790948943}
+  lineSpriteRenderer: {fileID: 1979040768145204342}
+  tintedAreaSpriteRenderer: {fileID: 1979040767790948942}
   boardFillCircleBottom: {fileID: 21300000, guid: 25ef0082246e26f49969b8445d072d13, type: 3}
   boardFillCircleTop: {fileID: 21300000, guid: c85e3ee69fc02c046b4806763fb06264, type: 3}
   lineThickness: 0.25
   areaOpacity: 0.1
   Color: {r: 1, g: 0, b: 0, a: 1}
   IsAreaAbove: 0
-  Height: 4
+  DefaultHeight: 0

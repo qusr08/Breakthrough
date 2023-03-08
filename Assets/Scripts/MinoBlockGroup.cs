@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MinoBlockGroup : BlockGroup {
-    [Header("Properties")]
-    [SerializeField, Tooltip("The bounds of the Mino.")] public Bounds MinoBounds;
-    [SerializeField, Tooltip("Whether or not this Mino has a boom block on it or not.")] public bool HasBoomBlock;
+	[Header("Properties")]
+	[SerializeField, Tooltip("The bounds of the Mino.")] public Bounds MinoBounds;
+	[SerializeField, Tooltip("Whether or not this Mino has a boom block on it or not.")] public bool HasBoomBlock;
 
-    private float placeTimer;
+	private float placeTimer;
 
-    // Variables to get the bounds max and mins
+	public bool HasLanded {
+		get => !CanMoveDownwards && placeTimer <= 0;
+	}
+
+	/*// Variables to get the bounds max and mins
     // This can be used to check if a mino has entered or landed in a board area
     public float BoundsMinY {
         get {
@@ -60,123 +64,122 @@ public class MinoBlockGroup : BlockGroup {
                 }
             }
         }
-    }
-    public bool HasLanded { get => !CanMoveDownwards && placeTimer <= 0; }
+    }*/
 
-    private new void OnValidate ( ) {
-        base.OnValidate( );
+	private new void OnValidate ( ) {
+		base.OnValidate( );
 
-        // Update the bounds of this mino based on the colliders of the child block objects
-        MinoBounds = new Bounds(transform.position, Vector3.zero);
-        foreach (Collider2D blockCollider2D in GetComponentsInChildren<Collider2D>( )) {
-            MinoBounds.Encapsulate(blockCollider2D.bounds);
-        }
+		// Update the bounds of this mino based on the colliders of the child block objects
+		MinoBounds = new Bounds(transform.position, Vector3.zero);
+		foreach (Collider2D blockCollider2D in GetComponentsInChildren<Collider2D>( )) {
+			MinoBounds.Encapsulate(blockCollider2D.bounds);
+		}
 
-        // Keep the center at a relative position so we can use it to calculate the min and max of the mino bounds as it moves
-        MinoBounds.center -= transform.position;
-    }
+		// Keep the center at a relative position so we can use it to calculate the min and max of the mino bounds as it moves
+		MinoBounds.center -= transform.position;
+	}
 
-    private new void Awake ( ) {
-        OnValidate( );
-    }
+	private new void Awake ( ) {
+		OnValidate( );
+	}
 
-    private new void Start ( ) {
-        base.Start( );
+	private new void Start ( ) {
+		base.Start( );
 
-        /// TODO: Make multiple boom blocks able to spawn
-        // Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
-        if (Random.Range(0f, 1f) < board.CurrentBoomBlockSpawnPercentage) {
-            // Get a random child block of the mino
-            Block block = GetComponentsInChildren<Block>( )[Random.Range(0, transform.childCount)];
+		/// TODO: Make multiple boom blocks able to spawn
+		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
+		if (Random.Range(0f, 1f) < board.CurrentBoomBlockSpawnPercentage) {
+			// Get a random child block of the mino
+			Block block = GetComponentsInChildren<Block>( )[Random.Range(0, transform.childCount)];
 
-            // Set that block to be a random type of boom block
-            switch (Random.Range(0, 3)) {
-                case 0:
-                    block.BlockType = BlockType.BOOM_DIRECTION;
-                    break;
-                case 1:
-                    block.BlockType = BlockType.BOOM_SURROUND;
-                    break;
-                case 2:
-                    block.BlockType = BlockType.BOOM_LINE;
-                    break;
-            }
+			// Set that block to be a random type of boom block
+			switch (Random.Range(0, 3)) {
+				case 0:
+					block.BlockType = BlockType.BOOM_DIRECTION;
+					break;
+				case 1:
+					block.BlockType = BlockType.BOOM_SURROUND;
+					break;
+				case 2:
+					block.BlockType = BlockType.BOOM_LINE;
+					break;
+			}
 
-            HasBoomBlock = true;
-        }
-    }
+			HasBoomBlock = true;
+		}
+	}
 
-    private void Update ( ) {
-        // If the size of this block group is 0, then destroy it
-        if (Size == 0) {
-            DestroyImmediate(gameObject);
+	private void Update ( ) {
+		// If the size of this block group is 0, then destroy it
+		if (Size == 0) {
+			DestroyImmediate(gameObject);
 
-            return;
-        }
+			return;
+		}
 
-        // If the mino has landed and is at its destination that it was moving to, add it to the board
-        if (HasLanded && IsAtDestination) {
-            board.AddLandedMinoToBoard(this);
+		// If the mino has landed and is at its destination that it was moving to, add it to the board
+		if (HasLanded && IsAtDestination) {
+			board.AddLandedMinoToBoard(this);
 
-            return;
-        }
+			return;
+		}
 
-        UpdateTransform( );
+		UpdateTransform( );
 
-        // Make sure that its the right board update state before updating the position
-        if (board.BoardUpdateState != BoardUpdateState.PLACING_MINO) {
-            return;
-        }
+		// Make sure that its the right board update state before updating the position
+		if (board.BoardUpdateState != BoardUpdateState.PLACING_MINO) {
+			return;
+		}
 
-        // Get the horizontal and vertical inputs
-        float hori = Input.GetAxisRaw("Horizontal");
-        float vert = Input.GetAxisRaw("Vertical");
-        placeTimer -= Time.deltaTime;
+		// Get the horizontal and vertical inputs
+		float hori = Input.GetAxisRaw("Horizontal");
+		float vert = Input.GetAxisRaw("Vertical");
+		placeTimer -= Time.deltaTime;
 
-        // Move the mino left and right
-        if (hori == 0) {
-            prevMoveTime = 0;
-        } else if (Time.time - prevMoveTime > gameManager.MoveTime) {
-            if (Move(Vector3.right * hori)) {
-                // Make the first horizontal movement of the player be a longer delay in between movements
-                // This prevents the player having to quickly tap the left and right buttons to move one board space
-                if (prevMoveTime == 0) {
-                    prevMoveTime = Time.time;
-                } else {
-                    prevMoveTime = Time.time - gameManager.MoveTimeAccelerated;
-                }
+		// Move the mino left and right
+		if (hori == 0) {
+			prevMoveTime = 0;
+		} else if (Time.time - prevMoveTime > gameManager.MoveTime) {
+			if (Move(Vector3.right * hori)) {
+				// Make the first horizontal movement of the player be a longer delay in between movements
+				// This prevents the player having to quickly tap the left and right buttons to move one board space
+				if (prevMoveTime == 0) {
+					prevMoveTime = Time.time;
+				} else {
+					prevMoveTime = Time.time - gameManager.MoveTimeAccelerated;
+				}
 
-                placeTimer = gameManager.PlaceTime;
-                needToUpdateTransform = true;
-            }
-        }
+				placeTimer = gameManager.PlaceTime;
+				needToUpdateTransform = true;
+			}
+		}
 
-        // Rotate the mino
-        if (vert == 0) {
-            prevRotateTime = 0;
-        } else if (vert > 0 && Time.time - prevRotateTime > gameManager.RotateTime) {
-            if (Rotate(gameManager.RotateDirection * 90)) {
-                placeTimer = gameManager.PlaceTime;
-                prevRotateTime = Time.time;
-                needToUpdateTransform = true;
-            }
-        }
+		// Rotate the mino
+		if (vert == 0) {
+			prevRotateTime = 0;
+		} else if (vert > 0 && Time.time - prevRotateTime > gameManager.RotateTime) {
+			if (Rotate(gameManager.RotateDirection * 90)) {
+				placeTimer = gameManager.PlaceTime;
+				prevRotateTime = Time.time;
+				needToUpdateTransform = true;
+			}
+		}
 
-        // Have the mino automatically fall downwards, or fall faster downwards according to player input
-        if (Time.time - prevFallTime > (vert < 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
-            CanMoveDownwards = Move(Vector3.down);
+		// Have the mino automatically fall downwards, or fall faster downwards according to player input
+		if (Time.time - prevFallTime > (vert < 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
+			CanMoveDownwards = Move(Vector3.down);
 
-            if (CanMoveDownwards) {
-                // If the player is fast dropping the mino, make sure to give points and reset the place timer
-                if (vert < 0) {
-                    placeTimer = gameManager.PlaceTime;
-                    gameManager.BoardPoints += gameManager.PointsPerFastDrop;
-                    // Debug.Log("Points: Fast drop");
-                }
+			if (CanMoveDownwards) {
+				// If the player is fast dropping the mino, make sure to give points and reset the place timer
+				if (vert < 0) {
+					placeTimer = gameManager.PlaceTime;
+					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
+					// Debug.Log("Points: Fast drop");
+				}
 
-                prevFallTime = Time.time;
-                needToUpdateTransform = true;
-            }
-        }
-    }
+				prevFallTime = Time.time;
+				needToUpdateTransform = true;
+			}
+		}
+	}
 }

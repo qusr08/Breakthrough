@@ -133,21 +133,23 @@ public class Board : MonoBehaviour {
 
         boomBlockFrames = new List<BoomBlockFrames>( );
 
-        /*// Set board area delegate methods
-        breakthroughArea.OnMinoLand += ( ) => {
-            // Update points
-            gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
-            // Debug.Log("Points: Breakthrough");
-            gameManager.TotalPoints += gameManager.BoardPoints;
-            gameManager.BoardPoints = 0;
-
-            BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
-        };
+		/*// Set board area delegate methods
         gameOverArea.OnBoardUpdate += ( ) => {
             if (GetBlocksInRow(gameOverArea.Height).Count > 0) {
 				BoardUpdateState = BoardUpdateState.GAME_OVER;
 			}
         };*/
+		breakthroughArea.OnDestroyMino += ( ) => {
+			// Update points
+			gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
+			// Debug.Log("Points: Breakthrough");
+			gameManager.TotalPoints += gameManager.BoardPoints;
+			gameManager.BoardPoints = 0;
+
+            // Reset the game over area to its default height
+
+			BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
+		};
     }
 
     private void Start ( ) {
@@ -223,7 +225,7 @@ public class Board : MonoBehaviour {
                 // If the perlin noise value is greater than 0, a wall block will spawn
                 // If it is less than or equal to 0, there will be a gap in the wall at that point
                 if (perlinValue > 0) {
-                    Block block = Instantiate(prefabBlock, new Vector3(i, j + breakthroughArea.Height), Quaternion.identity).GetComponent<Block>( );
+                    Block block = Instantiate(prefabBlock, new Vector3(i, j + breakthroughArea.DefaultHeight), Quaternion.identity).GetComponent<Block>( );
                     block.Health = perlinValue;
 
                     AddBlockToBoard(block);
@@ -244,7 +246,7 @@ public class Board : MonoBehaviour {
     private void GenerateRandomMino ( ) {
         /// TODO: Make getting specific transform positions on the board cleaner in code
         // The spawn position is going to be near the top middle of the board
-        Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - (Height - gameOverArea.Height) * 0.25f - 0.5f);
+        Vector3 spawnPosition = new Vector3((Width / 2) - 0.5f, Height - 2.5f);
 
         // Spawn a random type of mino
         ActiveMino = Instantiate(prefabMinos[Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<MinoBlockGroup>( );
@@ -347,23 +349,22 @@ public class Board : MonoBehaviour {
         Destroy(blockGroups[mergeToGroupIndex].gameObject);
     }
 
-    /// <summary>
-    /// Update all board areas.
-    /// </summary>
-    public void UpdateBoardAreas ( ) {
-        breakthroughArea.UpdateDelegates( );
-        gameOverArea.UpdateDelegates( );
-    }
-
-    /// <summary>
-    /// Increment the difficulty of the game
-    /// </summary>
-    private void UpdateDifficulty ( ) {
+	/// <summary>
+	/// Increment the difficulty of the game
+	/// </summary>
+	private void UpdateDifficulty ( ) {
         // Increase the difficulty of the game
         level += 0.16666666666f;
         wallHeight = Mathf.Min(Mathf.RoundToInt(Mathf.Sqrt(4.5f * level) + wallMinHeight), wallMaxHeight);
         wallRoughness = Mathf.Min(level * level * 0.006f + wallMinRoughness, wallMaxRoughness);
         wallElevation = Mathf.Min(level * level * 0.02f + wallMinElevation, wallMaxElevation);
+    }
+
+    /// <summary>
+    /// Update certain gameplay UI sizes
+    /// </summary>
+    public void UpdateGameplayUI ( ) {
+        gameOverBar.RecalculateHeight( );
     }
 
     /// <summary>

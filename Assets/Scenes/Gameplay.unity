@@ -250,7 +250,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.75, y: 18}
+  m_Size: {x: 0.75, y: 0}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -264,7 +264,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73100740}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.5, y: -3, z: 0}
+  m_LocalPosition: {x: -9.5, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1884849779}
@@ -302,7 +302,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1979040767790948942, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_Size.y
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1979040767790948942, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_Sprite
@@ -326,7 +326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1979040767790948943, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768145204342, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_Color.a
@@ -381,8 +381,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 833555035}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: DefaultHeight
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: lineThickness
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: ToCurrentHeight
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_RootOrder
@@ -394,7 +406,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19.5
+      value: 21.5
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1291,8 +1303,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 833555035}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: DefaultHeight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: lineThickness
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
+      propertyPath: ToCurrentHeight
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_RootOrder
@@ -1536,7 +1560,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.040836, y: 23.985281, z: 0}
+    m_Extent: {x: 36.03324, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -1762,7 +1786,6 @@ MonoBehaviour:
   - {fileID: 1830994206690904804, guid: 2a40bf84d9fceaa418ca8937961614b6, type: 3}
   - {fileID: 1830994206690904804, guid: 80f33c43e6300d04f81962f8fa125a2a, type: 3}
   prefabBoomBlockDebris: {fileID: 6677756551578485433, guid: 860b8076e703df94aab363f1e0583412, type: 3}
-  prefabTestBlockGroup: {fileID: 1473269012922141469, guid: bcbeb47a73756c341be0909499b67b42, type: 3}
   boardSpriteRenderer: {fileID: 2111922724}
   borderSpriteRenderer: {fileID: 1206732654}
   gameCanvasRectTransform: {fileID: 427616023}
