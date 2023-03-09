@@ -10,22 +10,26 @@ public enum BoardUpdateState {
 }
 
 public class Board : MonoBehaviour {
-	[Header("Scene Objects")]
-	[SerializeField] private GameManager gameManager;
-	[SerializeField] private BoardArea gameOverArea;
-	[SerializeField] private BoardArea breakthroughArea;
-	[SerializeField] private RectTransform leftListRectTransform;
-	[SerializeField] private RectTransform rightListRectTransform;
-	[SerializeField] private GameOverBar gameOverBar;
 	[Header("Prefabs")]
 	[SerializeField] private GameObject prefabBlock;
 	[SerializeField] private GameObject prefabBlockGroup;
 	[SerializeField] private GameObject[ ] prefabMinos;
 	[SerializeField] private GameObject prefabBoomBlockDebris;
 	[Header("Components")]
+	[SerializeField] private GameManager gameManager;
+	[Space]
 	[SerializeField] private SpriteRenderer boardSpriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
+	[SerializeField] private RectTransform leftListRectTransform;
+	[SerializeField] private RectTransform rightListRectTransform;
 	[SerializeField] private RectTransform gameCanvasRectTransform;
+	[Space]
+	[SerializeField] private BoardArea gameOverArea;
+	[SerializeField] private BoardArea breakthroughArea;
+	[SerializeField] private GameOverBar gameOverBar;
+	[SerializeField] private AnimatedText breakthroughText;
+	[SerializeField] private AnimatedText gameOverText;
+	[SerializeField] private AnimatedText pointsText;
 	[Header("Properties")]
 	[SerializeField, Range(4f, 32f), Tooltip("The width of the board (in blocks).")] public int Width = 16;
 	[SerializeField, Range(20f, 40f), Tooltip("The height of the board (in blocks).")] public int Height = 28;
@@ -51,7 +55,6 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField, Range(0f, 1f), Tooltip("The base spawn chance for boom blocks.")] private float boomBlockSpawnChance = 0.4f;
 	[SerializeField, Min(0f), Tooltip("How many Minos it will take to guarantee that the player gets a boom block on their Mino.")] private int boomBlockGuarantee = 5;
-	[HideInInspector] public int boomBlockDrought = 0;
 
 	// Used for tracking the boom block explosions
 	private List<BoomBlockFrames> boomBlockFrames;
@@ -60,6 +63,7 @@ public class Board : MonoBehaviour {
 	// Used for tracking what minos are left on the board
 	private List<List<Block>> minoBlocks;
 
+	private int boomBlockDrought = 0;
 	public float CurrentBoomBlockSpawnPercentage {
 		get => ((float) boomBlockDrought / boomBlockGuarantee) * (1 - boomBlockSpawnChance) + boomBlockSpawnChance;
 	}
@@ -74,7 +78,7 @@ public class Board : MonoBehaviour {
 
 			switch (value) {
 				case BoardUpdateState.BREAKTHROUGH:
-					Generate( );
+					StartCoroutine(BreakthroughSequence( ));
 
 					break;
 				case BoardUpdateState.PLACING_MINO:
@@ -141,21 +145,9 @@ public class Board : MonoBehaviour {
 
 		// Set board area delegate methods
 		breakthroughArea.OnDestroyMino += ( ) => {
-			// Update points
-			gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
-			// Debug.Log("Points: Breakthrough");
-			float percentageCleared = GetPercentageClearRectangle(0, Mathf.RoundToInt(gameOverArea.ToCurrentHeight), Width, Mathf.RoundToInt(gameOverArea.ToCurrentHeight - breakthroughArea.ToCurrentHeight));
-			gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * percentageCleared);
-			gameManager.BoardPoints = 0;
-
-			// Reset the game over area to its default height
-			gameOverArea.ToCurrentHeight = gameOverArea.DefaultHeight;
-
-			// Reset the game over bar's progress
-			gameOverBar.Progress = 0f;
-
 			BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
 		};
+
 		/// TODO: Add a delegate for when blocks are placed onto the board as that will also need to trigger a game over
 		gameOverArea.OnHeightChange += ( ) => {
 			if (GetPercentageClearRectangle(0, Mathf.RoundToInt(gameOverArea.ToCurrentHeight) + 1, Width, 1) < 1f) {
@@ -169,7 +161,7 @@ public class Board : MonoBehaviour {
 		wallRoughness = wallMinRoughness;
 		wallElevation = wallMinElevation;
 
-		BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
+		StartCoroutine(GenerateBoardSequence( ));
 	}
 
 	private void Update ( ) {
@@ -223,9 +215,6 @@ public class Board : MonoBehaviour {
 	private void Generate ( ) {
 		// Reset arrays
 		minoBlocks = new List<List<Block>>( );
-
-		// Remove all previous blocks from the board
-		RemoveAllBlocksFromBoard( );
 
 		// Generate the wall
 		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
@@ -415,9 +404,10 @@ public class Board : MonoBehaviour {
 	/// Remove a block from the board
 	/// </summary>
 	/// <param name="position">The position of the block to try and remove.</param>
+	/// <param name="ignoreHealth">Whether or not ignore the blocks health. If set to true, the block will definitely be destroyed no matter how damaged it is</param>
 	/// <returns>Whether or not the block was removed.</returns>
-	public bool RemoveBlockFromBoard (Vector3 position) {
-		return RemoveBlockFromBoard(GetBlockAtPosition(position));
+	public bool RemoveBlockFromBoard (Vector3 position, bool ignoreHealth = false) {
+		return RemoveBlockFromBoard(GetBlockAtPosition(position), ignoreHealth);
 	}
 
 	/// <summary>
@@ -457,23 +447,6 @@ public class Board : MonoBehaviour {
 		}
 
 		return false;
-	}
-
-	/// <summary>
-	/// Remove all blocks from the board
-	/// </summary>
-	public void RemoveAllBlocksFromBoard ( ) {
-		// Get all block groups and minos in the scene
-		BlockGroup[ ] blockGroups = FindObjectsOfType<BlockGroup>( );
-		MinoBlockGroup[ ] minos = FindObjectsOfType<MinoBlockGroup>( );
-
-		// Destroy all of those objects
-		for (int i = blockGroups.Length - 1; i >= 0; i--) {
-			Destroy(blockGroups[i].gameObject);
-		}
-		for (int i = minos.Length - 1; i >= 0; i--) {
-			Destroy(minos[i].gameObject);
-		}
 	}
 
 	/// <summary>
@@ -590,5 +563,110 @@ public class Board : MonoBehaviour {
 
 		// Return the amount counted divided by the total blocks
 		return (float) blockCount / (width * height);
+	}
+
+	private IEnumerator BreakthroughSequence ( ) {
+		// Update points
+		gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
+		float percentageCleared = GetPercentageClearRectangle(0, Mathf.RoundToInt(gameOverArea.ToCurrentHeight), Width, Mathf.RoundToInt(gameOverArea.ToCurrentHeight - breakthroughArea.ToCurrentHeight));
+		float totalPointsGained = Mathf.RoundToInt(gameManager.BoardPoints * percentageCleared);
+
+		// * Breakthrough text appears on screen
+		breakthroughText.ShowText(transform.position, true);
+
+		// Screen shakes a little bit
+
+		// Repell background squares
+
+		// * Break all blocks off of the board
+		// * These blocks should leave behind a "shadow" of where they were to make it more obvious how much of the board was cleared
+		yield return StartCoroutine(ClearBoardSequence( ));
+
+		// * Wait for a bit
+		yield return new WaitForSeconds(1f);
+
+		// * Move breakthrough text upwards
+		breakthroughText.MoveText(transform.position + (Vector3.up * Height / 4f));
+
+		// * Have percentage cleared text appear
+		pointsText.SetText($"{gameManager.BoardPoints} Board Points x {percentageCleared * 100:0.##}% Cleared\n= {totalPointsGained} Total Points Gained");
+		pointsText.ShowText(transform.position, false);
+
+		// * Wait for a bit
+		yield return new WaitForSeconds(3f);
+
+		// * Hide text
+		breakthroughText.HideText( );
+		pointsText.HideText();
+
+		// * Turn the next square on the level indicator green
+
+		// Reset the game over area to its default height
+		gameOverArea.ToCurrentHeight = gameOverArea.DefaultHeight;
+
+		// Reset the game over bar's progress
+		gameOverBar.Progress = 0f;
+
+		// Update the total points
+		gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * percentageCleared);
+		gameManager.BoardPoints = 0;
+
+		// * Generate a new wall
+		yield return StartCoroutine(GenerateBoardSequence( ));
+	}
+
+	private IEnumerator ClearBoardSequence ( ) {
+		// This sequence will destroy each row of the board one by one
+		// Only keep looping if there is a block in the row
+		bool hasBlockInRow = true;
+		float y = breakthroughArea.CurrentHeight;
+
+		while (hasBlockInRow) {
+			hasBlockInRow = false;
+
+			// Loop through the entire row at a certain y value
+			for (int x = 0; x < Width; x++) {
+				// If there is a block at the position, then remove it
+				if (RemoveBlockFromBoard(new Vector3(x, y), true)) {
+					hasBlockInRow = true;
+				}
+			}
+
+			y++;
+
+			// Wait a little bit before destroying the next row
+			yield return new WaitForSeconds(0.25f);
+		}
+	}
+
+	private IEnumerator GenerateBoardSequence ( ) {
+		// Reset arrays
+		minoBlocks = new List<List<Block>>( );
+
+		// Generate the wall
+		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
+		for (int j = 0; j < wallHeight; j++) {
+			for (int i = 0; i < Width; i++) {
+				// Make sure the perlin noise value can be converted to a wall block
+				int perlinValue = (int) Mathf.Clamp(Mathf.Round(wallValues[i, j]), 0, 3);
+
+				// If the perlin noise value is greater than 0, a wall block will spawn
+				// If it is less than or equal to 0, there will be a gap in the wall at that point
+				if (perlinValue > 0) {
+					Block block = Instantiate(prefabBlock, new Vector3(i, j + breakthroughArea.DefaultHeight), Quaternion.identity).GetComponent<Block>( );
+					block.Health = perlinValue;
+
+					AddBlockToBoard(block);
+				}
+			}
+
+			yield return new WaitForSeconds(0.25f);
+		}
+
+		// Increase the difficulty of the game
+		UpdateDifficulty( );
+
+		// Update the state to start placing minos
+		BoardUpdateState = BoardUpdateState.PLACING_MINO;
 	}
 }
