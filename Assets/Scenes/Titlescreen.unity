@@ -138,6 +138,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 85.25
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Credits Button
@@ -405,8 +409,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_fontSize
-      value: 43.95
+      value: 33.85
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_fontStyle
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Leaderboards Button
@@ -538,6 +550,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Quit Button
@@ -747,6 +763,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Guide Button
@@ -873,6 +893,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 81
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Options Button
@@ -999,6 +1023,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 50.45
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Stats Button
@@ -1266,6 +1294,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 4872177481084444134, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8064948740879697774, guid: cc2152da86bff0546b9897131722d454, type: 2}
     - target: {fileID: 4872177481366842116, guid: c1f593ea91d74a84bb6a4f14b7602eaa, type: 3}
       propertyPath: m_Name
       value: Play Button
