@@ -158,6 +158,7 @@ public class BlockGroup : MonoBehaviour {
 		// This happens when the mino is moving and destroys itself at the bottom of the board
 		if (Size == 0 && GetComponent<MinoBlockGroup>( )) {
 			board.BreakthroughBoardArea.OnDestroyMino( );
+			board.GameOverBoardArea.OnDestroyMino( );
 		}
 
 		return true;

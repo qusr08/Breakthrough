@@ -31,7 +31,10 @@ public class BoardArea : MonoBehaviour {
 	public delegate void OnHeightChangeDelegate ( );
 	public OnHeightChangeDelegate OnHeightChange = ( ) => { };
 
-	public float CurrentHeight {
+    public delegate void OnUpdateBlockGroupsDelegate ( );
+    public OnUpdateBlockGroupsDelegate OnUpdateBlockGroups = ( ) => { };
+
+    public float CurrentHeight {
 		get {
 			return currentHeight;
 		}

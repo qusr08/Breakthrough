@@ -250,7 +250,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.75, y: 20}
+  m_Size: {x: 0.75, y: 0}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1748,7 +1748,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.03324, y: 23.985281, z: 0}
+    m_Extent: {x: 36.040836, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -1976,8 +1976,8 @@ MonoBehaviour:
   leftListRectTransform: {fileID: 1357138077}
   rightListRectTransform: {fileID: 6306037}
   gameCanvasRectTransform: {fileID: 427616023}
-  gameOverArea: {fileID: 370275327}
-  breakthroughArea: {fileID: 1770263713}
+  GameOverBoardArea: {fileID: 370275327}
+  BreakthroughBoardArea: {fileID: 1770263713}
   gameOverBar: {fileID: 73100743}
   breakthroughText: {fileID: 6012790928866382219}
   gameOverText: {fileID: 0}
