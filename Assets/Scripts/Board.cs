@@ -565,11 +565,11 @@ public class Board : MonoBehaviour {
     /// <param name="position">The position to check</param>
     /// <param name="parent">The parent transform to check</param>
     /// <returns>Returns 'true' if the position is valid</returns>
-    public bool IsPositionValid (Vector3 position, Transform parent = null) {
+    public bool IsPositionValid (Vector3Int position, Transform parent = null, bool ignoreBlock = false) {
         Block block = GetBlockAtPosition(position);
 
         bool isInBounds = (position.x >= 0 && position.x < Width && position.y >= 0 && position.y < Height);
-        bool isBlockAtPosition = (block != null);
+        bool isBlockAtPosition = (!ignoreBlock && block != null);
         bool hasParentTransform = (parent != null && block != null && block.transform.parent == parent);
 
         return (isInBounds && (!isBlockAtPosition || hasParentTransform));
@@ -598,7 +598,7 @@ public class Board : MonoBehaviour {
     private List<BlockGroup> GetSurroundingBlockGroups (Block block, bool excludeCurrentBlockGroup = false) {
         List<BlockGroup> surroundingGroups = new List<BlockGroup>( );
 
-        foreach (Block neighborBlock in GetSurroundingBlocks(block.Position)) {
+        foreach (Block neighborBlock in GetSurroundingBlocks(Utils.Vect3Round(block.Position))) {
             // If there is a block at the neighboring position and it has a new block group, add it to the surrounding block group list
             // Also, make sure the neighbor block does or does not have the same group as the block parameter
             bool isNewBlockGroup = (neighborBlock.BlockGroup != null && !surroundingGroups.Contains(neighborBlock.BlockGroup));
@@ -618,10 +618,10 @@ public class Board : MonoBehaviour {
     /// <param name="position">The position to check around</param>
     /// <param name="excludeNullBlocks">Whether or not to exclude null values from the returned list</param>
     /// <returns>A list of all surrounding blocks to the position vector</returns>
-    private List<Block> GetSurroundingBlocks (Vector3 position, bool excludeNullBlocks = true) {
+    private List<Block> GetSurroundingBlocks (Vector3Int position, bool excludeNullBlocks = true) {
         List<Block> surroundingBlocks = new List<Block>( );
 
-        foreach (Vector3 cardinalPosition in Utils.GetCardinalPositions(position)) {
+        foreach (Vector3Int cardinalPosition in Utils.GetCardinalPositions(position)) {
             Block neighborBlock = GetBlockAtPosition(cardinalPosition);
 
             // If there is a block at the neighboring position, add it to the list

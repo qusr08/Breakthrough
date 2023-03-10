@@ -11,8 +11,8 @@ public class BoomBlockFrames {
 	/// <summary>
 	/// A list of all the positions that will be exploded when triggered.
 	/// </summary>
-	public List<List<Vector3>> frames;
-	public List<Vector3> this[int index] {
+	public List<List<Vector3Int>> frames;
+	public List<Vector3Int> this[int index] {
 		get {
 			return frames[index];
 		}
@@ -43,9 +43,9 @@ public class BoomBlockFrames {
 	/// </summary>
 	public void CalculateFrames ( ) {
 		// Create frame list
-		frames = new List<List<Vector3>>( );
+		frames = new List<List<Vector3Int>>( );
 		// Add boom block to the first frame
-		frames.Add(new List<Vector3>( ) { boomBlock.Position });
+		frames.Add(new List<Vector3Int>( ) { Utils.Vect3Round(boomBlock.Position) });
 
 		// Whether or not a new block to be exploded was found
 		bool foundBlockInRange;
@@ -57,9 +57,9 @@ public class BoomBlockFrames {
 			foundBlockInRange = false;
 
 			// Loops through each boom block that will explode on the current frame
-			foreach (Vector3 position in frames[frameIndex]) {
+			foreach (Vector3Int position in frames[frameIndex]) {
 				// Add all neighboring blocks to this current boom block to the next frame
-				foreach (Vector3 neighborPosition in Utils.GetCardinalPositions(position)) {
+				foreach (Vector3Int neighborPosition in Utils.GetCardinalPositions(position)) {
 					/// TODO: Add a check to stop the frame if there are no more blocks to be exploded
 					///			If there is just a long string where no blocks are destroyed, there is no need to pause the game and wait
 					///			This happens a lot with vertical line boom blocks
@@ -86,23 +86,28 @@ public class BoomBlockFrames {
 	/// <param name="position">The position to add to the frame</param>
 	/// <param name="frameIndex">The frame to add to</param>
 	/// <returns></returns>
-	private bool AddBlockToFrame (Vector3 position, int frameIndex) {
-		// Check to see if the position is within range of the boom block
-		if (!boomBlock.IsWithinRange(position)) {
+	private bool AddBlockToFrame (Vector3Int position, int frameIndex) {
+        // Check to see if the block has already been added to a frame
+        // This makes sure that a loop does not occur of block positions being repeatedly destroyed
+        foreach (List<Vector3Int> frame in frames) {
+            if (frame.Contains(position)) {
+                return false;
+            }
+        }
+
+        // Check to see if the position is within range of the boom block
+        if (!boomBlock.IsWithinRange(position)) {
 			return false;
 		}
 
-		// Check to see if the block has already been added to a frame
-		// This makes sure that a loop does not occur of block positions being repeatedly destroyed
-		foreach (List<Vector3> frame in frames) {
-			if (frame.Contains(position)) {
-				return false;
-			}
+		// Make sure the position is on the board
+		if (!board.IsPositionValid(position, ignoreBlock: true)) {
+			return false;
 		}
 
 		// Make sure the block frame list is big enough for the frame index
 		while (frames.Count <= frameIndex) {
-			frames.Add(new List<Vector3>( ));
+			frames.Add(new List<Vector3Int>( ));
 		}
 		frames[frameIndex].Add(position);
 

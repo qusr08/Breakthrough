@@ -131,8 +131,8 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	private bool CheckBlockForValidMove (Block block, Vector3 positionChange, float rotationChange) {
-		Vector3 currPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(moveTo + block.transform.localPosition, moveTo, rotateTo.z));
-		Vector3 toPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(currPosition, moveTo, rotationChange) + positionChange);
+        Vector3Int currPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(moveTo + block.transform.localPosition, moveTo, rotateTo.z));
+        Vector3Int toPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(currPosition, moveTo, rotationChange) + positionChange);
 
 		// If this block group can't fall below the bottom of the board but is trying to
 		if (!CanFallIntoBreakthroughArea && toPosition.y < board.BreakthroughBoardArea.DefaultHeight) {

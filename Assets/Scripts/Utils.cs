@@ -95,12 +95,12 @@ public static class Utils {
 	/// </summary>
 	/// <param name="position">The center position to check the cardinal directions of</param>
 	/// <returns>A list of all the cardinal position vectors</returns>
-	public static List<Vector3> GetCardinalPositions (Vector3 position) {
-		return new List<Vector3>( ) {
-			position + Vector3.right,
-			position + Vector3.down,
-			position + Vector3.left,
-			position + Vector3.up
+	public static List<Vector3Int> GetCardinalPositions (Vector3Int position) {
+		return new List<Vector3Int>( ) {
+			position + Vector3Int.right,
+			position + Vector3Int.down,
+			position + Vector3Int.left,
+			position + Vector3Int.up
 		};
 	}
 

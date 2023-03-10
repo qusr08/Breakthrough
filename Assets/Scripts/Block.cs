@@ -143,26 +143,27 @@ public class Block : MonoBehaviour {
 	/// </summary>
 	/// <param name="position">The position to check.</param>
 	/// <returns>Whether or not the position is within the range of the block</returns>
-	public bool IsWithinRange (Vector3 position) {
+	public bool IsWithinRange (Vector3Int position) {
 		bool negative = (BlockDirection == BlockDirection.LEFT || BlockDirection == BlockDirection.DOWN);
 		// Calculate the bounds of this block
-		float minX = -1, maxX = -1, minY = -1, maxY = -1;
+		int minX = -1, maxX = -1, minY = -1, maxY = -1;
+		Vector3Int truePosition = Utils.Vect3Round(Position);
 
-		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
-		switch (BlockType) {
+        // Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
+        switch (BlockType) {
 			case BlockType.BOOM_DIRECTION:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
-					int layerSize = (int) Mathf.Abs(Position.x - position.x);
-					minX = Position.x + (negative ? -DirectionalBoomBlockSize : 1);
-					maxX = Position.x + (negative ? -1 : DirectionalBoomBlockSize);
-					minY = Position.y - layerSize;
-					maxY = Position.y + layerSize;
+					int layerSize = Mathf.Abs(truePosition.x - position.x);
+					minX = truePosition.x + (negative ? -DirectionalBoomBlockSize : 1);
+					maxX = truePosition.x + (negative ? -1 : DirectionalBoomBlockSize);
+					minY = truePosition.y - layerSize;
+					maxY = truePosition.y + layerSize;
 				} else { // Vertical
-					int layerSize = (int) Mathf.Abs(Position.y - position.y);
-					minX = Position.x - layerSize;
-					maxX = Position.x + layerSize;
-					minY = Position.y + (negative ? -DirectionalBoomBlockSize : 1);
-					maxY = Position.y + (negative ? -1 : DirectionalBoomBlockSize);
+					int layerSize = Mathf.Abs(truePosition.y - position.y);
+					minX = truePosition.x - layerSize;
+					maxX = truePosition.x + layerSize;
+					minY = truePosition.y + (negative ? -DirectionalBoomBlockSize : 1);
+					maxY = truePosition.y + (negative ? -1 : DirectionalBoomBlockSize);
 				}
 
 				break;
@@ -170,26 +171,27 @@ public class Block : MonoBehaviour {
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = 0;
 					maxX = board.Width;
-					minY = Position.y;
-					maxY = Position.y;
+					minY = truePosition.y;
+					maxY = truePosition.y;
 				} else { // Vertical
-					minX = Position.x;
-					maxX = Position.x;
+					minX = truePosition.x;
+					maxX = truePosition.x;
 					minY = 0;
 					maxY = board.Height;
 				}
 
 				break;
 			case BlockType.BOOM_SURROUND:
-				minX = Position.x - SurroundBoomBlockSize;
-				maxX = Position.x + SurroundBoomBlockSize;
-				minY = Position.y - SurroundBoomBlockSize;
-				maxY = Position.y + SurroundBoomBlockSize;
+				minX = truePosition.x - SurroundBoomBlockSize;
+				maxX = truePosition.x + SurroundBoomBlockSize;
+				minY = truePosition.y - SurroundBoomBlockSize;
+				maxY = truePosition.y + SurroundBoomBlockSize;
 
 				break;
 		}
 
 		// Check to see if the block position is within the bounds of the block
+		Debug.Log($"({position.x}, {position.y}) => min({minX}, {minY}) max({maxX}, {maxY})");
 		bool inX = (position.x >= minX && position.x <= maxX);
 		bool inY = (position.y >= minY && position.y <= maxY);
 
