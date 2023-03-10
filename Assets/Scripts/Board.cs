@@ -83,7 +83,10 @@ public class Board : MonoBehaviour {
 
                     break;
                 case BoardUpdateState.PLACING_MINO:
-                    GenerateRandomMino( );
+					// Update the percentage cleared text on the game ui
+					gameManager.PercentageCleared = GetPercentageClearRectangle(0, Mathf.RoundToInt(GameOverBoardArea.ToCurrentHeight) - 1, Width, Mathf.RoundToInt(GameOverBoardArea.ToCurrentHeight - BreakthroughBoardArea.ToCurrentHeight));
+
+					GenerateRandomMino( );
 
                     break;
                 case BoardUpdateState.UPDATING_BOOM_BLOCKS:
@@ -143,8 +146,8 @@ public class Board : MonoBehaviour {
         // Set board area delegate methods
         BreakthroughBoardArea.OnDestroyMino += ( ) => BoardUpdateState = BoardUpdateState.BREAKTHROUGH;
         BreakthroughBoardArea.OnUpdateBlockGroups += ( ) => {
-            // Clear all blocks inside the brekathrough board area
-            for (int y = 0; y < BreakthroughBoardArea.CurrentHeight; y++) {
+			// Clear all blocks inside the brekathrough board area
+			for (int y = 0; y < BreakthroughBoardArea.CurrentHeight; y++) {
                 for (int x = 0; x < Width; x++) {
                     // If there is a block at the position, then remove it
                     if (RemoveBlockFromBoard(new Vector3(x, y), true)) {
@@ -294,8 +297,7 @@ public class Board : MonoBehaviour {
     private IEnumerator BreakthroughSequence ( ) {
         // Update points
         gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
-        float percentageCleared = GetPercentageClearRectangle(0, Mathf.RoundToInt(GameOverBoardArea.ToCurrentHeight), Width, Mathf.RoundToInt(GameOverBoardArea.ToCurrentHeight - BreakthroughBoardArea.ToCurrentHeight));
-        float totalPointsGained = Mathf.RoundToInt(gameManager.BoardPoints * percentageCleared);
+        int totalPointsGained = Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentageCleared / 100f);
 
         // * Breakthrough text appears on screen
         breakthroughText.ShowText(transform.position, true);
@@ -315,7 +317,7 @@ public class Board : MonoBehaviour {
         breakthroughText.MoveText(transform.position + (Vector3.up * Height / 4f));
 
         // * Have percentage cleared text appear
-        pointsText.SetText($"{gameManager.BoardPoints} Board Points x {percentageCleared * 100:0.##}% Cleared\n= {totalPointsGained} Total Points Gained");
+        pointsText.SetText($"{gameManager.BoardPoints} x {gameManager.PercentageCleared:0.##}% Cleared =\n+{totalPointsGained}");
         pointsText.ShowText(transform.position, false);
 
         // * Wait for a bit
@@ -334,7 +336,7 @@ public class Board : MonoBehaviour {
         gameOverBar.Progress = 0f;
 
         // Update the total points
-        gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * percentageCleared);
+        gameManager.TotalPoints += totalPointsGained;
         gameManager.BoardPoints = 0;
 
         // * Generate a new wall
@@ -440,8 +442,8 @@ public class Board : MonoBehaviour {
             AddBlockToBoard(mino[0], true);
         }
 
-        // If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
-        if (mino == ActiveMino) {
+		// If the mino that was added is the active mino (meaning it was being dropped by the player) then set the active mino to null and wait for a new mino to spawn
+		if (mino == ActiveMino) {
             ActiveMino = null;
         }
 
@@ -495,12 +497,12 @@ public class Board : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Spawn boom block debris at a certain position
-    /// </summary>
-    /// <param name="position">The position to spawn the particle system at.</param>
-    /// <param name="color">The color of the particle system.</param>
-    public void SpawnBoomBlockDebris (Vector3 position, Color color) {
+	/// <summary>
+	/// Spawn boom block debris at a certain position
+	/// </summary>
+	/// <param name="position">The position to spawn the particle system at.</param>
+	/// <param name="color">The color of the particle system.</param>
+	public void SpawnBoomBlockDebris (Vector3 position, Color color) {
         ParticleSystem boomBlockDebris = Instantiate(prefabBoomBlockDebris, position, Quaternion.identity).GetComponent<ParticleSystem>( );
         ParticleSystem.MainModule boomBlockDebrisMainModule = boomBlockDebris.main;
         boomBlockDebrisMainModule.startColor = color;

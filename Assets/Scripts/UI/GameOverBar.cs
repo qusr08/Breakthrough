@@ -10,8 +10,6 @@ public class GameOverBar : MonoBehaviour {
 	[SerializeField] private Transform fillTransform;
 	[SerializeField] private SpriteRenderer fillSpriteRenderer;
 	[SerializeField] private SpriteRenderer spriteRenderer;
-	[SerializeField] private BoardArea gameOverArea;
-	[SerializeField] private BoardArea breakthroughArea;
 	[Header("Properties")]
 	[SerializeField, Min(0f), Tooltip("The spacing between this bar and the board.")] private float uiPadding;
 	[SerializeField, Range(0f, 1f), Tooltip("How close the bar is to filling up all the way.")] private float progress;
@@ -61,9 +59,6 @@ public class GameOverBar : MonoBehaviour {
 		}
 #endif
 
-		board = FindObjectOfType<Board>( );
-		gameManager = FindObjectOfType<GameManager>( );
-
 		// Update the widths of the bars
 		spriteRenderer.size = new Vector2(board.BorderThickness, 0.0f);
 		fillSpriteRenderer.size = new Vector2(board.BorderThickness, 0.0f);
@@ -106,7 +101,7 @@ public class GameOverBar : MonoBehaviour {
 	/// Increase the progress made in the bar
 	/// </summary>
 	public void IncrementProgress ( ) {
-		Progress += 1f / Height;
+		Progress += 2f / Height;
 	}
 
 	/// <summary>

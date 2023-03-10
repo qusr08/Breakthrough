@@ -5,9 +5,10 @@ using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-	[Header("Scene GameObjects")]
+	[Header("Components")]
 	[SerializeField] public BoardUILabel TotalPointsUILabel;
 	[SerializeField] public BoardUILabel BoardPointsUILabel;
+	[SerializeField] public BoardUILabel PercentageClearedUILabel;
 	[Header("Points Values")]
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each destroyed block.")] public int PointsPerDestroyedBlock = 6;
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each block dropped into the breakthrough area.")] public int PointsPerDroppedBlock = 12;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour {
 	public float MoveTimeAccelerated {
 		get => MoveTime / 2f;
 	}
+
 	public int BoardPoints {
 		get => int.Parse(BoardPointsUILabel.Value.text);
 		set => BoardPointsUILabel.Value.text = value.ToString( );
@@ -36,5 +38,14 @@ public class GameManager : MonoBehaviour {
 	public int TotalPoints {
 		get => int.Parse(TotalPointsUILabel.Value.text);
 		set => TotalPointsUILabel.Value.text = value.ToString( );
+	}
+	public float PercentageCleared {
+		get {
+			int stringLength = PercentageClearedUILabel.Value.text.Length;
+			return float.Parse(PercentageClearedUILabel.Value.text.Substring(0, stringLength - 1));
+		}
+		set {
+			PercentageClearedUILabel.Value.text = $"{(value * 100):0.##}%";
+		}
 	}
 }

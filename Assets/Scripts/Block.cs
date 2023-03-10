@@ -191,7 +191,6 @@ public class Block : MonoBehaviour {
 		}
 
 		// Check to see if the block position is within the bounds of the block
-		Debug.Log($"({position.x}, {position.y}) => min({minX}, {minY}) max({maxX}, {maxY})");
 		bool inX = (position.x >= minX && position.x <= maxX);
 		bool inY = (position.y >= minY && position.y <= maxY);
 
