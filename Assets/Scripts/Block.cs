@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum BlockColor {
 	DARK_PURPLE, DARK_BLUE, DARK_PINK, TEAL, ORANGE, GREEN, LIGHT_BLUE, LIGHT_PURPLE, LIGHT_PINK, WALL_1, WALL_2, WALL_3
@@ -41,6 +42,8 @@ public class Block : MonoBehaviour {
 	[SerializeField, Min(0f), Tooltip("The maximum velocity at which the blocks explode off the board at.")] private float maxBlockVelocity;
 	[SerializeField, Min(0f), Tooltip("The minimum angular velocity at which the blocks explode off the board at.")] private float minBlockAngularVelocity;
 	[SerializeField, Min(0f), Tooltip("The maximum angular velocity at which the blocks explode off the board at.")] private float maxBlockAngularVelocity;
+	[SerializeField, Tooltip("The color of the shadow that blocks leave.")] private Color shadowColor;
+	[SerializeField, Tooltip("Whether or not this block is a shadow.")] private bool isShadow;
 
 	private readonly BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.WALL_1, BlockColor.WALL_2, BlockColor.WALL_3 };
 
@@ -84,7 +87,7 @@ public class Block : MonoBehaviour {
 			// If the health is 0, though, the block will be destroyed and so a block particle should be spawned
 			if (_health > 0) {
 				BlockColor = wallColorStages[_health - 1];
-			} else {
+			} else if (!isShadow) {
 				SpawnBlockParticle( );
 			}
 		}
@@ -149,8 +152,8 @@ public class Block : MonoBehaviour {
 		int minX = -1, maxX = -1, minY = -1, maxY = -1;
 		Vector3Int truePosition = Utils.Vect3Round(Position);
 
-        // Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
-        switch (BlockType) {
+		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
+		switch (BlockType) {
 			case BlockType.BOOM_DIRECTION:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					int layerSize = Mathf.Abs(truePosition.x - position.x);
@@ -213,5 +216,14 @@ public class Block : MonoBehaviour {
 	private void SpawnBlockParticle ( ) {
 		SpriteRenderer blockParticleSpriteRenderer = Instantiate(prefabBlockParticle, transform.position, Quaternion.identity).GetComponent<SpriteRenderer>( );
 		blockParticleSpriteRenderer.color = spriteRenderer.color;
+	}
+
+	/// <summary>
+	/// Converts this block into a "shadow", which represents where the block was previously
+	/// </summary>
+	public void ConvertToShadow ( ) {
+		isShadow = true;
+
+		spriteRenderer.color = shadowColor;
 	}
 }

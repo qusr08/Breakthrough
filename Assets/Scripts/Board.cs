@@ -318,7 +318,7 @@ public class Board : MonoBehaviour {
 
 		// * Break all blocks off of the board
 		// * These blocks should leave behind a "shadow" of where they were to make it more obvious how much of the board was cleared
-		yield return StartCoroutine(ClearBoardSequence( ));
+		yield return StartCoroutine(ClearBoardSequence(0.25f, true));
 
 		// * Wait for a bit
 		yield return new WaitForSeconds(1f);
@@ -327,11 +327,14 @@ public class Board : MonoBehaviour {
 		breakthroughText.MoveText(transform.position + (Vector3.up * Height / 4f));
 
 		// * Have percentage cleared text appear
-		pointsText.SetText($"{gameManager.BoardPoints} pts. x {gameManager.PercentageCleared:0.##}% Cleared =\n+{totalPointsGained} pts.");
+		pointsText.SetText($"{gameManager.BoardPoints} pts. x {gameManager.PercentageCleared:0.##}% Cleared \n+{totalPointsGained} pts.");
 		pointsText.ShowText(transform.position, false);
 
 		// * Wait for a bit
 		yield return new WaitForSeconds(3f);
+
+		// Actually clear the board now
+		yield return StartCoroutine(ClearBoardSequence(0.1f));
 
 		// * Hide text
 		breakthroughText.HideText( );
@@ -353,7 +356,7 @@ public class Board : MonoBehaviour {
 		yield return StartCoroutine(GenerateBoardSequence( ));
 	}
 
-	private IEnumerator ClearBoardSequence ( ) {
+	private IEnumerator ClearBoardSequence (float speed, bool convertToShadows = false) {
 		// This sequence will destroy each row of the board one by one
 		// Only keep looping if there is a block in the row
 		bool hasBlockInRow = true;
@@ -365,7 +368,7 @@ public class Board : MonoBehaviour {
 			// Loop through the entire row at a certain y value
 			for (int x = 0; x < Width; x++) {
 				// If there is a block at the position, then remove it
-				if (RemoveBlockFromBoard(new Vector3(x, y), true)) {
+				if (RemoveBlockFromBoard(new Vector3(x, y), true, convertToShadows)) {
 					hasBlockInRow = true;
 				}
 			}
@@ -373,7 +376,7 @@ public class Board : MonoBehaviour {
 			y++;
 
 			// Wait a little bit before destroying the next row
-			yield return new WaitForSeconds(0.25f);
+			yield return new WaitForSeconds(speed);
 		}
 	}
 
@@ -525,8 +528,8 @@ public class Board : MonoBehaviour {
 	/// <param name="position">The position of the block to try and remove.</param>
 	/// <param name="ignoreHealth">Whether or not ignore the blocks health. If set to true, the block will definitely be destroyed no matter how damaged it is</param>
 	/// <returns>Whether or not the block was removed.</returns>
-	public bool RemoveBlockFromBoard (Vector3 position, bool ignoreHealth = false) {
-		return RemoveBlockFromBoard(GetBlockAtPosition(position), ignoreHealth);
+	public bool RemoveBlockFromBoard (Vector3 position, bool ignoreHealth = false, bool convertToShadow = false) {
+		return RemoveBlockFromBoard(GetBlockAtPosition(position), ignoreHealth, convertToShadow);
 	}
 
 	/// <summary>
@@ -535,7 +538,7 @@ public class Board : MonoBehaviour {
 	/// <param name="block">The block to remove</param>
 	/// <param name="ignoreHealth">Whether or not ignore the blocks health. If set to true, the block will definitely be destroyed no matter how damaged it is</param>
 	/// <returns>Whether or not the block was destroyed</returns>
-	public bool RemoveBlockFromBoard (Block block, bool ignoreHealth = false) {
+	public bool RemoveBlockFromBoard (Block block, bool ignoreHealth = false, bool convertToShadow = false) {
 		// Make sure the block exists
 		if (block == null) {
 			return false;
@@ -559,8 +562,12 @@ public class Board : MonoBehaviour {
 				}
 			}
 
-			// Destroy the block gameobject
-			DestroyImmediate(block.gameObject);
+			// Either convert the block to a shadow or destroy it
+			if (convertToShadow) {
+				block.ConvertToShadow( );
+			} else {
+				DestroyImmediate(block.gameObject);
+			}
 
 			return true;
 		}

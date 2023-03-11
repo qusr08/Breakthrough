@@ -40,10 +40,15 @@ public class AnimatedText : MonoBehaviour {
 		IsVisible = isVisible;
 	}
 
-	private void Start ( ) {
-		// StartCoroutine(Loop( ));
-	}
+	/*private void Start ( ) {
+		StartCoroutine(Loop( ));
+	}*/
 
+	/// <summary>
+	/// Show the text
+	/// </summary>
+	/// <param name="startPosition">The starting position of the text</param>
+	/// <param name="playParticles">Whether or not to play particles at the end of the tween</param>
 	public void ShowText (Vector3 startPosition, bool playParticles) {
 		fromAlpha = 0f;
 		toAlpha = 1f;
@@ -57,6 +62,9 @@ public class AnimatedText : MonoBehaviour {
 		StartCoroutine(Animate(playParticles));
 	}
 
+	/// <summary>
+	/// Hide the text
+	/// </summary>
 	public void HideText ( ) {
 		fromAlpha = 1f;
 		toAlpha = 0f;
@@ -70,6 +78,10 @@ public class AnimatedText : MonoBehaviour {
 		StartCoroutine(Animate(false));
 	}
 
+	/// <summary>
+	/// Move the text to a certain position
+	/// </summary>
+	/// <param name="moveToPosition">The position to move to</param>
 	public void MoveText (Vector3 moveToPosition) {
 		fromAlpha = 1f;
 		toAlpha = 1f;
@@ -83,16 +95,29 @@ public class AnimatedText : MonoBehaviour {
 		StartCoroutine(Animate(false));
 	}
 
+	/// <summary>
+	/// Set the text
+	/// </summary>
+	/// <param name="text">The text to set to</param>
 	public void SetText (string text) {
 		textMeshPro.text = text;
 	}
 
+	/// <summary>
+	/// Set the alpha of the text
+	/// </summary>
+	/// <param name="alpha">The alpha to set to</param>
 	private void SetTextAlpha (float alpha) {
 		Color color = textMeshPro.color;
 		color.a = alpha;
 		textMeshPro.color = color;
 	}
 
+	/// <summary>
+	/// Animate the text based on the set position, rotatio, and color
+	/// </summary>
+	/// <param name="playParticles">Whether or not to play the particle system at the end of the tween</param>
+	/// <returns></returns>
 	private IEnumerator Animate (bool playParticles) {
 		// Set the initial values of the text
 		SetTextAlpha(fromAlpha);
@@ -118,17 +143,17 @@ public class AnimatedText : MonoBehaviour {
 		transform.SetPositionAndRotation(toPosition, toRotation);
 
 		// Spawn the particles for the text
-		if (playParticles) {
+		if (playParticles && textParticleSystem != null) {
 			textParticleSystem.Play( );
 		}
 	}
 
-	private IEnumerator Loop ( ) {
+	/*private IEnumerator Loop ( ) {
 		while (true) {
 			yield return new WaitForSeconds(animationTime * 1.5f);
 			StartCoroutine(Animate(true));
 			yield return new WaitForSeconds(animationTime * 1.5f);
 			StartCoroutine(Animate(false));
 		}
-	}
+	}*/
 }
