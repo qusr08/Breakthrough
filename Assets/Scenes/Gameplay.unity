@@ -251,7 +251,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.75, y: 0}
+  m_Size: {x: 0.75, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -265,7 +265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73100740}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.5, y: -14, z: 0}
+  m_LocalPosition: {x: -9.5, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1884849779}
@@ -369,7 +369,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.25, y: 1.25}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1301,11 +1301,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_text
-      value: Board Pts.
-      objectReference: {fileID: 0}
-    - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
-      propertyPath: m_fontStyle
-      value: 0
+      value: Board pts.
       objectReference: {fileID: 0}
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_sharedMaterial
@@ -1608,7 +1604,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2078,7 +2074,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473050, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_fontSize
-      value: 11
+      value: 10.5
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473050, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_fontStyle
@@ -2102,7 +2098,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473050, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_fontSizeBase
-      value: 11
+      value: 10.5
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473050, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_sharedMaterial
@@ -2118,7 +2114,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473050, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4283747480
+      value: 5557400
       objectReference: {fileID: 0}
     - target: {fileID: 2941269601840473051, guid: 1c6a50728fb9ec240a4b9c3e96dd2490, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -2488,7 +2484,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.25, y: 1.25}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2519,7 +2515,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1729672254}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.5, y: -8.625, z: 0}
+  m_LocalPosition: {x: 9.75, y: -6.625, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1695087366}
@@ -2541,18 +2537,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 2111922726}
+  gameManager: {fileID: 833555035}
   currentLevelTransform: {fileID: 1695087366}
   currentLevelText: {fileID: 1745468535}
-  currentLevelSpriteRenderer: {fileID: 0}
+  currentLevelSpriteRenderer: {fileID: 1695087367}
   nextLevelTransform: {fileID: 148417776}
   nextLevelText: {fileID: 936162806}
-  nextLevelSpriteRenderer: {fileID: 0}
-  dotsTransform: {fileID: 1636599861}
-  uiPadding: 0.75
+  nextLevelSpriteRenderer: {fileID: 148417777}
+  dotSpriteRenderers:
+  - {fileID: 2061678875}
+  - {fileID: 1288207717}
+  - {fileID: 346165642}
+  - {fileID: 1030683139}
+  - {fileID: 899384128}
+  - {fileID: 1035584482}
+  uiPadding: 1
   elementPadding: 0.25
   unselectedColor: {r: 0.64705884, g: 0.72156864, b: 0.74509805, a: 1}
   selectedColor: {r: 0.59607846, g: 0.8000001, b: 0.32941177, a: 1}
+  unselectedSize: 0.5
+  selectedSize: 1
   progress: 0
+  level: 0
 --- !u!1 &1745468533
 GameObject:
   m_ObjectHideFlags: 0
@@ -2787,7 +2793,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 36.03324, y: 23.985281, z: 0}
+    m_Extent: {x: 36.03411, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -2829,7 +2835,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1884849778}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 73100742}
@@ -2921,10 +2927,6 @@ PrefabInstance:
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_text
       value: Percentage Cleared
-      objectReference: {fileID: 0}
-    - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
-      propertyPath: m_fontStyle
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_sharedMaterial
@@ -3279,6 +3281,7 @@ MonoBehaviour:
   GameOverBoardArea: {fileID: 370275327}
   BreakthroughBoardArea: {fileID: 1770263713}
   gameOverBar: {fileID: 73100743}
+  breakthroughLevelbar: {fileID: 1729672256}
   breakthroughText: {fileID: 6012790928866382219}
   gameOverText: {fileID: 0}
   pointsText: {fileID: 1331283400}
@@ -3289,7 +3292,7 @@ MonoBehaviour:
   BorderThickness: 0.75
   gameCanvasScale: 0.028703
   BoomBlockAnimationSpeed: 0.05
-  _boardUpdateState: 6
+  _boardUpdateState: 0
   ActiveMino: {fileID: 0}
   level: 0
   wallHeight: 2
@@ -3433,7 +3436,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_text
-      value: Total Pts.
+      value: Total pts.
       objectReference: {fileID: 0}
     - target: {fileID: 4764229571657600017, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
       propertyPath: m_fontColor.b

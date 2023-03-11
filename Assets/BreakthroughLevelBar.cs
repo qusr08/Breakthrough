@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -7,31 +8,55 @@ using UnityEngine;
 public class BreakthroughLevelBar : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private Board board;
+	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Transform currentLevelTransform;
 	[SerializeField] private TextMeshPro currentLevelText;
 	[SerializeField] private SpriteRenderer currentLevelSpriteRenderer;
 	[SerializeField] private Transform nextLevelTransform;
 	[SerializeField] private TextMeshPro nextLevelText;
 	[SerializeField] private SpriteRenderer nextLevelSpriteRenderer;
-	[SerializeField] private Transform dotsTransform;
+	[SerializeField] private List<SpriteRenderer> dotSpriteRenderers;
 	[Header("Properties")]
 	[SerializeField, Min(0f), Tooltip("The spacing between this bar and the board.")] private float uiPadding;
 	[SerializeField, Min(0f), Tooltip("The spacing between each of the blocks that make up this bar.")] private float elementPadding;
 	[SerializeField, Tooltip("The color that the elements appear when they are not selected.")] private Color unselectedColor;
 	[SerializeField, Tooltip("The color that the elements appear when they are selected.")] private Color selectedColor;
-	[SerializeField, Range(0, 5), Tooltip("The current progress of the player to reaching the next level.")] private int progress;
+	[SerializeField, Range(0f, 2f), Tooltip("The unselected size of a dot.")] private float unselectedSize;
+	[SerializeField, Range(0f, 2f), Tooltip("The selected size of a dot.")] private float selectedSize;
+	[SerializeField, Range(0f, 1f), Tooltip("The current progress of the player to reaching the next level.")] private float progress;
+	[SerializeField, Min(0), Tooltip("The current level that is being displayed.")] private int level;
 
-	public int Progress {
+	private float[ ] toDotSizes;
+	private float[ ] toDotSizesVelocities;
+
+	private bool calledOnValidate;
+
+	public float Progress {
 		get {
 			return progress;
 		}
 		set {
 			progress = value;
 
-			// Set the colors of the dot elements
-			for (int i = 0; i < dotsTransform.childCount; i++) {
-				dotsTransform.GetChild(i).GetComponent<SpriteRenderer>( ).color = (progress >= dotsTransform.childCount - 1 - i ? selectedColor : unselectedColor);
+			// Set what the dot elements should resize to and change their color to
+			for (int i = 0; i < dotSpriteRenderers.Count; i++) {
+				bool isSelected = progress * (dotSpriteRenderers.Count - 1) >= dotSpriteRenderers.Count - 1 - i;
+				dotSpriteRenderers[i].color = (isSelected ? selectedColor : unselectedColor);
+				toDotSizes[i] = isSelected ? selectedSize : unselectedSize;
 			}
+		}
+	}
+
+	public int Level {
+		get {
+			return level;
+		}
+		set {
+			level = value;
+
+			// Update the level text variables
+			currentLevelText.text = level.ToString( );
+			nextLevelText.text = (level + 1).ToString( );
 		}
 	}
 
@@ -46,22 +71,33 @@ public class BreakthroughLevelBar : MonoBehaviour {
 		}
 #endif
 
-		// Set the positions of all the elements
-		transform.position = new Vector3(board.transform.position.x + (board.Width / 2f) + board.BorderThickness + uiPadding, (8 + (7 * elementPadding)) / 2f + board.BreakthroughBoardArea.CurrentHeight, 0f);
-		currentLevelTransform.position = GetElementPosition(8);
-		for (int i = 0; i < dotsTransform.childCount; i++) {
-			dotsTransform.GetChild(i).position = GetElementPosition(i + 2);
+		RecalculateHeight( );
+
+		// Calculate the sizes of the dots based on the progress
+		toDotSizes = new float[dotSpriteRenderers.Count];
+		toDotSizesVelocities = new float[dotSpriteRenderers.Count];
+		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
+			toDotSizes[i] = unselectedSize;
+			toDotSizesVelocities[i] = 0f;
 		}
-		nextLevelTransform.position = GetElementPosition(1);
+		Progress = progress;
+
+		// Immediately set the size of the dots in the editor
+		/*for (int i = 0; i < dotSpriteRenderers.Count; i++) {
+			float size = toDotSizes[i];
+			dotSpriteRenderers[i].size = new Vector2(size, size);
+		}*/
 
 		// Set the color of the elements
-		currentLevelTransform.GetComponent<SpriteRenderer>( ).color = selectedColor;
-		nextLevelTransform.GetComponent<SpriteRenderer>( ).color = unselectedColor;
+		currentLevelSpriteRenderer.color = selectedColor;
+		nextLevelSpriteRenderer.color = unselectedColor;
 
-		Progress = progress;
+		calledOnValidate = true;
 	}
 
 	private void Awake ( ) {
+		calledOnValidate = false;
+
 #if UNITY_EDITOR
 		OnValidate( );
 #else
@@ -69,8 +105,39 @@ public class BreakthroughLevelBar : MonoBehaviour {
 #endif
 	}
 
+	private void Update ( ) {
+		if (!calledOnValidate) {
+			return;
+		}
+
+		// Smoothly transition between states of the elements
+		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
+			float currentSize = dotSpriteRenderers[i].size.x;
+			float smoothedValue = Mathf.SmoothDamp(currentSize, toDotSizes[i], ref toDotSizesVelocities[i], gameManager.BlockAnimationSpeed);
+			dotSpriteRenderers[i].size = new Vector2(smoothedValue, smoothedValue);
+		}
+	}
+
+	/// <summary>
+	/// Calculate the position of a specific element
+	/// </summary>
+	/// <param name="elementIndex">The index of the element. This is essentially the order of the elements as they stack vertically.</param>
+	/// <returns>The position to set the element to</returns>
 	private Vector3 GetElementPosition (int elementIndex) {
 		int offsetIndex = 8 - elementIndex;
 		return new Vector3(transform.position.x, offsetIndex + (offsetIndex * elementPadding) + board.BreakthroughBoardArea.CurrentHeight, 0f);
+	}
+
+	/// <summary>
+	/// Recalculate the y position of all the elements
+	/// </summary>
+	public void RecalculateHeight ( ) {
+		// Set the positions of all the elements
+		transform.position = new Vector3(board.transform.position.x + (board.Width / 2f) + board.BorderThickness + uiPadding, (8 + (7 * elementPadding)) / 2f + board.BreakthroughBoardArea.CurrentHeight, 0f);
+		currentLevelTransform.position = GetElementPosition(8);
+		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
+			dotSpriteRenderers[i].transform.position = GetElementPosition(i + 2);
+		}
+		nextLevelTransform.position = GetElementPosition(1);
 	}
 }

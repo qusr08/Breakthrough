@@ -25,6 +25,8 @@ public class GameOverBar : MonoBehaviour {
 	private Vector3 toFillPosition;
 	private Vector3 toFillPositionVelocity;
 
+	private bool calledOnValidate;
+
 	public float Progress {
 		get {
 			return progress;
@@ -73,9 +75,13 @@ public class GameOverBar : MonoBehaviour {
 		FillHeight = toFillHeight;
 		transform.localPosition = toPosition;
 		fillTransform.localPosition = toFillPosition;
+
+		calledOnValidate = true;
 	}
 
 	private void Awake ( ) {
+		calledOnValidate = false;
+
 #if UNITY_EDITOR
 		OnValidate( );
 #else
@@ -84,6 +90,10 @@ public class GameOverBar : MonoBehaviour {
 	}
 
 	private void Update ( ) {
+		if (!calledOnValidate) {
+			return;
+		}
+
 		// Smoothly transition the height of the bar and the height of the fill inside
 		Height = Mathf.SmoothDamp(Height, toHeight, ref toHeightVelocity, gameManager.BlockAnimationSpeed);
 		FillHeight = Mathf.SmoothDamp(FillHeight, toFillHeight, ref toFillHeightVelocity, gameManager.BlockAnimationSpeed);
