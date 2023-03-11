@@ -46,14 +46,16 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField, Tooltip("The current level of the game.")] private int level = 0;
 	[SerializeField, Tooltip("The current height of the wall.")] private int wallHeight = 0;
-	[SerializeField, Tooltip("The current roughness of the Perlin Noise used to generate the wall. Roughness is defined as how steep the increments/decriments of the values are.")] private float wallRoughness = 0f;
-	[SerializeField, Tooltip("The current elevation of the Perlin Noise used to generate the wall. Elevation is defined as how high the values are.")] private float wallElevation = 0f;
+	[SerializeField, Tooltip("The current minimum value of the wall block health.")] private float wallGenMinimum;
+	[SerializeField, Tooltip("The current maximum value of the wall block health.")] private float wallGenMaximum;
+	// [SerializeField, Tooltip("The current roughness of the Perlin Noise used to generate the wall. Roughness is defined as how steep the increments/decriments of the values are.")] private float wallRoughness = 0f;
+	// [SerializeField, Tooltip("The current elevation of the Perlin Noise used to generate the wall. Elevation is defined as how high the values are.")] private float wallElevation = 0f;
 	[SerializeField, Min(0), Tooltip("The maximum height of the wall.")] private int wallMaxHeight = 11;
 	[SerializeField, Min(0), Tooltip("The minimum height of the wall.")] private int wallMinHeight = 2;
-	[SerializeField, Range(0f, 1f), Tooltip("The maximum roughness of the wall.")] private float wallMaxRoughness = 2f;
-	[SerializeField, Range(0f, 1f), Tooltip("The minimum roughness of the wall.")] private float wallMinRoughness = 0.1f;
-	[SerializeField, Range(0f, 1f), Tooltip("The maximum elevation of the wall.")] private float wallMaxElevation = 1f;
-	[SerializeField, Range(0f, 1f), Tooltip("The minimum elevation of the wall.")] private float wallMinElevation = 0.1f;
+	// [SerializeField, Range(0f, 1f), Tooltip("The maximum roughness of the wall.")] private float wallMaxRoughness = 2f;
+	// [SerializeField, Range(0f, 1f), Tooltip("The minimum roughness of the wall.")] private float wallMinRoughness = 0.1f;
+	// [SerializeField, Range(0f, 1f), Tooltip("The maximum elevation of the wall.")] private float wallMaxElevation = 1f;
+	// [SerializeField, Range(0f, 1f), Tooltip("The minimum elevation of the wall.")] private float wallMinElevation = 0.1f;
 	[Space]
 	[SerializeField, Range(0f, 1f), Tooltip("The base spawn chance for boom blocks.")] private float boomBlockSpawnChance = 0.4f;
 	[SerializeField, Min(0f), Tooltip("How many Minos it will take to guarantee that the player gets a boom block on their Mino.")] private int boomBlockGuarantee = 5;
@@ -163,8 +165,10 @@ public class Board : MonoBehaviour {
 
 	private void Start ( ) {
 		wallHeight = wallMinHeight;
-		wallRoughness = wallMinRoughness;
-		wallElevation = wallMinElevation;
+		// wallRoughness = wallMinRoughness;
+		// wallElevation = wallMinElevation;
+		wallGenMinimum = 0f;
+		wallGenMaximum = 1f;
 
 		StartCoroutine(GenerateBoardSequence( ));
 	}
@@ -226,14 +230,19 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	private void UpdateDifficulty ( ) {
 		// Update varibles for difficulty scaling
-		float levelValue = level / 6f;
-		wallHeight = Mathf.Min(Mathf.RoundToInt(Mathf.Sqrt(4.5f * levelValue) + wallMinHeight), wallMaxHeight);
-		wallRoughness = Mathf.Min(levelValue * levelValue * 0.006f + wallMinRoughness, wallMaxRoughness);
-		wallElevation = Mathf.Min(levelValue * levelValue * 0.02f + wallMinElevation, wallMaxElevation);
+		// float levelValue = level / 6f;
+		// wallHeight = Mathf.Min(Mathf.RoundToInt(Mathf.Sqrt(4.5f * levelValue) + wallMinHeight), wallMaxHeight);
+		// wallRoughness = Mathf.Min(levelValue * levelValue * 0.006f + wallMinRoughness, wallMaxRoughness);
+		// wallElevation = Mathf.Min(levelValue * levelValue * 0.02f + wallMinElevation, wallMaxElevation);
+
+		wallHeight = Mathf.RoundToInt(Mathf.Clamp(0.7f * (Mathf.Sin(0.46f * level) + (0.54f * level)) + wallMinHeight, wallMinHeight, wallMaxHeight));
+		wallGenMaximum = Mathf.Clamp(0.11f * level + 1f, 1, 3);
+		wallGenMinimum = Mathf.Clamp(0.07f * level, 0, 2);
+		gameManager.FallTime = Mathf.Clamp(0.013f * level + 1f, 0.25f, 1f);
 
 		// Update the breakthrough level indicator
 		breakthroughLevelbar.Level = (level / 6) + 1;
-		breakthroughLevelbar.Progress = (level % 6) / 5f;
+		breakthroughLevelbar.Progress = level % 6;
 
 		// Increase the difficulty of the game after calculations
 		level++;
@@ -306,7 +315,7 @@ public class Board : MonoBehaviour {
 
 	private IEnumerator BreakthroughSequence ( ) {
 		// Update points
-		gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
+		gameManager.BoardPoints += gameManager.PointsPerBreakthrough * breakthroughLevelbar.Level;
 		int totalPointsGained = Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentageCleared / 100f);
 
 		// * Breakthrough text appears on screen
@@ -327,7 +336,7 @@ public class Board : MonoBehaviour {
 		breakthroughText.MoveText(transform.position + (Vector3.up * Height / 4f));
 
 		// * Have percentage cleared text appear
-		pointsText.SetText($"{gameManager.BoardPoints} pts. x {gameManager.PercentageCleared:0.##}% Cleared \n+{totalPointsGained} pts.");
+		pointsText.SetText($"{gameManager.BoardPoints} pts x {gameManager.PercentageCleared:0.##}% Cleared \n+{totalPointsGained} pts");
 		pointsText.ShowText(transform.position, false);
 
 		// * Wait for a bit
@@ -336,21 +345,16 @@ public class Board : MonoBehaviour {
 		// Actually clear the board now
 		yield return StartCoroutine(ClearBoardSequence(0.1f));
 
-		// * Hide text
+		// Hide text
 		breakthroughText.HideText( );
 		pointsText.HideText( );
 
-		// * Turn the next square on the level indicator green
-
-		// Reset the game over area to its default height
-		GameOverBoardArea.ToCurrentHeight = GameOverBoardArea.DefaultHeight;
-
-		// Reset the game over bar's progress
-		gameOverBar.Progress = 0f;
-
-		// Update the total points
+		// Reset variables
 		gameManager.TotalPoints += totalPointsGained;
 		gameManager.BoardPoints = 0;
+		gameManager.PercentageCleared = 0f;
+		GameOverBoardArea.ToCurrentHeight = GameOverBoardArea.DefaultHeight;
+		gameOverBar.Progress = 0f;
 
 		// * Generate a new wall
 		yield return StartCoroutine(GenerateBoardSequence( ));
@@ -385,7 +389,7 @@ public class Board : MonoBehaviour {
 		minoBlocks = new List<List<Block>>( );
 
 		// Generate the wall
-		float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
+		/*float[ , ] wallValues = Utils.GeneratePerlinNoiseGrid(Width, wallHeight, wallRoughness, 4, wallElevation);
 		for (int j = 0; j < wallHeight; j++) {
 			for (int i = 0; i < Width; i++) {
 				// Make sure the perlin noise value can be converted to a wall block
@@ -402,13 +406,46 @@ public class Board : MonoBehaviour {
 			}
 
 			yield return new WaitForSeconds(0.25f);
+		}*/
+
+		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, wallHeight, wallGenMinimum, wallGenMaximum);
+		for (int j = 0; j < wallHeight; j++) {
+			for (int i = 0; i < Width; i++) {
+				// Make sure the perlin noise value can be converted to a wall block
+				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
+
+				// There is also a 50 percent chance that the health will just increase
+				if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+					randomValue++;
+				}
+
+				// Make sure the bottom of the wall is always solid
+				// This prevents any straight paths being generated
+				if (randomValue == 0 && j == 0) {
+					randomValue = 1;
+				}
+
+				// Make sure the value stays within the range of the wall health
+				randomValue = Mathf.Clamp(randomValue, 0, 3);
+
+				// If the noise value is greater than 0, a wall block will spawn
+				// If it is less than or equal to 0, there will be a gap in the wall at that point
+				if (randomValue > 0) {
+					Block block = Instantiate(prefabBlock, new Vector3(i, j + BreakthroughBoardArea.DefaultHeight), Quaternion.identity).GetComponent<Block>( );
+					block.Health = randomValue;
+					AddBlockToBoard(block);
+				}
+			}
+
+			yield return new WaitForSeconds(0.25f);
 		}
 
 		// Increase the difficulty of the game
 		UpdateDifficulty( );
 
 		// Update the state to start placing minos
-		BoardUpdateState = BoardUpdateState.PLACING_MINO;
+		// BoardUpdateState = BoardUpdateState.PLACING_MINO;
+		BoardUpdateState = BoardUpdateState.UPDATING_BLOCK_GROUPS;
 	}
 
 	#endregion
@@ -548,6 +585,16 @@ public class Board : MonoBehaviour {
 		block.BlockGroup.IsModified = true;
 		block.Health -= (ignoreHealth ? block.Health : 1);
 
+		// If the block is to be converted into a shadow, skip giving the player points
+		if (convertToShadow) {
+			block.ConvertToShadow( );
+			return true;
+		}
+		if (block.IsShadow) {
+			DestroyImmediate(block.gameObject);
+			return true;
+		}
+
 		// If the health has reached 0, then the block will be destroyed
 		if (block.Health == 0) {
 			// If the block has a mino index, it was once part of a mino
@@ -562,12 +609,8 @@ public class Board : MonoBehaviour {
 				}
 			}
 
-			// Either convert the block to a shadow or destroy it
-			if (convertToShadow) {
-				block.ConvertToShadow( );
-			} else {
-				DestroyImmediate(block.gameObject);
-			}
+			// Destroy the block
+			DestroyImmediate(block.gameObject);
 
 			return true;
 		}

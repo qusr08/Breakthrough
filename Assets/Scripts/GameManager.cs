@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each fully destroyed mino.")] public int PointsPerDestroyedMino = 60;
 	[SerializeField, Min(0f), Tooltip("The points that the player gets for each time they fast drop the mino.")] public int PointsPerFastDrop = 2;
 	[Header("Game Values")]
-	[SerializeField, Min(0f), Tooltip("The default speed that block groups fall.")] public float FallTime = 1f;
+	[SerializeField, Min(0f), Tooltip("The default speed that mino block groups fall.")] public float FallTime = 1f;
+	[SerializeField, Min(0f), Tooltip("The accelerated speed that block groups fall.")] public float FallTimeAccelerated = 1f / 20f;
 	[SerializeField, Min(0f), Tooltip("The sensitivity of the player movement.")] public float MoveTime = 0.15f;
 	[SerializeField, Min(0f), Tooltip("The sensitivity of the player rotation.")] public float RotateTime = 0.25f;
 	[SerializeField, Min(0f), Tooltip("How long a block group that is controlled by the player needs to be stationary in order for it to be placed.")] public float PlaceTime = 0.75f;
@@ -24,9 +25,6 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Range(0f, 1f), Tooltip("How much blocks should be scaled down when they are created. This gives a gap between each of them and gives a better idea of where each grid space is.")] public float BlockScale = 0.95f;
 	[SerializeField, Range(0f, 1f), Tooltip("How fast block group transforms should be animated.")] public float BlockAnimationSpeed = 0.04f;
 
-	public float FallTimeAccelerated {
-		get => FallTime / 20f;
-	}
 	public float MoveTimeAccelerated {
 		get => MoveTime / 2f;
 	}

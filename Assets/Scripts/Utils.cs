@@ -132,6 +132,18 @@ public static class Utils {
 		return noise;
 	}
 
+	public static float[ , ] GenerateRandomNoiseGrid (int width, int height, float minRange, float maxRange) {
+		float[ , ] noise = new float[width, height];
+
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				noise[i, j] = UnityEngine.Random.Range(minRange, maxRange);
+			}
+		}
+
+		return noise;
+	}
+
 	/// <summary>
 	/// Find the size of an enum.
 	/// </summary>

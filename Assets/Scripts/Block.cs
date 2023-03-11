@@ -43,7 +43,7 @@ public class Block : MonoBehaviour {
 	[SerializeField, Min(0f), Tooltip("The minimum angular velocity at which the blocks explode off the board at.")] private float minBlockAngularVelocity;
 	[SerializeField, Min(0f), Tooltip("The maximum angular velocity at which the blocks explode off the board at.")] private float maxBlockAngularVelocity;
 	[SerializeField, Tooltip("The color of the shadow that blocks leave.")] private Color shadowColor;
-	[SerializeField, Tooltip("Whether or not this block is a shadow.")] private bool isShadow;
+	[SerializeField, Tooltip("Whether or not this block is a shadow.")] public bool IsShadow;
 
 	private readonly BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.WALL_1, BlockColor.WALL_2, BlockColor.WALL_3 };
 
@@ -87,7 +87,7 @@ public class Block : MonoBehaviour {
 			// If the health is 0, though, the block will be destroyed and so a block particle should be spawned
 			if (_health > 0) {
 				BlockColor = wallColorStages[_health - 1];
-			} else if (!isShadow) {
+			} else if (!IsShadow) {
 				SpawnBlockParticle( );
 			}
 		}
@@ -222,7 +222,7 @@ public class Block : MonoBehaviour {
 	/// Converts this block into a "shadow", which represents where the block was previously
 	/// </summary>
 	public void ConvertToShadow ( ) {
-		isShadow = true;
+		IsShadow = true;
 
 		spriteRenderer.color = shadowColor;
 	}

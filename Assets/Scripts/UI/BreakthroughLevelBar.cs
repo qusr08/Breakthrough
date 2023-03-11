@@ -23,7 +23,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 	[SerializeField, Tooltip("The color that the elements appear when they are selected.")] private Color selectedColor;
 	[SerializeField, Range(0f, 2f), Tooltip("The unselected size of a dot.")] private float unselectedSize;
 	[SerializeField, Range(0f, 2f), Tooltip("The selected size of a dot.")] private float selectedSize;
-	[SerializeField, Range(0f, 1f), Tooltip("The current progress of the player to reaching the next level.")] private float progress;
+	[SerializeField, Tooltip("The current progress of the player to reaching the next level.")] private int progress;
 	[SerializeField, Min(0), Tooltip("The current level that is being displayed.")] private int level;
 
 	private float[ ] toDotSizes;
@@ -31,7 +31,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 
 	private bool calledOnValidate;
 
-	public float Progress {
+	public int Progress {
 		get {
 			return progress;
 		}
@@ -40,7 +40,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 
 			// Set what the dot elements should resize to and change their color to
 			for (int i = 0; i < dotSpriteRenderers.Count; i++) {
-				bool isSelected = progress * (dotSpriteRenderers.Count - 1) >= dotSpriteRenderers.Count - 1 - i;
+				bool isSelected = progress >= dotSpriteRenderers.Count - i;
 				dotSpriteRenderers[i].color = (isSelected ? selectedColor : unselectedColor);
 				toDotSizes[i] = isSelected ? selectedSize : unselectedSize;
 			}
