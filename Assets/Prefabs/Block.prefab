@@ -147,6 +147,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   board: {fileID: 0}
   gameManager: {fileID: 0}
+  audioManager: {fileID: 0}
   prefabBlockDebris: {fileID: 2993162176935200072, guid: a38fee3d5f1afa14fa65d0e0d95dd0de, type: 3}
   prefabBlockParticle: {fileID: 6681043757095424035, guid: 4472b37c552e5304cb78dc7567229618, type: 3}
   spriteRenderer: {fileID: 1130229828950931900}

@@ -110,8 +110,8 @@ public class GameOverBar : MonoBehaviour {
 	/// <summary>
 	/// Increase the progress made in the bar
 	/// </summary>
-	public void IncrementProgress ( ) {
-		Progress += 2f / Height;
+	public void IncrementProgress (float progress) {
+		Progress += progress / Height;
 	}
 
 	/// <summary>

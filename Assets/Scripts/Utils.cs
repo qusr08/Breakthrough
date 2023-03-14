@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public static class Utils {
@@ -132,6 +133,14 @@ public static class Utils {
 		return noise;
 	}
 
+	/// <summary>
+	/// Generate a random grid of values
+	/// </summary>
+	/// <param name="width">The width of the grid.</param>
+	/// <param name="height">The height of the grid.</param>
+	/// <param name="minRange">The minimum range of the values.</param>
+	/// <param name="maxRange">The maximum range of the values.</param>
+	/// <returns>Returns a float array that has all of the random values inside it.</returns>
 	public static float[ , ] GenerateRandomNoiseGrid (int width, int height, float minRange, float maxRange) {
 		float[ , ] noise = new float[width, height];
 
@@ -164,5 +173,36 @@ public static class Utils {
 		}
 
 		return Color.white;
+	}
+
+	/// <summary>
+	/// Get a random array element with an excluded index
+	/// </summary>
+	/// <typeparam name="T">The type of the values contained within the array</typeparam>
+	/// <param name="array">The array to get the value of</param>
+	/// <param name="excludedIndex">The index to exclude from the array</param>
+	/// <returns>A random element from the array that is not at the excluded index</returns>
+	public static T GetRandomArrayElementExcluded<T> (List<T> array, int excludedIndex) {
+		return array[GetRandomArrayIndexExcluded(array, excludedIndex)];
+	}
+
+	/// <summary>
+	/// Get a random array index with an excluded index
+	/// </summary>
+	/// <typeparam name="T">The type of the values contained within the array</typeparam>
+	/// <param name="array">The array to get the index from</param>
+	/// <param name="excludedIndex">The index to exclude</param>
+	/// <returns>A random index that is not the excluded index</returns>
+	public static int GetRandomArrayIndexExcluded<T> (List<T> array, int excludedIndex) {
+		List<int> copy = new List<int>( );
+		for (int i = 0; i < array.Count; i++) {
+			if (i == excludedIndex) {
+				continue;
+			}
+
+			copy.Add(i);
+		}
+
+		return UnityEngine.Random.Range(0, copy.Count);
 	}
 }

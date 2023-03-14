@@ -20,6 +20,7 @@ public class Block : MonoBehaviour {
 	[Header("Scene GameObjects")]
 	[SerializeField] private Board board;
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private AudioManager audioManager;
 	[Header("Prefabs")]
 	[SerializeField] private GameObject prefabBlockDebris;
 	[SerializeField] private GameObject prefabBlockParticle;
@@ -88,6 +89,7 @@ public class Block : MonoBehaviour {
 			if (_health > 0) {
 				BlockColor = wallColorStages[_health - 1];
 			} else if (!IsShadow) {
+				audioManager.PlaySoundEffect(SoundEffectClipType.BREAK_BLOCK);
 				SpawnBlockParticle( );
 			}
 		}
@@ -121,6 +123,7 @@ public class Block : MonoBehaviour {
 
 		board = FindObjectOfType<Board>( );
 		gameManager = FindObjectOfType<GameManager>( );
+		audioManager = FindObjectOfType<AudioManager>( );
 
 		BlockColor = _blockColor;
 		BlockType = _blockType;

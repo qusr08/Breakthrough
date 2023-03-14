@@ -18,9 +18,11 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject prefabBoomBlockDebris;
 	[Header("Components")]
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private AudioManager audioManager;
 	[Space]
 	[SerializeField] private SpriteRenderer boardSpriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
+	[SerializeField] private SpriteRenderer glowSpriteRenderer;
 	[SerializeField] private RectTransform leftListRectTransform;
 	[SerializeField] private RectTransform rightListRectTransform;
 	[SerializeField] private RectTransform gameCanvasRectTransform;
@@ -38,6 +40,7 @@ public class Board : MonoBehaviour {
 	[SerializeField, Range(0f, 20f), Tooltip("The padding between the board and the edge of the screen.")] public float CameraPadding = 3;
 	[SerializeField, Min(0f), Tooltip("The padding between the board and the UI elements on the left and right.")] public float UIPadding = 0f;
 	[SerializeField, Range(0f, 5f), Tooltip("The thickness of the border around the board.")] public float BorderThickness = 0.75f;
+	[SerializeField, Range(0f, 20f), Tooltip("The thickness of the glow around the board.")] public float GlowThickness = 5f;
 	[SerializeField, Min(0f), Tooltip("The scale of the game UI canvas to have it fit next to the board.")] private float gameCanvasScale = 0.028703f; /// TODO: Figure out how this number is achieved, I got no clue
 	[SerializeField, Range(0.001f, 1f), Tooltip("The speed at which boom block expolosions are animated.")] public float BoomBlockAnimationSpeed = 0.05f;
 	[Space]
@@ -52,6 +55,7 @@ public class Board : MonoBehaviour {
 	// [SerializeField, Tooltip("The current elevation of the Perlin Noise used to generate the wall. Elevation is defined as how high the values are.")] private float wallElevation = 0f;
 	[SerializeField, Min(0), Tooltip("The maximum height of the wall.")] private int wallMaxHeight = 11;
 	[SerializeField, Min(0), Tooltip("The minimum height of the wall.")] private int wallMinHeight = 2;
+	[SerializeField, Min(0f), Tooltip("The increment value of the game over bar.")] private float gameOverBarIncrement = 2f;
 	// [SerializeField, Range(0f, 1f), Tooltip("The maximum roughness of the wall.")] private float wallMaxRoughness = 2f;
 	// [SerializeField, Range(0f, 1f), Tooltip("The minimum roughness of the wall.")] private float wallMinRoughness = 0.1f;
 	// [SerializeField, Range(0f, 1f), Tooltip("The maximum elevation of the wall.")] private float wallMaxElevation = 1f;
@@ -82,6 +86,7 @@ public class Board : MonoBehaviour {
 
 			switch (value) {
 				case BoardUpdateState.BREAKTHROUGH:
+					audioManager.PlaySoundEffect(SoundEffectClipType.WIN);
 					StartCoroutine(BreakthroughSequence( ));
 
 					break;
@@ -129,6 +134,7 @@ public class Board : MonoBehaviour {
 
 		// Set the size of the border
 		borderSpriteRenderer.size = new Vector2(Width + (BorderThickness * 2), Height + (BorderThickness * 2));
+		glowSpriteRenderer.size = new Vector2(Width + (GlowThickness * 2), Height + (GlowThickness * 2));
 
 		// Set game canvas dimensions
 		gameCanvasRectTransform.localPosition = Vector3.zero;
@@ -187,6 +193,8 @@ public class Board : MonoBehaviour {
 						if (boomBlockFrames[i].Count == 0) {
 							boomBlockFrames.RemoveAt(i);
 						}
+
+						audioManager.PlaySoundEffect(SoundEffectClipType.BOOM_BLOCK_FRAME);
 					}
 
 					// If there are no more boom blocks to explode, switch the update state
@@ -235,10 +243,11 @@ public class Board : MonoBehaviour {
 		// wallRoughness = Mathf.Min(levelValue * levelValue * 0.006f + wallMinRoughness, wallMaxRoughness);
 		// wallElevation = Mathf.Min(levelValue * levelValue * 0.02f + wallMinElevation, wallMaxElevation);
 
-		wallHeight = Mathf.RoundToInt(Mathf.Clamp(0.7f * (Mathf.Sin(0.46f * level) + (0.54f * level)) + wallMinHeight, wallMinHeight, wallMaxHeight));
-		wallGenMaximum = Mathf.Clamp(0.11f * level + 1f, 1, 3);
-		wallGenMinimum = Mathf.Clamp(0.07f * level, 0, 2);
-		gameManager.FallTime = Mathf.Clamp(0.013f * level + 1f, 0.25f, 1f);
+		wallHeight = Mathf.RoundToInt(Mathf.Clamp(0.96f * (Mathf.Sin(0.58f * level) + (0.68f * level)) + wallMinHeight, wallMinHeight, wallMaxHeight));
+		wallGenMaximum = Mathf.Clamp(0.123f * level + 1f, 1, 3);
+		wallGenMinimum = Mathf.Clamp(0.063f * level, 0, 2);
+		gameManager.FallTime = Mathf.Clamp(0.032f * level + 1f, 1f / 20f, 1f);
+		gameOverBarIncrement = Mathf.Clamp(0.06f * level + 2f, 2f, 4.5f);
 
 		// Update the breakthrough level indicator
 		breakthroughLevelbar.Level = (level / 6) + 1;
@@ -314,10 +323,6 @@ public class Board : MonoBehaviour {
 	#region Sequences
 
 	private IEnumerator BreakthroughSequence ( ) {
-		// Update points
-		gameManager.BoardPoints += gameManager.PointsPerBreakthrough * breakthroughLevelbar.Level;
-		int totalPointsGained = Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentageCleared / 100f);
-
 		// * Breakthrough text appears on screen
 		breakthroughText.ShowText(transform.position, true);
 
@@ -335,8 +340,12 @@ public class Board : MonoBehaviour {
 		// * Move breakthrough text upwards
 		breakthroughText.MoveText(transform.position + (Vector3.up * Height / 4f));
 
+		// Update points
+		gameManager.BoardPoints += gameManager.PointsPerBreakthrough * breakthroughLevelbar.Level;
+		int totalPointsGained = (int) (gameManager.BoardPoints * (gameManager.PercentageCleared / 100f));
+
 		// * Have percentage cleared text appear
-		pointsText.SetText($"{gameManager.BoardPoints} pts x {gameManager.PercentageCleared:0.##}% Cleared \n+{totalPointsGained} pts");
+		pointsText.SetText($"{gameManager.BoardPoints} pts x {gameManager.PercentageCleared:0.##}% clear \n\n+{totalPointsGained} pts");
 		pointsText.ShowText(transform.position, false);
 
 		// * Wait for a bit
@@ -437,6 +446,8 @@ public class Board : MonoBehaviour {
 				}
 			}
 
+			audioManager.PlaySoundEffect(SoundEffectClipType.BUILD_WALL);
+
 			yield return new WaitForSeconds(0.25f);
 		}
 
@@ -462,6 +473,8 @@ public class Board : MonoBehaviour {
 
 		// Spawn a random type of mino
 		ActiveMino = Instantiate(prefabMinos[UnityEngine.Random.Range(0, prefabMinos.Length)], spawnPosition, Quaternion.identity).GetComponent<MinoBlockGroup>( );
+
+		audioManager.PlaySoundEffect(SoundEffectClipType.SPAWN_MINO);
 
 		// Update whether or not the player is still in a drought of boom blocks
 		if (ActiveMino.HasBoomBlock) {
@@ -498,7 +511,7 @@ public class Board : MonoBehaviour {
 		}
 
 		// Increase the progress of the game over bar
-		gameOverBar.IncrementProgress( );
+		gameOverBar.IncrementProgress(gameOverBarIncrement);
 
 		// Only start to update the boom blocks if the current state is not a breakthrough
 		// When the code is in a state of a breakthrough, all of the wall is being regenerated and it makes no sense to update boom blocks

@@ -6,6 +6,7 @@ public class BlockGroup : MonoBehaviour {
 	[Header("Scene Objects")]
 	[SerializeField] protected Board board;
 	[SerializeField] protected GameManager gameManager;
+	[SerializeField] protected AudioManager audioManager;
 	[Header("Properties")]
 	[SerializeField, Tooltip("Whether or not this block group is modified (a block has been added/removed) and needs to be updated.")] public bool IsModified;
 	[SerializeField, Tooltip("Whether or not this block group can move downwards.")] public bool CanMoveDownwards;
@@ -33,6 +34,7 @@ public class BlockGroup : MonoBehaviour {
 	protected virtual void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 		gameManager = FindObjectOfType<GameManager>( );
+		audioManager = FindObjectOfType<AudioManager>( );
 	}
 
 	protected virtual void Awake ( ) {
@@ -106,6 +108,8 @@ public class BlockGroup : MonoBehaviour {
 			CanFallIntoBreakthroughArea = true;
 		}
 
+		audioManager.PlaySoundEffect(SoundEffectClipType.MOVE_BLOCK_GROUP);
+
 		return true;
 	}
 
@@ -126,6 +130,8 @@ public class BlockGroup : MonoBehaviour {
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
 			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - gameManager.RotateDirection) % 4);
 		}
+
+		audioManager.PlaySoundEffect(SoundEffectClipType.ROTATE_BLOCK_GROUP);
 
 		return true;
 	}
