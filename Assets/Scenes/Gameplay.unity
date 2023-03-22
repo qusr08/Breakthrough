@@ -251,7 +251,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 0.75, y: 0}
+  m_Size: {x: 0.75, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -265,7 +265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73100740}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.5, y: -14, z: 0}
+  m_LocalPosition: {x: -9.5, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1884849779}
@@ -717,7 +717,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -774,17 +774,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae8f1548ea5600542964f868118b38d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &398148345 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5121941579545307370, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
-  m_PrefabInstance: {fileID: 961730412}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74f1358230fae6b4a83c2eb2600f5184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &427616022
@@ -888,17 +877,6 @@ Canvas:
   m_SortingLayerID: 205540463
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &439405895 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5121941579545307370, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
-  m_PrefabInstance: {fileID: 2050367490}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74f1358230fae6b4a83c2eb2600f5184, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,6 +960,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &689732382 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
+  m_PrefabInstance: {fileID: 4764229571001218896}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &833555034
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,22 +1000,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TotalPointsUILabel: {fileID: 1748895535}
-  BoardPointsUILabel: {fileID: 398148345}
-  PercentageClearedUILabel: {fileID: 439405895}
+  board: {fileID: 2111922726}
+  audioManager: {fileID: 131922950}
+  gameOverBar: {fileID: 73100743}
+  breakthroughLevelbar: {fileID: 1729672256}
+  totalPointsText: {fileID: 689732382}
+  boardPointsText: {fileID: 1316265406}
+  percentageClearedText: {fileID: 1661729932}
+  breakthroughText: {fileID: 6012790928866382219}
+  gameOverText: {fileID: 0}
+  pointsText: {fileID: 8908335981970975813}
+  _hazardBoardArea: {fileID: 370275327}
+  _breakthroughBoardArea: {fileID: 1770263713}
+  _gameState: 1
   PointsPerDestroyedBlock: 6
   PointsPerDroppedBlock: 12
   PointsPerBreakthrough: 600
   PointsPerDestroyedMino: 60
   PointsPerFastDrop: 2
-  FallTime: 1
-  FallTimeAccelerated: 0.05
-  MoveTime: 0.15
-  RotateTime: 0.25
-  PlaceTime: 0.75
-  RotateDirection: -1
-  BlockScale: 0.95
-  BlockAnimationSpeed: 0.04
+  boardsGenerated: 0
+  wallHeight: 0
+  wallHeightMinimum: 2
+  wallHeightMaximum: 15
+  wallBlockHealthMinimum: 0
+  wallBlockHealthMaximum: 0
+  gameOverBarSpeed: 0.2
+  boomBlockSpawnChance: 0.4
+  boomBlockGuarantee: 5
+  minoFallTime: 1
+  minoMoveTime: 0.15
+  minoRotateTime: 0.25
+  minoRotateDirection: -1
+  minoPlaceTime: 0.75
+  blockScale: 0.95
+  animationSpeed: 0.04
 --- !u!4 &833555036
 Transform:
   m_ObjectHideFlags: 0
@@ -1040,7 +1047,7 @@ Transform:
   m_Children:
   - {fileID: 1122588010}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &899384126
 GameObject:
@@ -1734,7 +1741,6 @@ GameObject:
   - component: {fileID: 1122588009}
   - component: {fileID: 1122588008}
   - component: {fileID: 1122588007}
-  - component: {fileID: 1122588011}
   m_Layer: 5
   m_Name: Screen Canvas
   m_TagString: Untagged
@@ -1823,34 +1829,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1122588011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1122588006}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TotalPointsUILabel: {fileID: 0}
-  BoardPointsUILabel: {fileID: 0}
-  PercentageClearedUILabel: {fileID: 0}
-  PointsPerDestroyedBlock: 6
-  PointsPerDroppedBlock: 12
-  PointsPerBreakthrough: 600
-  PointsPerDestroyedMino: 60
-  PointsPerFastDrop: 2
-  FallTime: 1
-  FallTimeAccelerated: 0.05
-  MoveTime: 0.15
-  RotateTime: 0.25
-  PlaceTime: 0.75
-  RotateDirection: -1
-  BlockScale: 0.95
-  BlockAnimationSpeed: 0.04
 --- !u!1 &1206732652
 GameObject:
   m_ObjectHideFlags: 0
@@ -2038,7 +2016,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1979040768713393473, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2168,6 +2146,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1316265406 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
+  m_PrefabInstance: {fileID: 961730412}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1341299665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2466,7 +2455,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490240923
 GameObject:
@@ -2638,6 +2627,17 @@ Transform:
   m_Father: {fileID: 1729672255}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1661729932 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4764229572178145932, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
+  m_PrefabInstance: {fileID: 2050367490}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1695087365
 GameObject:
   m_ObjectHideFlags: 0
@@ -2960,17 +2960,6 @@ MeshRenderer:
   m_SortingLayer: 6
   m_SortingOrder: 1
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1748895535 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5121941579545307370, guid: d1fc4a2575ee222499c79e67b734c011, type: 3}
-  m_PrefabInstance: {fileID: 4764229571001218896}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74f1358230fae6b4a83c2eb2600f5184, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1770263713 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1979040768713393472, guid: 333ef30ba8164d242b5da03a2fd8cb8f, type: 3}
@@ -3024,7 +3013,7 @@ MonoBehaviour:
   alpha: 0.5
   BackgroundBlockBounds:
     m_Center: {x: 7.5, y: 13.5, z: 0}
-    m_Extent: {x: 29.151949, y: 23.985281, z: 0}
+    m_Extent: {x: 36.06703, y: 23.985281, z: 0}
   spawnRate: 2
   maxBlocks: 25
 --- !u!4 &1775966053
@@ -3039,7 +3028,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1884849778
 GameObject:
@@ -3066,7 +3055,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1884849778}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 73100742}
@@ -3480,7 +3469,7 @@ RectTransform:
   - {fileID: 1341299668}
   - {fileID: 2941269602690328090}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3520,13 +3509,6 @@ MonoBehaviour:
   leftListRectTransform: {fileID: 1357138077}
   rightListRectTransform: {fileID: 6306037}
   gameCanvasRectTransform: {fileID: 427616023}
-  GameOverBoardArea: {fileID: 370275327}
-  BreakthroughBoardArea: {fileID: 1770263713}
-  gameOverBar: {fileID: 73100743}
-  breakthroughLevelbar: {fileID: 1729672256}
-  breakthroughText: {fileID: 6012790928866382219}
-  gameOverText: {fileID: 0}
-  pointsText: {fileID: 8908335981970975813}
   Width: 16
   Height: 28
   CameraPadding: 3
@@ -3535,17 +3517,8 @@ MonoBehaviour:
   GlowThickness: 6.21
   gameCanvasScale: 0.028703
   BoomBlockAnimationSpeed: 0.05
-  _boardUpdateState: 0
-  ActiveMino: {fileID: 0}
-  level: 0
-  wallHeight: 2
-  wallGenMinimum: 0
-  wallGenMaximum: 0
-  wallMaxHeight: 15
-  wallMinHeight: 2
-  gameOverBarIncrement: 2
-  boomBlockSpawnChance: 0.5
-  boomBlockGuarantee: 5
+  _boardState: 0
+  activeMino: {fileID: 0}
 --- !u!224 &2941269602690328090
 RectTransform:
   m_ObjectHideFlags: 0

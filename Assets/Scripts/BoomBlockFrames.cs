@@ -153,7 +153,7 @@ public class BoomBlockFrames {
 			}
 
 			// Spawn in the boom block debris particle system
-			board.SpawnBoomBlockDebris(frames[0][i], color);
+			board.CreateBoomBlockDebris(frames[0][i], color);
 		}
 
 		// Remove the first frame

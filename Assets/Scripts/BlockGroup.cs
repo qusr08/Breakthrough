@@ -59,7 +59,7 @@ public class BlockGroup : MonoBehaviour {
 		UpdateTransform( );
 
 		// Make sure that its the right board update state before updating the position
-		if (board.BoardUpdateState != BoardUpdateState.UPDATING_BLOCK_GROUPS) {
+		if (board.BoardState != BoardState.UPDATING_BLOCK_GROUPS) {
 			return;
 		}
 
@@ -75,8 +75,8 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	protected void UpdateTransform ( ) {
-		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, gameManager.BlockAnimationSpeed);
-		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, gameManager.BlockAnimationSpeed);
+		transform.position = Vector3.SmoothDamp(transform.position, moveTo, ref moveVelocity, gameManager.AnimationSpeed);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, rotateTo, ref rotateVelocity, gameManager.AnimationSpeed);
 
 		if (IsAtDestination && needToUpdateTransform) {
 			needToUpdateTransform = false;
@@ -104,7 +104,7 @@ public class BlockGroup : MonoBehaviour {
 		moveTo += direction;
 
 		// If this block group makes a successful move that is not below the bottom of the board, then it can fall below the board
-		if (!CanFallIntoBreakthroughArea && moveTo.y >= board.BreakthroughBoardArea.DefaultHeight) {
+		if (!CanFallIntoBreakthroughArea && moveTo.y >= gameManager.BreakthroughBoardArea.DefaultHeight) {
 			CanFallIntoBreakthroughArea = true;
 		}
 
@@ -128,7 +128,7 @@ public class BlockGroup : MonoBehaviour {
 
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
-			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - gameManager.RotateDirection) % 4);
+			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - gameManager.MinoRotateDirection) % 4);
 		}
 
 		audioManager.PlaySoundEffect(SoundEffectClipType.ROTATE_BLOCK_GROUP);
@@ -141,7 +141,7 @@ public class BlockGroup : MonoBehaviour {
         Vector3Int toPosition = Utils.Vect3Round(Utils.RotatePositionAroundPivot(currPosition, moveTo, rotationChange) + positionChange);
 
 		// If this block group can't fall below the bottom of the board but is trying to
-		if (!CanFallIntoBreakthroughArea && toPosition.y < board.BreakthroughBoardArea.DefaultHeight) {
+		if (!CanFallIntoBreakthroughArea && toPosition.y < gameManager.BreakthroughBoardArea.DefaultHeight) {
 			// The block group can't move down then
 			return false;
 		}
@@ -163,8 +163,8 @@ public class BlockGroup : MonoBehaviour {
 		// If this block group is a mino and it has been completely destroyed, then update the board area
 		// This happens when the mino is moving and destroys itself at the bottom of the board
 		if (Size == 0 && GetComponent<MinoBlockGroup>( )) {
-			board.BreakthroughBoardArea.OnDestroyMino( );
-			board.GameOverBoardArea.OnDestroyMino( );
+			gameManager.BreakthroughBoardArea.OnDestroyMino( );
+			gameManager.HazardBoardArea.OnDestroyMino( );
 		}
 
 		return true;

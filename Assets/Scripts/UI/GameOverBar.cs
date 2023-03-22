@@ -95,14 +95,14 @@ public class GameOverBar : MonoBehaviour {
 		}
 
 		// Smoothly transition the height of the bar and the height of the fill inside
-		Height = Mathf.SmoothDamp(Height, toHeight, ref toHeightVelocity, gameManager.BlockAnimationSpeed);
-		FillHeight = Mathf.SmoothDamp(FillHeight, toFillHeight, ref toFillHeightVelocity, gameManager.BlockAnimationSpeed);
-		transform.localPosition = Vector3.SmoothDamp(transform.localPosition, toPosition, ref toPositionVelocity, gameManager.BlockAnimationSpeed);
-		fillTransform.localPosition = Vector3.SmoothDamp(fillTransform.localPosition, toFillPosition, ref toFillPositionVelocity, gameManager.BlockAnimationSpeed);
+		Height = Mathf.SmoothDamp(Height, toHeight, ref toHeightVelocity, gameManager.AnimationSpeed);
+		FillHeight = Mathf.SmoothDamp(FillHeight, toFillHeight, ref toFillHeightVelocity, gameManager.AnimationSpeed);
+		transform.localPosition = Vector3.SmoothDamp(transform.localPosition, toPosition, ref toPositionVelocity, gameManager.AnimationSpeed);
+		fillTransform.localPosition = Vector3.SmoothDamp(fillTransform.localPosition, toFillPosition, ref toFillPositionVelocity, gameManager.AnimationSpeed);
 
 		// If the game over bar has reached its maximum height, reset the progress and decrease the game over area height
 		if (toFillHeight - FillHeight < Utils.CLOSE_ENOUGH && 1f - Progress < Utils.CLOSE_ENOUGH) {
-			board.GameOverBoardArea.ToCurrentHeight--;
+			gameManager.HazardBoardArea.ToCurrentHeight--;
 			Progress = 0f;
 		}
 	}
@@ -119,7 +119,7 @@ public class GameOverBar : MonoBehaviour {
 	/// </summary>
 	public void RecalculateHeight ( ) {
 		// Set the size of the bar
-		toHeight = board.GameOverBoardArea.ToCurrentHeight - board.BreakthroughBoardArea.ToCurrentHeight;
-		toPosition = new Vector3(-(board.Width / 2f) - board.BorderThickness - uiPadding, (board.GameOverBoardArea.ToCurrentHeight + board.BreakthroughBoardArea.ToCurrentHeight) / 2f - (board.Height / 2f), 0f);
+		toHeight = gameManager.HazardBoardArea.ToCurrentHeight - gameManager.BreakthroughBoardArea.ToCurrentHeight;
+		toPosition = new Vector3(-(board.Width / 2f) - board.BorderThickness - uiPadding, (gameManager.HazardBoardArea.ToCurrentHeight + gameManager.BreakthroughBoardArea.ToCurrentHeight) / 2f - (board.Height / 2f), 0f);
 	}
 }

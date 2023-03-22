@@ -143,9 +143,9 @@ public class AnimatedText : MonoBehaviour {
 		transform.SetPositionAndRotation(toPosition, toRotation);
 
 		// Spawn the particles for the text
-		if (playParticles && textParticleSystem != null) {
+		/*if (playParticles && textParticleSystem != null) {
 			textParticleSystem.Play( );
-		}
+		}*/
 	}
 
 	/*private IEnumerator Loop ( ) {

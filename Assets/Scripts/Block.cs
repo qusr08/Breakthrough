@@ -141,7 +141,7 @@ public class Block : MonoBehaviour {
 		BlockDirection = (BlockDirection) Random.Range(0, 4);
 
 		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1);
-		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * gameManager.RotateDirection * 90);
+		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * gameManager.MinoRotateDirection * 90);
 	}
 
 	/// <summary>

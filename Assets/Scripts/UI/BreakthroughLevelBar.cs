@@ -26,8 +26,8 @@ public class BreakthroughLevelBar : MonoBehaviour {
 	[SerializeField, Tooltip("The current progress of the player to reaching the next level.")] private int progress;
 	[SerializeField, Min(0), Tooltip("The current level that is being displayed.")] private int level;
 
-	private float[ ] toDotSizes;
-	private float[ ] toDotSizesVelocities;
+	private float[ ] toDotSizes = new float[6];
+	private float[ ] toDotSizesVelocities = new float[6];
 
 	private bool calledOnValidate;
 
@@ -74,12 +74,11 @@ public class BreakthroughLevelBar : MonoBehaviour {
 		RecalculateHeight( );
 
 		// Calculate the sizes of the dots based on the progress
-		toDotSizes = new float[dotSpriteRenderers.Count];
-		toDotSizesVelocities = new float[dotSpriteRenderers.Count];
 		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
 			toDotSizes[i] = unselectedSize;
 			toDotSizesVelocities[i] = 0f;
 		}
+
 		Progress = progress;
 
 		// Immediately set the size of the dots in the editor
@@ -113,7 +112,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 		// Smoothly transition between states of the elements
 		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
 			float currentSize = dotSpriteRenderers[i].size.x;
-			float smoothedValue = Mathf.SmoothDamp(currentSize, toDotSizes[i], ref toDotSizesVelocities[i], gameManager.BlockAnimationSpeed);
+			float smoothedValue = Mathf.SmoothDamp(currentSize, toDotSizes[i], ref toDotSizesVelocities[i], gameManager.AnimationSpeed);
 			dotSpriteRenderers[i].size = new Vector2(smoothedValue, smoothedValue);
 		}
 	}
@@ -125,7 +124,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 	/// <returns>The position to set the element to</returns>
 	private Vector3 GetElementPosition (int elementIndex) {
 		int offsetIndex = 8 - elementIndex;
-		return new Vector3(transform.position.x, offsetIndex + (offsetIndex * elementPadding) + board.BreakthroughBoardArea.CurrentHeight, 0f);
+		return new Vector3(transform.position.x, offsetIndex + (offsetIndex * elementPadding) + gameManager.BreakthroughBoardArea.CurrentHeight, 0f);
 	}
 
 	/// <summary>
@@ -133,7 +132,7 @@ public class BreakthroughLevelBar : MonoBehaviour {
 	/// </summary>
 	public void RecalculateHeight ( ) {
 		// Set the positions of all the elements
-		transform.position = new Vector3(board.transform.position.x + (board.Width / 2f) + board.BorderThickness + uiPadding, (8 + (7 * elementPadding)) / 2f + board.BreakthroughBoardArea.CurrentHeight, 0f);
+		transform.position = new Vector3(board.transform.position.x + (board.Width / 2f) + board.BorderThickness + uiPadding, (8 + (7 * elementPadding)) / 2f + gameManager.BreakthroughBoardArea.CurrentHeight, 0f);
 		currentLevelTransform.position = GetElementPosition(8);
 		for (int i = 0; i < dotSpriteRenderers.Count; i++) {
 			dotSpriteRenderers[i].transform.position = GetElementPosition(i + 2);

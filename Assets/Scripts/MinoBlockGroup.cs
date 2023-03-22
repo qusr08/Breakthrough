@@ -88,7 +88,7 @@ public class MinoBlockGroup : BlockGroup {
 
 		/// TODO: Make multiple boom blocks able to spawn
 		// Generate a random number between 0 and 1, and if it is less than the percentage of a boom block being on a mino, then place a random one
-		if (Random.Range(0f, 1f) < board.CurrentBoomBlockSpawnPercentage) {
+		if (Random.Range(0f, 1f) < gameManager.CurrentBoomBlockSpawnPercentage) {
 			// Get a random child block of the mino
 			Block block = GetComponentsInChildren<Block>( )[Random.Range(0, transform.childCount)];
 
@@ -119,7 +119,7 @@ public class MinoBlockGroup : BlockGroup {
 
 		// If the mino has landed and is at its destination that it was moving to, add it to the board
 		if (HasLanded && IsAtDestination) {
-			board.AddLandedMinoToBoard(this);
+			board.AddMinoToBoard(this);
 
 			return;
 		}
@@ -127,7 +127,7 @@ public class MinoBlockGroup : BlockGroup {
 		UpdateTransform( );
 
 		// Make sure that its the right board update state before updating the position
-		if (board.BoardUpdateState != BoardUpdateState.PLACING_MINO) {
+		if (board.BoardState != BoardState.PLACING_MINO) {
 			return;
 		}
 
@@ -139,7 +139,7 @@ public class MinoBlockGroup : BlockGroup {
 		// Move the mino left and right
 		if (hori == 0) {
 			prevMoveTime = 0;
-		} else if (Time.time - prevMoveTime > gameManager.MoveTime) {
+		} else if (Time.time - prevMoveTime > gameManager.MinoMoveTime) {
 			if (Move(Vector3.right * hori)) {
 				// Make the first horizontal movement of the player be a longer delay in between movements
 				// This prevents the player having to quickly tap the left and right buttons to move one board space
@@ -149,7 +149,7 @@ public class MinoBlockGroup : BlockGroup {
 					prevMoveTime = Time.time - gameManager.MoveTimeAccelerated;
 				}
 
-				placeTimer = gameManager.PlaceTime;
+				placeTimer = gameManager.MinoPlaceTime;
 				needToUpdateTransform = true;
 			}
 		}
@@ -157,22 +157,22 @@ public class MinoBlockGroup : BlockGroup {
 		// Rotate the mino
 		if (vert == 0) {
 			prevRotateTime = 0;
-		} else if (vert > 0 && Time.time - prevRotateTime > gameManager.RotateTime) {
-			if (Rotate(gameManager.RotateDirection * 90)) {
-				placeTimer = gameManager.PlaceTime;
+		} else if (vert > 0 && Time.time - prevRotateTime > gameManager.MinoRotateTime) {
+			if (Rotate(gameManager.MinoRotateDirection * 90)) {
+				placeTimer = gameManager.MinoPlaceTime;
 				prevRotateTime = Time.time;
 				needToUpdateTransform = true;
 			}
 		}
 
 		// Have the mino automatically fall downwards, or fall faster downwards according to player input
-		if (Time.time - prevFallTime > (vert < 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
+		if (Time.time - prevFallTime > (vert < 0 ? gameManager.FallTimeAccelerated : gameManager.MinoFallTime)) {
 			CanMoveDownwards = Move(Vector3.down);
 
 			if (CanMoveDownwards) {
 				// If the player is fast dropping the mino, make sure to give points and reset the place timer
 				if (vert < 0) {
-					placeTimer = gameManager.PlaceTime;
+					placeTimer = gameManager.MinoPlaceTime;
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
 					// Debug.Log("Points: Fast drop");
 				}

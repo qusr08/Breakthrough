@@ -59,7 +59,7 @@ public class BoardArea : MonoBehaviour {
 			tintedAreaSpriteRenderer.size = new Vector2(board.Width, (IsAreaAbove ? board.Height - currentHeight : currentHeight));
 
 			// Update any board UI that may rely on the heights of this board area
-			board.UpdateGameplayUI( );
+			gameManager.UpdateGameplayUI( );
 		}
 	}
 	public float ToCurrentHeight {
@@ -107,6 +107,6 @@ public class BoardArea : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		CurrentHeight = Mathf.SmoothDamp(CurrentHeight, ToCurrentHeight, ref toCurrentHeightVelocity, gameManager.BlockAnimationSpeed);
+		CurrentHeight = Mathf.SmoothDamp(CurrentHeight, ToCurrentHeight, ref toCurrentHeightVelocity, gameManager.AnimationSpeed);
 	}
 }
