@@ -2,118 +2,84 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum BlockColor {
 	DARK_PURPLE, DARK_BLUE, DARK_PINK, TEAL, ORANGE, GREEN, LIGHT_BLUE, LIGHT_PURPLE, LIGHT_PINK, WALL_1, WALL_2, WALL_3
 }
 
 public enum BlockType {
-	NORMAL, BOOM_DIRECTION, BOOM_LINE, BOOM_SURROUND
+	BOOM_PYRA, BOOM_LINE, BOOM_AREA, WALL, NORMAL
 }
 
 public enum BlockDirection {
-	RIGHT, DOWN, LEFT, UP
+	UP, RIGHT, DOWN, LEFT
 }
 
 public class Block : MonoBehaviour {
-	[Header("Scene GameObjects")]
-	[SerializeField] private Board board;
-	[SerializeField] private GameManager gameManager;
-	[SerializeField] private AudioManager audioManager;
-	[Header("Prefabs")]
-	[SerializeField] private GameObject prefabBlockDebris;
-	[SerializeField] private GameObject prefabBlockParticle;
 	[Header("Components")]
+	[SerializeField] private Board board;
+	[SerializeField] private ParticleManager particleManager;
+	[SerializeField] private GameManager gameManager;
+	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private SpriteRenderer iconSpriteRenderer;
-	[SerializeField] private Rigidbody2D blockRigidbody2D;
 	[Header("Properties")]
-	[SerializeField, Tooltip("The range of the surround boom block when it explodes.")] public int SurroundBoomBlockSize = 2;
-	[SerializeField, Tooltip("The range of the directional boom block when it explodes.")] public int DirectionalBoomBlockSize = 3;
+	[SerializeField] private Vector2Int _position = Vector2Int.zero;
+	[SerializeField] private BlockColor _blockColor = BlockColor.WALL_1;
+	[SerializeField] private BlockDirection _blockDirection = BlockDirection.UP;
+	[SerializeField] private BlockType _blockType = BlockType.NORMAL;
+	[SerializeField] private BlockGroup _blockGroup = null;
+	[SerializeField] private int _health = 1;
+	[SerializeField] private int _minoIndex = -1;
 	[Space]
-	[SerializeField, Tooltip("A list of all the colors that the blocks can be. These colors should line up with the BlockColor enum in Block.cs.")] private string[ ] colors;
-	[SerializeField, Tooltip("A list of all the icons that can overlay on top of the block. These can represent boom block types for example.")] private Sprite[ ] icons;
-	[SerializeField, Tooltip("The current color of the block.")] private BlockColor _blockColor = BlockColor.WALL_3;
-	[SerializeField, Tooltip("The current type of the block.")] private BlockType _blockType = BlockType.NORMAL;
-	[SerializeField, Tooltip("The current direction that the block is 'facing'.")] private BlockDirection _blockDirection = BlockDirection.RIGHT;
-	[SerializeField, Tooltip("The current health of the block.")] private int _health = 1;
-	[SerializeField, Tooltip("The index of the mino that this block applies to. This value is used to see if a full mino was destroyed in Board.cs.")] private int minoIndex = -1;
-	[SerializeField, Min(0f), Tooltip("The minimum velocity at which the blocks explode off the board at.")] private float minBlockVelocity;
-	[SerializeField, Min(0f), Tooltip("The maximum velocity at which the blocks explode off the board at.")] private float maxBlockVelocity;
-	[SerializeField, Min(0f), Tooltip("The minimum angular velocity at which the blocks explode off the board at.")] private float minBlockAngularVelocity;
-	[SerializeField, Min(0f), Tooltip("The maximum angular velocity at which the blocks explode off the board at.")] private float maxBlockAngularVelocity;
-	[SerializeField, Tooltip("The color of the shadow that blocks leave.")] private Color shadowColor;
-	[SerializeField, Tooltip("Whether or not this block is a shadow.")] public bool IsShadow;
+	[SerializeField] private BlockColorStringDictionary blockColors;
+	[SerializeField] private BlockTypeSpriteDictionary blockIcons;
+	[SerializeField] private int areaBoomBlockSize = 2;
+	[SerializeField] private int pyraBoomBlockSize = 3;
 
-	private readonly BlockColor[ ] wallColorStages = new BlockColor[ ] { BlockColor.WALL_1, BlockColor.WALL_2, BlockColor.WALL_3 };
+	#region Properties
+	public Vector2Int Position => _position;
+	public Color Color => spriteRenderer.color;
+	public BlockDirection BlockDirection => _blockDirection;
+	public BlockType BlockType => _blockType;
+	public BlockGroup BlockGroup => _blockGroup;
+	public int MinoIndex => _minoIndex;
+	public int BlockGroupID => BlockGroup.ID;
+	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
 
 	public BlockColor BlockColor {
-		get {
-			return _blockColor;
-		}
-
+		get => _blockColor;
 		set {
 			_blockColor = value;
-			spriteRenderer.color = Utils.GetColorFromHex(colors[(int) _blockColor]);
+			spriteRenderer.color = Utils.GetColorFromHex(blockColors[value]);
 		}
-	}
-	public BlockType BlockType {
-		get {
-			return _blockType;
-		}
-
-		set {
-			_blockType = value;
-			iconSpriteRenderer.sprite = icons[(int) _blockType];
-		}
-	}
-	public BlockDirection BlockDirection {
-		get => _blockDirection; set => _blockDirection = value;
 	}
 	public int Health {
-		get {
-			return _health;
-		}
-
+		get => _health;
 		set {
-			// If the health has been decreased, spawn some particles on the block
+			// If the value is less than the current health, then the block was damaged
 			if (value < _health) {
-				SpawnBlockDebris( );
+				particleManager.SpawnBlockDebrisParticle(Position, Color);
 			}
 
 			_health = value;
 
-			// Only wall blocks should have health above 1, so if the health is not 0, update the wall sprite
-			// If the health is 0, though, the block will be destroyed and so a block particle should be spawned
-			if (_health > 0) {
-				BlockColor = wallColorStages[_health - 1];
-			} else if (!IsShadow) {
-				audioManager.PlaySoundEffect(SoundEffectClipType.BREAK_BLOCK);
-				SpawnBlockParticle( );
+			// If the value is greater than 0, then the block was not completely destroyed
+			// If the value is less than or equal to 0, then the block was completely destroyed
+			if (value > 0) {
+				/// TODO: Update color (for wall blocks)
+			} else {
+				particleManager.SpawnBlockParticle(Position, Color);
 			}
 		}
 	}
-	public Vector3 Position {
-		get => transform.position; set => transform.position = value;
-	}
-	public BlockGroup BlockGroup {
-		get => transform.parent.GetComponent<BlockGroup>( );
-	}
-	public bool IsBoomBlock {
-		get => BlockType != BlockType.NORMAL;
-	}
-	public Sprite Sprite {
-		get => spriteRenderer.sprite;
-	}
-	public int MinoIndex {
-		get => minoIndex; set => minoIndex = value;
-	}
+	#endregion
 
+	#region Unity
 #if UNITY_EDITOR
-	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-	private void _OnValidate ( ) {
+	protected void _OnValidate ( ) {
 #if UNITY_EDITOR
 		EditorApplication.delayCall -= _OnValidate;
 		if (this == null) {
@@ -122,14 +88,11 @@ public class Block : MonoBehaviour {
 #endif
 
 		board = FindObjectOfType<Board>( );
+		particleManager = FindObjectOfType<ParticleManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
-		audioManager = FindObjectOfType<AudioManager>( );
-
-		BlockColor = _blockColor;
-		BlockType = _blockType;
 	}
 
-	private void Awake ( ) {
+	protected void Awake ( ) {
 #if UNITY_EDITOR
 		OnValidate( );
 #else
@@ -137,39 +100,44 @@ public class Block : MonoBehaviour {
 #endif
 	}
 
-	private void Start ( ) {
-		BlockDirection = (BlockDirection) Random.Range(0, 4);
-
-		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1);
-		transform.eulerAngles = new Vector3(0, 0, (int) BlockDirection * gameManager.MinoRotateDirection * 90);
+	private void OnDestroy ( ) {
+		gameManager.AddBoardPoints(PointsType.DESTROYED_BLOCK);
 	}
+	#endregion
 
 	/// <summary>
-	/// Check to see if a block is within the range of a block (if it is a boom block)
+	/// Check to see if the input position is within range of this block. This block needs to be a boom block for this method to be effective.
 	/// </summary>
-	/// <param name="position">The position to check.</param>
-	/// <returns>Whether or not the position is within the range of the block</returns>
-	public bool IsWithinRange (Vector3Int position) {
-		bool negative = (BlockDirection == BlockDirection.LEFT || BlockDirection == BlockDirection.DOWN);
-		// Calculate the bounds of this block
-		int minX = -1, maxX = -1, minY = -1, maxY = -1;
-		Vector3Int truePosition = Utils.Vect3Round(Position);
+	/// <param name="position">The position to check</param>
+	/// <returns>true if the position is within range of the boom block, false otherwise. Also returns false if this block is not a boom block.</returns>
+	public bool IsWithinRange (Vector2Int position) {
+		// If the block is not a boom block, it has no range so return false
+		if (!IsBoomBlock) {
+			return false;
+		}
 
-		// Based on this type of block, determine where the boom block would explode and if the block parameter is within range of it
+		bool negative = (BlockDirection == BlockDirection.LEFT || BlockDirection == BlockDirection.DOWN);
+		int minX = -1;
+		int maxX = -1;
+		int minY = -1;
+		int maxY = -1;
+
+		// Each boom block type is going to have a different range
+		// Depending on which one it is, calculate the minimum and maximum x and y of the boom block range
 		switch (BlockType) {
-			case BlockType.BOOM_DIRECTION:
+			case BlockType.BOOM_PYRA:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
-					int layerSize = Mathf.Abs(truePosition.x - position.x);
-					minX = truePosition.x + (negative ? -DirectionalBoomBlockSize : 1);
-					maxX = truePosition.x + (negative ? -1 : DirectionalBoomBlockSize);
-					minY = truePosition.y - layerSize;
-					maxY = truePosition.y + layerSize;
+					int layerSize = Mathf.Abs(Position.x - position.x);
+					minX = Position.x + (negative ? -pyraBoomBlockSize : 1);
+					maxX = Position.x + (negative ? -1 : pyraBoomBlockSize);
+					minY = Position.y - layerSize;
+					maxY = Position.y + layerSize;
 				} else { // Vertical
-					int layerSize = Mathf.Abs(truePosition.y - position.y);
-					minX = truePosition.x - layerSize;
-					maxX = truePosition.x + layerSize;
-					minY = truePosition.y + (negative ? -DirectionalBoomBlockSize : 1);
-					maxY = truePosition.y + (negative ? -1 : DirectionalBoomBlockSize);
+					int layerSize = Mathf.Abs(Position.y - position.y);
+					minX = Position.x - layerSize;
+					maxX = Position.x + layerSize;
+					minY = Position.y + (negative ? -pyraBoomBlockSize : 1);
+					maxY = Position.y + (negative ? -1 : pyraBoomBlockSize);
 				}
 
 				break;
@@ -177,56 +145,28 @@ public class Block : MonoBehaviour {
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = 0;
 					maxX = board.Width;
-					minY = truePosition.y;
-					maxY = truePosition.y;
+					minY = Position.y;
+					maxY = Position.y;
 				} else { // Vertical
-					minX = truePosition.x;
-					maxX = truePosition.x;
+					minX = Position.x;
+					maxX = Position.x;
 					minY = 0;
 					maxY = board.Height;
 				}
 
 				break;
-			case BlockType.BOOM_SURROUND:
-				minX = truePosition.x - SurroundBoomBlockSize;
-				maxX = truePosition.x + SurroundBoomBlockSize;
-				minY = truePosition.y - SurroundBoomBlockSize;
-				maxY = truePosition.y + SurroundBoomBlockSize;
+			case BlockType.BOOM_AREA:
+				minX = Position.x - areaBoomBlockSize;
+				maxX = Position.x + areaBoomBlockSize;
+				minY = Position.y - areaBoomBlockSize;
+				maxY = Position.y + areaBoomBlockSize;
 
 				break;
 		}
 
-		// Check to see if the block position is within the bounds of the block
+		// Check to see if the input position is within the range of this block
 		bool inX = (position.x >= minX && position.x <= maxX);
 		bool inY = (position.y >= minY && position.y <= maxY);
-
 		return (inX && inY);
-	}
-
-	/// <summary>
-	/// Spawn this blocks particle effect
-	/// </summary>
-	private void SpawnBlockDebris ( ) {
-		ParticleSystem blockDebris = Instantiate(prefabBlockDebris, transform.position, Quaternion.identity).GetComponent<ParticleSystem>( );
-		ParticleSystem.MainModule blockDebrisMainModule = blockDebris.main;
-		blockDebrisMainModule.startColor = spriteRenderer.color;
-		blockDebris.Play( );
-	}
-
-	/// <summary>
-	/// Spawn this block's particle
-	/// </summary>
-	private void SpawnBlockParticle ( ) {
-		SpriteRenderer blockParticleSpriteRenderer = Instantiate(prefabBlockParticle, transform.position, Quaternion.identity).GetComponent<SpriteRenderer>( );
-		blockParticleSpriteRenderer.color = spriteRenderer.color;
-	}
-
-	/// <summary>
-	/// Converts this block into a "shadow", which represents where the block was previously
-	/// </summary>
-	public void ConvertToShadow ( ) {
-		IsShadow = true;
-
-		spriteRenderer.color = shadowColor;
 	}
 }

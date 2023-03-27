@@ -146,44 +146,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 0}
+  particleManager: {fileID: 0}
   gameManager: {fileID: 0}
-  audioManager: {fileID: 0}
-  prefabBlockDebris: {fileID: 2993162176935200072, guid: a38fee3d5f1afa14fa65d0e0d95dd0de, type: 3}
-  prefabBlockParticle: {fileID: 6681043757095424035, guid: 4472b37c552e5304cb78dc7567229618, type: 3}
   spriteRenderer: {fileID: 1130229828950931900}
   iconSpriteRenderer: {fileID: 1130229829663535140}
-  blockRigidbody2D: {fileID: 3541818754807346855}
-  SurroundBoomBlockSize: 2
-  DirectionalBoomBlockSize: 3
-  colors:
-  - '#605DFF'
-  - '#56A5FF'
-  - '#C7426A'
-  - '#19A09A'
-  - '#FF9E62'
-  - '#B8F06F'
-  - '#97E5EE'
-  - '#A998FF'
-  - '#F586A7'
-  - '#8B9EA5'
-  - '#5A757E'
-  - '#293C43'
-  icons:
-  - {fileID: 0}
-  - {fileID: -3740889732657162250, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
-  - {fileID: -8804995556728519892, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
-  - {fileID: -8494576548519730528, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
+  _position: {x: 0, y: 0}
   _blockColor: 1
-  _blockType: 0
   _blockDirection: 0
+  _blockType: 0
+  _blockGroup: {fileID: 0}
   _health: 1
-  minoIndex: -1
-  minBlockVelocity: 1
-  maxBlockVelocity: 2
-  minBlockAngularVelocity: 5
-  maxBlockAngularVelocity: 10
-  shadowColor: {r: 0.7803922, g: 0.25882354, b: 0.4156863, a: 0.2509804}
-  IsShadow: 0
+  _minoIndex: -1
+  blockColors:
+    m_keys: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b00000000000000
+    m_values:
+    - '#56a5ff'
+    - '#c7426a'
+    - '#19a09a'
+    - '#ff9e62'
+    - '#b8f06f'
+    - '#97e5ee'
+    - '#a998ff'
+    - '#f586a7'
+    - '#8b9ea5'
+    - '#5a757e'
+    - '#293c43'
+    - '#605dff'
+  blockIcons:
+    m_keys: 0000000001000000020000000300000004000000
+    m_values:
+    - {fileID: -3740889732657162250, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
+    - {fileID: -8804995556728519892, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
+    - {fileID: -8494576548519730528, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
+    - {fileID: 0}
+    - {fileID: 0}
+  areaBoomBlockSize: 2
+  pyraBoomBlockSize: 3
 --- !u!1 &1130229829663535146
 GameObject:
   m_ObjectHideFlags: 0

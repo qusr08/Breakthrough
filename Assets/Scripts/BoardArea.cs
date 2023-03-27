@@ -3,80 +3,27 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class BoardArea : MonoBehaviour {
-	[Header("Scene GameObjects")]
-	[SerializeField] private Board board;
-	[SerializeField] private GameManager gameManager;
-	[Header("Components")]
-	[SerializeField] private Transform lineTransform;
-	[SerializeField] private Transform tintedAreaTransform;
-	[SerializeField] private SpriteRenderer lineSpriteRenderer;
-	[SerializeField] private SpriteRenderer tintedAreaSpriteRenderer;
-	[SerializeField] private Sprite boardFillCircleBottom;
-	[SerializeField] private Sprite boardFillCircleTop;
-	[Header("Properties")]
-	[SerializeField, Range(0f, 1f), Tooltip("The thickness of the line that defines the board area.")] private float lineThickness = 0.25f;
-	[SerializeField, Range(0f, 1f), Tooltip("How transparent the board area is.")] private float areaOpacity = 0.1f;
-	[SerializeField, Tooltip("The color of the board area.")] public Color Color;
-	[SerializeField, Tooltip("Whether or not the board area is above or below the line.")] public bool IsAreaAbove;
-	[SerializeField, Min(0), Tooltip("The default height of the board area.")] public int DefaultHeight;
+public abstract class BoardArea : MonoBehaviour {
+	[Header("Components - Board Area")]
+	[SerializeField] protected Transform lineTransform;
+	[SerializeField] protected Transform areaTransform;
+	[SerializeField] protected SpriteRenderer lineSpriteRenderer;
+	[SerializeField] protected SpriteRenderer areaSpriteRenderer;
+	[SerializeField] protected Sprite fillCircleBottom;
+	[SerializeField] protected Sprite fillCircleTop;
+	[Header("Properties - Board Area")]
+	[SerializeField] private int _height;
+	[SerializeField] protected Color color;
+	[SerializeField] protected float areaOpacity;
+	[SerializeField] protected float lineThickness;
+	[SerializeField] private bool _isAreaAbove;
 
-	private float currentHeight;
-	private float toCurrentHeight;
-	private float toCurrentHeightVelocity;
+	#region Properties
+	public int Height => _height;
+	public bool IsAreaAbove => _isAreaAbove;
+	#endregion
 
-	public delegate void OnDestroyMinoDelegate ( );
-	public OnDestroyMinoDelegate OnDestroyMino = ( ) => { };
-
-	public delegate void OnHeightChangeDelegate ( );
-	public OnHeightChangeDelegate OnHeightChange = ( ) => { };
-
-    public delegate void OnUpdateBlockGroupsDelegate ( );
-    public OnUpdateBlockGroupsDelegate OnUpdateBlockGroups = ( ) => { };
-
-    public float CurrentHeight {
-		get {
-			return currentHeight;
-		}
-
-		set {
-			currentHeight = value;
-
-			// Do not update anything if the board is null
-			if (board == null) {
-				return;
-			}
-
-			// Set the position of the board area line based on the height specified
-			transform.position = new Vector3(-0.5f + board.Width / 2.0f, -0.5f + currentHeight, 0);
-
-			// Set the position and size of the line
-			lineTransform.position = transform.position;
-			lineTransform.localScale = new Vector3(board.Width, lineThickness, 1);
-
-			// Set the position and size of the tinted area
-			tintedAreaTransform.position = transform.position + Vector3.up * (IsAreaAbove ? (board.Height - currentHeight) / 2.0f : -currentHeight / 2.0f);
-			tintedAreaSpriteRenderer.size = new Vector2(board.Width, (IsAreaAbove ? board.Height - currentHeight : currentHeight));
-
-			// Update any board UI that may rely on the heights of this board area
-			gameManager.UpdateGameplayUI( );
-		}
-	}
-	public float ToCurrentHeight {
-		get {
-			return toCurrentHeight;
-		}
-
-		set {
-			// If the height has been changed, call its delegate method
-			if (toCurrentHeight != value) {
-				OnHeightChange( );
-			}
-
-			toCurrentHeight = value;
-		}
-	}
-
+	#region Unity
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -89,24 +36,17 @@ public class BoardArea : MonoBehaviour {
 #endif
 
 		// Set sprites and colors of for the board area
-		lineSpriteRenderer.color = Color;
-		tintedAreaSpriteRenderer.sprite = (IsAreaAbove ? boardFillCircleTop : boardFillCircleBottom);
-		tintedAreaSpriteRenderer.color = new Color(Color.r, Color.g, Color.b, areaOpacity);
-
-		// Fully update the animations so they are visible
-		toCurrentHeight = DefaultHeight;
-		CurrentHeight = DefaultHeight;
+		lineSpriteRenderer.color = color;
+		areaSpriteRenderer.sprite = (IsAreaAbove ? fillCircleTop : fillCircleBottom);
+		areaSpriteRenderer.color = new Color(color.r, color.g, color.b, areaOpacity);
 	}
 
-	private void Awake ( ) {
+	protected void Awake ( ) {
 #if UNITY_EDITOR
 		OnValidate( );
 #else
 		_OnValidate( );
 #endif
-	}
-
-	private void Update ( ) {
-		CurrentHeight = Mathf.SmoothDamp(CurrentHeight, ToCurrentHeight, ref toCurrentHeightVelocity, gameManager.AnimationSpeed);
+		#endregion
 	}
 }
