@@ -8,7 +8,7 @@ public enum BlockColor {
 }
 
 public enum BlockType {
-	BOOM_PYRA, BOOM_LINE, BOOM_AREA, WALL, NORMAL
+	BOOM_PYRA, BOOM_LINE, BOOM_AREA, NORMAL
 }
 
 public enum BlockDirection {
@@ -38,20 +38,40 @@ public class Block : MonoBehaviour {
 	[SerializeField] private int pyraBoomBlockSize = 3;
 
 	#region Properties
-	public Vector2Int Position => _position;
 	public Color Color => spriteRenderer.color;
 	public BlockDirection BlockDirection => _blockDirection;
-	public BlockType BlockType => _blockType;
-	public BlockGroup BlockGroup => _blockGroup;
 	public int MinoIndex => _minoIndex;
 	public int BlockGroupID => BlockGroup.ID;
 	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
 
+	public Vector2Int Position {
+		get => _position;
+		set {
+			_position = value;
+			transform.position = new Vector3(_position.x, _position.y);
+		}
+	}
 	public BlockColor BlockColor {
 		get => _blockColor;
 		set {
 			_blockColor = value;
 			spriteRenderer.color = Utils.GetColorFromHex(blockColors[value]);
+		}
+	}
+	public BlockType BlockType {
+		get => _blockType;
+		set {
+			_blockType = value;
+			iconSpriteRenderer.sprite = blockIcons[_blockType];
+		}
+	}
+	public BlockGroup BlockGroup {
+		get => _blockGroup;
+		set {
+			_blockGroup.RemoveBlock(this);
+			_blockGroup = value;
+			_blockGroup.AddBlock(this);
+			transform.SetParent(_blockGroup.transform, true);
 		}
 	}
 	public int Health {

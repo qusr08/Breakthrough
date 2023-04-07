@@ -173,12 +173,11 @@ MonoBehaviour:
     - '#293c43'
     - '#605dff'
   blockIcons:
-    m_keys: 0000000001000000020000000300000004000000
+    m_keys: 00000000010000000200000003000000
     m_values:
     - {fileID: -3740889732657162250, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
     - {fileID: -8804995556728519892, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
     - {fileID: -8494576548519730528, guid: e6520d5112a6cf94e94d1c79cc5acd43, type: 3}
-    - {fileID: 0}
     - {fileID: 0}
   areaBoomBlockSize: 2
   pyraBoomBlockSize: 3

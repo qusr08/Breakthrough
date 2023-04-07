@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BlockGroup : MonoBehaviour {
 	[Header("Components - Block Group")]
@@ -20,7 +21,7 @@ public class BlockGroup : MonoBehaviour {
 	protected float previousFallTime = 0;
 
 	#region Properties
-	public int ID => _id;
+	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
 
 	public bool CanFall { get => _canFall; private set => _canFall = value; }
@@ -93,5 +94,76 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		return true;
+	}
+
+	public void AddBlock (Block block) {
+		blocks.Add(block);
+	}
+
+	public void RemoveBlock (Block block) {
+		blocks.Remove(block);
+
+		if (Count == 0) {
+			Destroy(this);
+		}
+	}
+
+	private BlockGroup MergeToBlockGroup (BlockGroup blockGroup) {
+		while (Count > 0) {
+			this[0].BlockGroup = blockGroup;
+		}
+
+		return blockGroup;
+	}
+
+	/// <summary>
+	/// Merge two block groups together
+	/// </summary>
+	/// <param name="blockGroup1">A block group to merge</param>
+	/// <param name="blockGroup2">A block group to merge</param>
+	/// <returns>Returns a block group that contains all the blocks from the two input block groups</returns>
+	public static BlockGroup MergeBlockGroups (BlockGroup blockGroup1, BlockGroup blockGroup2) {
+		// If the block groups are the same, then just return
+		if (blockGroup1.ID == blockGroup2.ID) {
+			return blockGroup1;
+		}
+
+		// If one of the block groups are a player controlled block group, make sure that one is always destroyed (as in all the blocks move out of it)
+		if (blockGroup2.GetType( ) == typeof(PlayerControlledBlockGroup)) {
+			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		}
+		if (blockGroup1.GetType( ) == typeof(PlayerControlledBlockGroup)) {
+			return blockGroup1.MergeToBlockGroup(blockGroup2);
+		}
+		// Merge the smaller block group into the larger block group to improve performance
+		if (blockGroup1.Count >= blockGroup2.Count) {
+			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		} else {
+			return blockGroup1.MergeToBlockGroup(blockGroup2);
+		}
+	}
+
+	/// <summary>
+	/// Merge all block groups in the list together
+	/// </summary>
+	/// <param name="blockGroups">All the block groups that should be merged together</param>
+	/// <returns>Returns a block group that contains all the blocks from the list of block groups</returns>
+	public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
+		while (blockGroups.Count > 1) {
+			// If either the first or second index points to a null block group, remove it from the list and continue to the next iteration
+			if (blockGroups[0] == null) {
+				blockGroups.RemoveAt(0);
+				continue;
+			}
+			if (blockGroups[1] == null) {
+				blockGroups.RemoveAt(1);
+				continue;
+			}
+
+			// Merge the first and second block groups together and save that into the first index
+			blockGroups[0] = MergeBlockGroups(blockGroups[0], blockGroups[1]);
+		}
+
+		return blockGroups[0];
 	}
 }
