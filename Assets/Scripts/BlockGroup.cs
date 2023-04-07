@@ -81,7 +81,7 @@ public class BlockGroup : MonoBehaviour {
 
 	private bool IsValidBlockPosition (Block block, Vector2Int newPosition) {
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
-		if (!CanFallBelow && newPosition.y < board.BreakthroughBoardAreaHeight) {
+		if (!CanFallBelow && newPosition.y < board.BreakthroughBoardArea.Height) {
 			return false;
 		}
 

@@ -18,6 +18,8 @@ public abstract class BoardArea : MonoBehaviour {
 	[SerializeField] protected float lineThickness;
 	[SerializeField] private bool _isAreaAbove;
 
+	private int defaultHeight;
+
 	#region Properties
 	public int Height => _height;
 	public bool IsAreaAbove => _isAreaAbove;
@@ -48,5 +50,7 @@ public abstract class BoardArea : MonoBehaviour {
 		_OnValidate( );
 #endif
 		#endregion
-	}
+
+		defaultHeight = Height;
+    }
 }

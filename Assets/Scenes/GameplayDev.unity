@@ -252,36 +252,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &788594463
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 788594464}
-  m_Layer: 0
-  m_Name: Board Area
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &788594464
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 788594463}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.5, y: 13.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1065242836
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,6 +498,8 @@ MonoBehaviour:
   - {fileID: 623521767164865886, guid: 808f2d35324e3634b9e1ca784298fe90, type: 3}
   - {fileID: 1830994206690904804, guid: 2a40bf84d9fceaa418ca8937961614b6, type: 3}
   - {fileID: 1830994206690904804, guid: 80f33c43e6300d04f81962f8fa125a2a, type: 3}
+  blockGroupPrefab: {fileID: 8478777859116991009, guid: 6280865aa4e29264b8d65953181e9dc7, type: 3}
+  blockPrefab: {fileID: 1130229828950931875, guid: d2b730b0859741245866fc9131da88ed, type: 3}
   _boardState: 0
   _width: 16
   _height: 28
