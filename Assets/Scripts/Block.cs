@@ -45,7 +45,10 @@ public class Block : MonoBehaviour {
 	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
 
 	public Vector2Int Position {
-		get => _position;
+		get {
+			_position = (Vector2Int) Utils.Vect3Round(transform.position);
+			return _position;
+		}
 		set {
 			_position = value;
 			transform.position = new Vector3(_position.x, _position.y);
@@ -123,6 +126,8 @@ public class Block : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 		particleManager = FindObjectOfType<ParticleManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
+
+		BlockGroup = GetComponentInParent<BlockGroup>( );
 	}
 
 	protected void Awake ( ) {

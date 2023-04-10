@@ -56,6 +56,8 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 			if (CanFall) {
 				previousFallTime = Time.time;
+			} else {
+				board.PlaceActiveMino( );
 			}
 		}
 	}

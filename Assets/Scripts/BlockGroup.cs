@@ -54,6 +54,9 @@ public class BlockGroup : MonoBehaviour {
 	protected virtual void Start ( ) {
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
 			AddBlock(block);
+
+			// Update the position of the block
+			Vector2Int _ = block.Position;
 		}
 	}
 
@@ -65,7 +68,9 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		if (Time.time - previousFallTime > gameManager.FallTimeAccelerated) {
-			if (TryMove(Vector2Int.down)) {
+			CanFall = TryMove(Vector2Int.down);
+
+			if (CanFall) {
 				previousFallTime = Time.time;
 			}
 		}
@@ -85,9 +90,6 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		toPosition += (Vector3Int) deltaPosition;
-		foreach (Block block in blocks) {
-			block.Position += deltaPosition;
-		}
 
 		// if (!CanFallBelow && toPosition.y >= board.BreakthroughBoardArea.Height) {
 		if (!CanFallBelow && toPosition.y >= 2) {
@@ -105,10 +107,12 @@ public class BlockGroup : MonoBehaviour {
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
 		// if (!CanFallBelow && newPosition.y < board.BreakthroughBoardArea.Height) {
 		if (!CanFallBelow && newPosition.y < 2) {
+			Debug.Log("Cant fall below. " + newPosition);
 			return false;
 		}
 
 		if (board.IsBlockAt(newPosition, blockGroupID: ID)) {
+			Debug.Log("is block at : " + newPosition);
 			if (newPosition.y < 0) {
 				board.DamageBlock(block, destroy: true);
 			} else {

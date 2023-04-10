@@ -75,10 +75,11 @@ public class BoomBlockFrames {
 				return false;
 			}
 		}
-
-		foreach (Vector2Int framePosition in frames[frameIndex]) {
-			if (position == framePosition) {
-				return false;
+		if (frames.Count > frameIndex) {
+			foreach (Vector2Int framePosition in frames[frameIndex]) {
+				if (position == framePosition) {
+					return false;
+				}
 			}
 		}
 

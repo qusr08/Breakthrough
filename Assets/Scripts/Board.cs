@@ -266,6 +266,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	private void GenerateMino ( ) {
 		gameManager.ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Count)], minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
+		gameManager.ActiveMino.ID = blockGroupCount++;
 
 		// If the mino was generated with a boom block, then the boom block drought is over
 		// If the mino was not generated with a boom block, then the boom block drought continues and increases the chance of a boom block to spawn for the next mino
@@ -276,7 +277,7 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	private void OnPlaceActiveMino ( ) {
+	public void PlaceActiveMino ( ) {
 		for (int i = 0; i < gameManager.ActiveMino.Count; i++) {
 			// Add all of the blocks that make up the mino to be updated and merged into other block groups
 			blocksToUpdate.Add(gameManager.ActiveMino[i]);
