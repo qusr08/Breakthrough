@@ -254,10 +254,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="block">The block to create boom block frames from</param>
 	private void GenerateBoomBlockFrames (Block block) {
-		if (!block.IsBoomBlock) {
-			return;
-		}
-
+		Debug.Log("GenerateBoomBlockFrames");
 		boomBlockFrames.Add(new BoomBlockFrames(this, gameManager, block));
 	}
 
@@ -279,13 +276,14 @@ public class Board : MonoBehaviour {
 
 	public void PlaceActiveMino ( ) {
 		for (int i = 0; i < gameManager.ActiveMino.Count; i++) {
+			Debug.Log("active mino count " + i);
 			// Add all of the blocks that make up the mino to be updated and merged into other block groups
-			blocksToUpdate.Add(gameManager.ActiveMino[i]);
+			// blocksToUpdate.Add(gameManager.ActiveMino[i]);
 
 			// If the block is a boom block, generate boom blocks frames for it
-			if (gameManager.ActiveMino[i].IsBoomBlock) {
-				GenerateBoomBlockFrames(gameManager.ActiveMino[i]);
-			}
+			// if (gameManager.ActiveMino[i].IsBoomBlock) {
+			//	GenerateBoomBlockFrames(gameManager.ActiveMino[i]);
+			// }
 		}
 
 		gameManager.ActiveMino = null;
@@ -293,6 +291,7 @@ public class Board : MonoBehaviour {
 	}
 
 	private void MergeBlockGroups ( ) {
+		Debug.Log("Merge Block Groups");
 		while (blocksToUpdate.Count > 0) {
 			// Get the surrounding block groups to the current block
 			List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
@@ -342,9 +341,9 @@ public class Board : MonoBehaviour {
 	}
 
 	private void UpdateBoomBlockFrames ( ) {
-		boomBlockFrameTimer -= Time.deltaTime;
+		Debug.Log("Update Boom Block Frames");
 		// If a certain amount of time has passed, destroy the next frame of blocks
-		if (boomBlockFrameTimer <= 0) {
+		if (Time.time - boomBlockFrameTimer >= gameManager.BoomBlockAnimationSpeed) {
 			// Loop through each of the boom blocks explosion frames
 			for (int i = boomBlockFrames.Count - 1; i >= 0; i--) {
 				boomBlockFrames[i].DestroyFirstFrame( );
@@ -360,7 +359,7 @@ public class Board : MonoBehaviour {
 				BoardState = BoardState.MERGING_BLOCKGROUPS;
 			}
 
-			boomBlockFrameTimer = gameManager.BoomBlockAnimationSpeed;
+			boomBlockFrameTimer = Time.time;
 		}
 	}
 

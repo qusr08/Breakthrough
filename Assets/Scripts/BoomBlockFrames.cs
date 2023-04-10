@@ -44,9 +44,11 @@ public class BoomBlockFrames {
 
 			// For each position in the previous frame, add all the cardinal positions around the current position to the next frame
 			foreach (Vector2Int position in frames[frameIndex]) {
-				List<Vector2Int> neighbors = Utils.GetCardinalPositions(position);
+                Debug.Log("Looking at Position: " + frameIndex + " " + position);
+                List<Vector2Int> neighbors = Utils.GetCardinalPositions(position);
 				foreach (Vector2Int neighborPosition in neighbors) {
 					if (TryAddPositionToFrame(neighborPosition, frameIndex + 1)) {
+						Debug.Log("Found Position: " + frameIndex + " " + neighborPosition);
 						hasBlockInRange = true;
 					}
 				}

@@ -21,10 +21,10 @@ public class PlayerControlledBlockGroup : BlockGroup {
 	}
 
 	protected override void Start ( ) {
-		base.Start( );
+		// base.Start( );
 
 		if (Random.Range(0f, 1f) < gameManager.BoomBlockSpawnChance) {
-			Block block = this[Random.Range(0, Count)];
+			Block block = blocks[Random.Range(0, Count)];
 
 			switch (Random.Range(0, 3)) {
 				case 0:
@@ -52,6 +52,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 		// Fall down based on the fall time of the minos
 		if (Time.time - previousFallTime > gameManager.FallTime) {
+			Debug.Log("player controlled block group update");
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {

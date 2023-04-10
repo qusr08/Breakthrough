@@ -22,19 +22,13 @@ public class BlockGroup : MonoBehaviour {
 	protected Vector3 toRotation;
 	private Vector3 toRotationVelocity;
 
-	protected float previousFallTime = 0;
+	protected float previousFallTime;
 
 	#region Properties
 	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
-
 	public bool CanFall { get => _canFall; protected set => _canFall = value; }
 	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
-
-	public Block this[int i] {
-		get => blocks[i];
-		set => blocks[i] = value;
-	}
 	public int Count => blocks.Count;
 	#endregion
 
@@ -58,7 +52,9 @@ public class BlockGroup : MonoBehaviour {
 			// Update the position of the block
 			Vector2Int _ = block.Position;
 		}
-	}
+
+        previousFallTime = Time.time;
+    }
 
 	private void Update ( ) {
 		UpdateTransform( );
@@ -83,8 +79,9 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	protected bool TryMove (Vector2Int deltaPosition) {
-		for (int i = Count - 1; i >= 0; i--) {
-			if (!IsValidBlockPosition(blocks[i], blocks[i].Position + deltaPosition)) {
+        for (int i = Count - 1; i >= 0; i--) {
+            Debug.Log("Try Move Block Group - " + i);
+            if (!IsValidBlockPosition(blocks[i], blocks[i].Position + deltaPosition)) {
 				return false;
 			}
 		}
@@ -137,7 +134,7 @@ public class BlockGroup : MonoBehaviour {
 
 	private BlockGroup MergeToBlockGroup (BlockGroup blockGroup) {
 		while (Count > 0) {
-			this[0].BlockGroup = blockGroup;
+			blocks[0].BlockGroup = blockGroup;
 		}
 
 		return blockGroup;
@@ -182,9 +179,12 @@ public class BlockGroup : MonoBehaviour {
 		blockGroups.RemoveAt(0);
 
 		while (blockGroups.Count > 0) {
+			Debug.Log("MergeAllBlockGroups Loop");
 			mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, blockGroups[0]);
 			blockGroups.RemoveAt(0);
 		}
+
+		Debug.Log("Done");
 
 		return mergedBlockGroup;
 	}
