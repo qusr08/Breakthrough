@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,16 +17,19 @@ public class BlockGroup : MonoBehaviour {
 
 	protected List<Block> blocks = new List<Block>( );
 
-	protected Vector2Int toPosition;
-	protected Quaternion toRotation;
+	protected Vector3 toPosition;
+	private Vector3 toPositionVelocity;
+	protected Vector3 toRotation;
+	private Vector3 toRotationVelocity;
+
 	protected float previousFallTime = 0;
 
 	#region Properties
 	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
 
-	public bool CanFall { get => _canFall; private set => _canFall = value; }
-	public bool CanFallBelow { get => _canFallBelow; private set => _canFallBelow = value; }
+	public bool CanFall { get => _canFall; protected set => _canFall = value; }
+	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
 
 	public Block this[int i] {
 		get => blocks[i];
@@ -42,16 +46,20 @@ public class BlockGroup : MonoBehaviour {
 
 	protected virtual void Awake ( ) {
 		OnValidate( );
+
+		toPosition = transform.position;
+		toRotation = transform.eulerAngles;
 	}
 
-	protected virtual void Update ( ) {
-		/// TODO: Update transforms over time (tween)
-
-		UpdateSelf( );
+	protected virtual void Start ( ) {
+		foreach (Block block in GetComponentsInChildren<Block>( )) {
+			AddBlock(block);
+		}
 	}
-	#endregion
 
-	protected virtual void UpdateSelf ( ) {
+	private void Update ( ) {
+		UpdateTransform( );
+
 		if (board.BoardState != BoardState.UPDATING_BLOCKGROUPS) {
 			return;
 		}
@@ -62,6 +70,12 @@ public class BlockGroup : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
+
+	protected virtual void UpdateTransform ( ) {
+		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BlockGroupAnimationSpeed);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BlockGroupAnimationSpeed);
+	}
 
 	protected bool TryMove (Vector2Int deltaPosition) {
 		for (int i = Count - 1; i >= 0; i--) {
@@ -70,7 +84,15 @@ public class BlockGroup : MonoBehaviour {
 			}
 		}
 
-		toPosition += deltaPosition;
+		toPosition += (Vector3Int) deltaPosition;
+		foreach (Block block in blocks) {
+			block.Position += deltaPosition;
+		}
+
+		// if (!CanFallBelow && toPosition.y >= board.BreakthroughBoardArea.Height) {
+		if (!CanFallBelow && toPosition.y >= 2) {
+			CanFallBelow = true;
+		}
 
 		return true;
 	}
@@ -81,11 +103,12 @@ public class BlockGroup : MonoBehaviour {
 
 	private bool IsValidBlockPosition (Block block, Vector2Int newPosition) {
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
-		if (!CanFallBelow && newPosition.y < board.BreakthroughBoardArea.Height) {
+		// if (!CanFallBelow && newPosition.y < board.BreakthroughBoardArea.Height) {
+		if (!CanFallBelow && newPosition.y < 2) {
 			return false;
 		}
 
-		if (board.IsBlockAt(newPosition, ID)) {
+		if (board.IsBlockAt(newPosition, blockGroupID: ID)) {
 			if (newPosition.y < 0) {
 				board.DamageBlock(block, destroy: true);
 			} else {
@@ -104,7 +127,7 @@ public class BlockGroup : MonoBehaviour {
 		blocks.Remove(block);
 
 		if (Count == 0) {
-			Destroy(this);
+			Destroy(gameObject);
 		}
 	}
 
@@ -149,21 +172,16 @@ public class BlockGroup : MonoBehaviour {
 	/// <param name="blockGroups">All the block groups that should be merged together</param>
 	/// <returns>Returns a block group that contains all the blocks from the list of block groups</returns>
 	public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
-		while (blockGroups.Count > 1) {
-			// If either the first or second index points to a null block group, remove it from the list and continue to the next iteration
-			if (blockGroups[0] == null) {
-				blockGroups.RemoveAt(0);
-				continue;
-			}
-			if (blockGroups[1] == null) {
-				blockGroups.RemoveAt(1);
-				continue;
-			}
+		// This is the block group that all of the other block groups will be merged into
+		// The block group referenced by this object may change as the block groups are merged
+		BlockGroup mergedBlockGroup = blockGroups[0];
+		blockGroups.RemoveAt(0);
 
-			// Merge the first and second block groups together and save that into the first index
-			blockGroups[0] = MergeBlockGroups(blockGroups[0], blockGroups[1]);
+		while (blockGroups.Count > 0) {
+			mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, blockGroups[0]);
+			blockGroups.RemoveAt(0);
 		}
 
-		return blockGroups[0];
+		return mergedBlockGroup;
 	}
 }

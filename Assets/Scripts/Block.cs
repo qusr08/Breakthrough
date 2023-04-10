@@ -41,7 +41,7 @@ public class Block : MonoBehaviour {
 	public Color Color => spriteRenderer.color;
 	public BlockDirection BlockDirection => _blockDirection;
 	public int MinoIndex => _minoIndex;
-	public int BlockGroupID => BlockGroup.ID;
+	public int BlockGroupID => (BlockGroup == null ? -1 : BlockGroup.ID);
 	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
 
 	public Vector2Int Position {
@@ -68,10 +68,23 @@ public class Block : MonoBehaviour {
 	public BlockGroup BlockGroup {
 		get => _blockGroup;
 		set {
-			_blockGroup.RemoveBlock(this);
+			// If the block group is being set to the same thing, do nothing
+			if (_blockGroup == value) {
+				return;
+			}
+
+			// Remove this block from its current block group
+			if (_blockGroup != null) {
+				_blockGroup.RemoveBlock(this);
+			}
+
 			_blockGroup = value;
-			_blockGroup.AddBlock(this);
-			transform.SetParent(_blockGroup.transform, true);
+
+			// Add this block to the new block group
+			if (_blockGroup != null) {
+				_blockGroup.AddBlock(this);
+				transform.SetParent(_blockGroup.transform, true);
+			}
 		}
 	}
 	public int Health {

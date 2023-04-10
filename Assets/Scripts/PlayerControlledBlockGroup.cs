@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControlledBlockGroup : BlockGroup {
 	[Header("Properties - Player Controlled Block Group")]
@@ -19,7 +20,9 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		base.Awake( );
 	}
 
-	protected void Start ( ) {
+	protected override void Start ( ) {
+		base.Start( );
+
 		if (Random.Range(0f, 1f) < gameManager.BoomBlockSpawnChance) {
 			Block block = this[Random.Range(0, Count)];
 
@@ -38,20 +41,27 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			HasBoomBlock = true;
 		}
 	}
-	#endregion
 
-	protected override void UpdateSelf ( ) {
+	private void Update ( ) {
+		UpdateTransform( );
+
+		// Only move the player controlled block group while in this specific board state
 		if (board.BoardState != BoardState.PLACING_MINO) {
 			return;
 		}
 
-		previousFallTime += Time.deltaTime;
-		if (previousFallTime > gameManager.FallTime) {
-			TryMove(Vector2Int.down);
+		// Fall down based on the fall time of the minos
+		if (Time.time - previousFallTime > gameManager.FallTime) {
+			CanFall = TryMove(Vector2Int.down);
+
+			if (CanFall) {
+				previousFallTime = Time.time;
+			}
 		}
 	}
+	#endregion
 
-	/*public void OnMoveHorizontal (InputValue value) {
+	public void OnMoveHorizontal (InputValue value) {
 
 	}
 
@@ -61,5 +71,5 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 	public void OnRotate (InputValue value) {
 
-	}*/
+	}
 }
