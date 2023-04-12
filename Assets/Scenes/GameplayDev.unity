@@ -293,15 +293,16 @@ MonoBehaviour:
   boardsGenerated: 0
   _activeMino: {fileID: 0}
   _fallTime: 1
-  _fallTimeAccelerated: 0.02
+  _fallTimeAccelerated: 0.04
   _moveTime: 0.15
   _moveTimeAccelerated: 0.075
   _rotateTime: 0.25
   _rotateTimeAccelerated: 0.0625
   _placeTime: 0.75
   _blockScale: 0.95
+  _rotateDirection: -1
   _boomBlockAnimationSpeed: 0.05
-  _blockGroupAnimationSpeed: 0.075
+  _blockGroupAnimationSpeed: 0.05
   boomBlockGuarantee: 5
   boomBlockInitialChance: 0.2
 --- !u!4 &1065242838

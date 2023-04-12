@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move Horizontal",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "d27d133c-3f78-45cc-8b19-7436ef61ff70",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -16,7 +16,7 @@
                 },
                 {
                     "name": "Move Vertical",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "fb63e401-f21c-405e-aab9-50cf7a5e6edc",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -25,7 +25,7 @@
                 },
                 {
                     "name": "Rotate",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "e494b59c-69c1-4e53-8847-5562eb6f2569",
                     "expectedControlType": "Button",
                     "processors": "",

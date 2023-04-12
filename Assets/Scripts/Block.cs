@@ -8,11 +8,11 @@ public enum BlockColor {
 }
 
 public enum BlockType {
-	BOOM_PYRA, BOOM_LINE, BOOM_AREA, NORMAL
+	BOOM_PYRA, BOOM_LINE, BOOM_AREA, NORMAL, WALL
 }
 
 public enum BlockDirection {
-	UP, RIGHT, DOWN, LEFT
+	RIGHT, DOWN, LEFT, UP
 }
 
 public class Block : MonoBehaviour {
@@ -39,11 +39,13 @@ public class Block : MonoBehaviour {
 
 	#region Properties
 	public Color Color => spriteRenderer.color;
-	public BlockDirection BlockDirection => _blockDirection;
+	public BlockDirection BlockDirection {
+		get => _blockDirection;
+		set => _blockDirection = value;
+	}
 	public int MinoIndex => _minoIndex;
 	public int BlockGroupID => (BlockGroup == null ? -1 : BlockGroup.ID);
 	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
-
 	public Vector2Int Position {
 		get {
 			_position = (Vector2Int) Utils.Vect3Round(transform.position);
@@ -96,8 +98,14 @@ public class Block : MonoBehaviour {
 
 			// If the value is greater than 0, then the block was not completely destroyed
 			// If the value is less than or equal to 0, then the block was completely destroyed
-			if (value > 0) {
-				/// TODO: Update color (for wall blocks)
+			if (value > 0 && BlockType == BlockType.WALL) {
+				if (value == 3) {
+					BlockColor = BlockColor.WALL_3;
+				} else if (value == 2) {
+					BlockColor = BlockColor.WALL_2;
+				} else if (value == 1) {
+					BlockColor = BlockColor.WALL_1;
+				}
 			} else {
 				particleManager.SpawnBlockParticle(Position, Color);
 			}
@@ -123,7 +131,7 @@ public class Block : MonoBehaviour {
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
 		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1f);
-    }
+	}
 
 	protected void Awake ( ) {
 #if UNITY_EDITOR

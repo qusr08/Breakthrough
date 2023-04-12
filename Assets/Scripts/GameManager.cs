@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float _rotateTimeAccelerated;
 	[SerializeField, Min(0f)] private float _placeTime;
 	[SerializeField, Min(0f)] private float _blockScale;
+	[SerializeField, Range(-1, 1)] private int _rotateDirection = 1;
 	[SerializeField, Min(0f)] private float _boomBlockAnimationSpeed;
 	[SerializeField, Min(0f)] private float _blockGroupAnimationSpeed;
 	[SerializeField, Min(1)] private int boomBlockGuarantee;
@@ -77,6 +78,7 @@ public class GameManager : MonoBehaviour {
 	public float MoveTimeAccelerated => _moveTimeAccelerated;
 	public float RotateTime => _rotateTime;
 	public float RotateTimeAccelerated => _rotateTimeAccelerated;
+	public int RotateDirection => _rotateDirection;
 	public float PlaceTime => _placeTime;
 	public float BlockScale => _blockScale;
 	public float BoomBlockAnimationSpeed => _boomBlockAnimationSpeed;

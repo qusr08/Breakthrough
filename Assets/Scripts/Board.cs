@@ -42,6 +42,7 @@ public class Board : MonoBehaviour {
 	private int blockGroupCount;
 
 	private List<Block> blocksToUpdate = new List<Block>( );
+	private List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
 	private bool needToUpdate = false;
 
 	#region Properties
@@ -54,6 +55,8 @@ public class Board : MonoBehaviour {
 		get => _boardState;
 		set {
 			_boardState = value;
+
+			Debug.Log("Set Board State: " + value.ToString( ));
 
 			switch (value) {
 				case BoardState.PLACING_MINO:
@@ -219,8 +222,12 @@ public class Board : MonoBehaviour {
 		// If the block now has 0 health, as in the block has been completely destroyed
 		if (block.Health == 0) {
 			// If the block has a block group, make sure the block group knows that it was modified
+			// The block group will be updated the next time merge block group is called
 			if (block.BlockGroupID != -1) {
-				blocksToUpdate.AddRange(block.BlockGroup.Blocks);
+				// Make sure to only add the block group once
+				if (!blockGroupsToUpdate.Contains(block.BlockGroup)) {
+					blockGroupsToUpdate.Add(block.BlockGroup);
+				}
 			}
 
 			// If the block has a mino index, remove the reference to the block in the mino list
@@ -233,7 +240,8 @@ public class Board : MonoBehaviour {
 				}
 			}
 
-			Destroy(block);
+			// Destroy the block game object
+			Destroy(block.gameObject);
 
 			return true;
 		}
@@ -241,9 +249,15 @@ public class Board : MonoBehaviour {
 		return false;
 	}
 
-	public void CreateBlock (Vector2Int position, int health = 1) {
+	/// <summary>
+	/// Create a new block
+	/// </summary>
+	/// <param name="position">The position to create the block at</param>
+	/// <param name="health">The health of the block to create</param>
+	public void CreateBlock (Vector2Int position, int health = 1, BlockType blockType = BlockType.NORMAL) {
 		Block block = Instantiate(blockPrefab, transform).GetComponent<Block>( );
 		block.Position = position;
+		block.BlockType = blockType;
 		block.Health = health;
 
 		blocksToUpdate.Add(block);
@@ -254,7 +268,6 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="block">The block to create boom block frames from</param>
 	private void GenerateBoomBlockFrames (Block block) {
-		Debug.Log("GenerateBoomBlockFrames");
 		boomBlockFrames.Add(new BoomBlockFrames(this, gameManager, block));
 	}
 
@@ -263,6 +276,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	private void GenerateMino ( ) {
 		gameManager.ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Count)], minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
+		gameManager.ActiveMino.transform.SetParent(transform, true);
 		gameManager.ActiveMino.ID = blockGroupCount++;
 
 		// If the mino was generated with a boom block, then the boom block drought is over
@@ -274,65 +288,81 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Place down the active mino onto the board
+	/// </summary>
 	public void PlaceActiveMino ( ) {
 		for (int i = 0; i < gameManager.ActiveMino.Count; i++) {
-			Debug.Log("active mino count " + i);
 			// Add all of the blocks that make up the mino to be updated and merged into other block groups
 			blocksToUpdate.Add(gameManager.ActiveMino.GetBlock(i));
 
-            // If the block is a boom block, generate boom blocks frames for it
-            if (gameManager.ActiveMino.GetBlock(i).IsBoomBlock) {
+			// If the block is a boom block, generate boom blocks frames for it
+			if (gameManager.ActiveMino.GetBlock(i).IsBoomBlock) {
 				GenerateBoomBlockFrames(gameManager.ActiveMino.GetBlock(i));
-            }
-        }
+			}
+		}
 
-        gameManager.ActiveMino = null;
+		gameManager.ActiveMino = null;
 		BoardState = BoardState.MERGING_BLOCKGROUPS;
 	}
 
+	/// <summary>
+	/// Update all of the block groups by merging them together or creating new ones
+	/// </summary>
 	private void MergeBlockGroups ( ) {
-		Debug.Log("Merge Block Groups");
+		// Add all of the blocks that are inside of the block groups to update
+		// This is easier to do here than to add each block individually as they need to be updated
+		while (blockGroupsToUpdate.Count > 0) {
+			blocksToUpdate.AddRange(blockGroupsToUpdate[0].GetBlocks( ));
+			blockGroupsToUpdate.RemoveAt(0);
+		}
+
+		// Loop through all of the blocks that need to be updated and sort them into block groups
 		while (blocksToUpdate.Count > 0) {
 			// If the block is null, it was removed in another place and can just be ignored
-			if (blocksToUpdate[0] == null) {
-				continue;
-			}
+			if (blocksToUpdate[0] != null) {
+				// Get the surrounding block groups to the current block
+				List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
 
-			// Get the surrounding block groups to the current block
-			List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
+				foreach (Vector2Int neighborBlockPosition in Utils.GetCardinalPositions(blocksToUpdate[0].Position)) {
+					// If there is not a block at the neighboring position, then continue to the next position
+					if (!IsBlockAt(neighborBlockPosition, offBoardValue: false)) {
+						continue;
+					}
 
-			foreach (Vector2Int neighborBlockPosition in Utils.GetCardinalPositions(blocksToUpdate[0].Position)) {
-				// If there is not a block at the neighboring position, then continue to the next position
-				if (!IsBlockAt(neighborBlockPosition, offBoardValue: false)) {
-					continue;
+					Block neighborBlock = GetBlockAt(neighborBlockPosition);
+
+					// If the block at the neighboring position has the same block group as the current block, continue to the next position
+					// We don't want block groups to merge with themselves
+					if (neighborBlock.BlockGroupID == blocksToUpdate[0].BlockGroupID) {
+						continue;
+					}
+
+					surroundingBlockGroups.Add(neighborBlock.BlockGroup);
 				}
 
-				Block neighborBlock = GetBlockAt(neighborBlockPosition);
-
-				// If the block at the neighboring position has the same block group as the current block, continue to the next position
-				// We don't want block groups to merge with themselves
-				if (neighborBlock.BlockGroupID == blocksToUpdate[0].BlockGroupID) {
-					continue;
+				// If there are no surrounding block groups, create a new block group
+				// If there are surrounding block groups, merge all of them together
+				if (surroundingBlockGroups.Count == 0) {
+					BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
+					blockGroup.ID = blockGroupCount++;
+					blocksToUpdate[0].BlockGroup = blockGroup;
+				} else {
+					blocksToUpdate[0].BlockGroup = BlockGroup.MergeAllBlockGroups(surroundingBlockGroups);
 				}
-
-				surroundingBlockGroups.Add(neighborBlock.BlockGroup);
-			}
-
-			// If there are no surrounding block groups, create a new block group
-			// If there are surrounding block groups, merge all of them together
-			if (surroundingBlockGroups.Count == 0) {
-				BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
-				blockGroup.ID = blockGroupCount++;
-				blocksToUpdate[0].BlockGroup = blockGroup;
-			} else {
-				blocksToUpdate[0].BlockGroup = BlockGroup.MergeAllBlockGroups(surroundingBlockGroups);
 			}
 
 			blocksToUpdate.RemoveAt(0);
 		}
 
-		blocksToUpdate.Clear( );
+		// Get all of the remaining block groups
 		blockGroups = GetComponentsInChildren<BlockGroup>( ).ToList( );
+
+		// Set that each block group can fall by default
+		// This will be updated eventually inside the Update() method in the block group class
+		foreach (BlockGroup blockGroup in blockGroups) {
+			blockGroup.CanFall = true;
+		}
 
 		// If there are more boom blocks to explode, then update them
 		// If there are no more boom blocks to explode, then start to place another mino
@@ -345,8 +375,10 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Update the boom block frames
+	/// </summary>
 	private void UpdateBoomBlockFrames ( ) {
-		Debug.Log("Update Boom Block Frames");
 		// If a certain amount of time has passed, destroy the next frame of blocks
 		if (Time.time - boomBlockFrameTimer >= gameManager.BoomBlockAnimationSpeed) {
 			// Loop through each of the boom blocks explosion frames
@@ -368,11 +400,26 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Update the block groups by checking to see if they are still falling
+	/// </summary>
 	private void UpdateBlockGroups ( ) {
 		// Wait until all block groups have finished moving
 		bool blockGroupsCanMove = false;
-		foreach (BlockGroup blockGroup in blockGroups) {
-			if (blockGroup.CanFall) {
+
+		// Check to see if any of the block groups can fall (and are moving)
+		for (int i = blockGroups.Count - 1; i >= 0; i--) {
+			// If the current block group has a count of 0, then destroy it
+			// This can happen as leftovers from merging the block groups or an entire block group can be destroyed by boom blocks
+			if (blockGroups[i].Count == 0) {
+				Destroy(blockGroups[i].gameObject);
+				blockGroups.RemoveAt(i);
+
+				continue;
+			}
+
+			// If the block group can fall, then at least one block group on the board is still updating
+			if (blockGroups[i].CanFall) {
 				blockGroupsCanMove = true;
 
 				break;
@@ -413,7 +460,7 @@ public class Board : MonoBehaviour {
 				// A value of 0 means the block would have 0 health, so no block should be created there
 				if (randomValue > 0) {
 					// CreateBlock(new Vector2Int(i, j + breakthroughBoardArea.Height), health: randomValue);
-					CreateBlock(new Vector2Int(i, j + 2), health: randomValue);
+					CreateBlock(new Vector2Int(i, j + 2), health: randomValue, blockType: BlockType.WALL);
 				}
 			}
 

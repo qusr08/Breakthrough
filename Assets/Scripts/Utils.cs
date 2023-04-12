@@ -36,6 +36,17 @@ public static class Utils {
 	}
 
 	/// <summary>
+	/// Rotate a position vector around a pivot
+	/// </summary>
+	/// <param name="position">The position vector to rotate</param>
+	/// <param name="pivot">The position vector of the pivot to rotate around</param>
+	/// <param name="degAngle">The angle in degrees to rotate the position vector</param>
+	/// <returns>The rotated position vector</returns>
+	public static Vector2 RotatePositionAroundPivot (Vector2 position, Vector2 pivot, float degAngle) {
+		return (Quaternion.Euler(0, 0, degAngle) * (position - pivot) + (Vector3) pivot);
+	}
+
+	/// <summary>
 	/// Check to see if two position vectors are close enough to each other
 	/// THIS DOES NOT CHECK TO EXACTLY EQUAL, JUST TO MAKE SURE THE TWO VECTORS ARE CLOSE
 	/// THIS IS USEFUL WHEN DEALING WITH CHECKING POSITIONS IN UNITY
@@ -81,6 +92,16 @@ public static class Utils {
 	public static Vector3Int Vect3Round (Vector3 vector) {
 		return new Vector3Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
 	}
+
+	/// <summary>
+	/// Round each element in a vector to the nearest integer
+	/// </summary>
+	/// <param name="vector">The vector to round</param>
+	/// <returns>The modified vector with each element an integer</returns>
+	public static Vector2Int Vect2Round (Vector3 vector) {
+		return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
+	}
+
 
 	/// <summary>
 	/// Check to see if a value is even

@@ -8,9 +8,19 @@ public class PlayerControlledBlockGroup : BlockGroup {
 	[SerializeField] private bool _hasBoomBlock = false;
 	[SerializeField] private bool _hasLanded = false;
 
+	private int horizontalValue = 0;
+	private int verticalValue = 0;
+	private int rotateValue = 0;
+
+	private float placeTimer;
+
 	#region Properties
-	public bool HasBoomBlock { get => _hasBoomBlock; private set => _hasBoomBlock = value; }
-	public bool HasLanded { get => _hasLanded; private set => _hasLanded = value; }
+	public bool HasBoomBlock {
+		get => _hasBoomBlock; private set => _hasBoomBlock = value;
+	}
+	public bool HasLanded {
+		get => _hasLanded; private set => _hasLanded = value;
+	}
 	#endregion
 
 	#region Unity
@@ -50,30 +60,70 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			return;
 		}
 
+		placeTimer -= Time.deltaTime;
+
 		// Fall down based on the fall time of the minos
-		if (Time.time - previousFallTime > gameManager.FallTime) {
-			Debug.Log("player controlled block group update");
+		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {
 				previousFallTime = Time.time;
-			} else if (isDoneTweening) {
+
+				if (verticalValue > 0) {
+					placeTimer = gameManager.PlaceTime;
+				}
+			} else if (isDoneTweening && placeTimer <= 0) {
 				board.PlaceActiveMino( );
 				HasLanded = true;
+			}
+		}
+
+		// Try to move the mino horizontally
+		// If the mino is not moving horizontally, then reset the last time it moved
+		if (horizontalValue == 0) {
+			previousMoveTime = 0;
+		} else if (Time.time - previousMoveTime > gameManager.MoveTime) {
+			// If the mino can move horizontally, reset the place timer and move time
+			if (TryMove(new Vector2Int(horizontalValue, 0))) {
+				// If the player holds down the button, the mino should move slightly faster
+				if (previousMoveTime == 0) {
+					previousMoveTime = Time.time;
+				} else {
+					previousMoveTime = Time.time - gameManager.MoveTimeAccelerated;
+				}
+
+				placeTimer = gameManager.PlaceTime;
+			}
+		}
+
+		// Try and rotate the mino
+		if (rotateValue == 0) {
+			previousRotateTime = 0;
+		} else if (Time.time - previousRotateTime > gameManager.RotateTime) {
+			// If the mino was successfully rotated, then reset the place timer and rotate time
+			if (TryRotate(gameManager.RotateDirection * 90f)) {
+				// If the player holds down the button, the mino should rotate slightly faster
+				if (previousRotateTime == 0) {
+					previousRotateTime = Time.time;
+				} else {
+					previousRotateTime = Time.time - gameManager.RotateTimeAccelerated;
+				}
+
+				placeTimer = gameManager.PlaceTime;
 			}
 		}
 	}
 	#endregion
 
 	public void OnMoveHorizontal (InputValue value) {
-
+		horizontalValue = Mathf.RoundToInt(value.Get<float>( ));
 	}
 
 	public void OnMoveVertical (InputValue value) {
-
+		verticalValue = Mathf.RoundToInt(value.Get<float>( ));
 	}
 
 	public void OnRotate (InputValue value) {
-
+		rotateValue = Mathf.RoundToInt(value.Get<float>( ));
 	}
 }
