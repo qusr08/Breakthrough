@@ -301,7 +301,7 @@ MonoBehaviour:
   _placeTime: 0.75
   _blockScale: 0.95
   _boomBlockAnimationSpeed: 0.05
-  _blockGroupAnimationSpeed: 0.2
+  _blockGroupAnimationSpeed: 0.075
   boomBlockGuarantee: 5
   boomBlockInitialChance: 0.2
 --- !u!4 &1065242838

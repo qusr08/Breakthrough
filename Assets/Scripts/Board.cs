@@ -220,7 +220,7 @@ public class Board : MonoBehaviour {
 		if (block.Health == 0) {
 			// If the block has a block group, make sure the block group knows that it was modified
 			if (block.BlockGroupID != -1) {
-				block.BlockGroup.IsModified = true;
+				blocksToUpdate.AddRange(block.BlockGroup.Blocks);
 			}
 
 			// If the block has a mino index, remove the reference to the block in the mino list
@@ -278,21 +278,26 @@ public class Board : MonoBehaviour {
 		for (int i = 0; i < gameManager.ActiveMino.Count; i++) {
 			Debug.Log("active mino count " + i);
 			// Add all of the blocks that make up the mino to be updated and merged into other block groups
-			// blocksToUpdate.Add(gameManager.ActiveMino[i]);
+			blocksToUpdate.Add(gameManager.ActiveMino.GetBlock(i));
 
-			// If the block is a boom block, generate boom blocks frames for it
-			// if (gameManager.ActiveMino[i].IsBoomBlock) {
-			//	GenerateBoomBlockFrames(gameManager.ActiveMino[i]);
-			// }
-		}
+            // If the block is a boom block, generate boom blocks frames for it
+            if (gameManager.ActiveMino.GetBlock(i).IsBoomBlock) {
+				GenerateBoomBlockFrames(gameManager.ActiveMino.GetBlock(i));
+            }
+        }
 
-		gameManager.ActiveMino = null;
+        gameManager.ActiveMino = null;
 		BoardState = BoardState.MERGING_BLOCKGROUPS;
 	}
 
 	private void MergeBlockGroups ( ) {
 		Debug.Log("Merge Block Groups");
 		while (blocksToUpdate.Count > 0) {
+			// If the block is null, it was removed in another place and can just be ignored
+			if (blocksToUpdate[0] == null) {
+				continue;
+			}
+
 			// Get the surrounding block groups to the current block
 			List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
 

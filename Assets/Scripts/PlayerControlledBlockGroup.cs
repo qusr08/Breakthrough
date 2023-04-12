@@ -6,25 +6,20 @@ using UnityEngine.InputSystem;
 public class PlayerControlledBlockGroup : BlockGroup {
 	[Header("Properties - Player Controlled Block Group")]
 	[SerializeField] private bool _hasBoomBlock = false;
+	[SerializeField] private bool _hasLanded = false;
 
 	#region Properties
 	public bool HasBoomBlock { get => _hasBoomBlock; private set => _hasBoomBlock = value; }
+	public bool HasLanded { get => _hasLanded; private set => _hasLanded = value; }
 	#endregion
 
 	#region Unity
-	protected override void OnValidate ( ) {
-		base.OnValidate( );
-	}
-
-	protected override void Awake ( ) {
-		base.Awake( );
-	}
 
 	protected override void Start ( ) {
-		// base.Start( );
+		base.Start( );
 
 		if (Random.Range(0f, 1f) < gameManager.BoomBlockSpawnChance) {
-			Block block = blocks[Random.Range(0, Count)];
+			Block block = GetBlock(Random.Range(0, Count));
 
 			switch (Random.Range(0, 3)) {
 				case 0:
@@ -50,6 +45,11 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			return;
 		}
 
+		// If the mino has landed, then do not update any more movement
+		if (HasLanded) {
+			return;
+		}
+
 		// Fall down based on the fall time of the minos
 		if (Time.time - previousFallTime > gameManager.FallTime) {
 			Debug.Log("player controlled block group update");
@@ -57,8 +57,9 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 			if (CanFall) {
 				previousFallTime = Time.time;
-			} else {
+			} else if (isDoneTweening) {
 				board.PlaceActiveMino( );
+				HasLanded = true;
 			}
 		}
 	}

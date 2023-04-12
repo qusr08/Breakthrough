@@ -76,16 +76,10 @@ public class Block : MonoBehaviour {
 				return;
 			}
 
-			// Remove this block from its current block group
-			if (_blockGroup != null) {
-				_blockGroup.RemoveBlock(this);
-			}
-
 			_blockGroup = value;
 
 			// Add this block to the new block group
 			if (_blockGroup != null) {
-				_blockGroup.AddBlock(this);
 				transform.SetParent(_blockGroup.transform, true);
 			}
 		}
@@ -128,7 +122,8 @@ public class Block : MonoBehaviour {
 		gameManager = FindObjectOfType<GameManager>( );
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
-	}
+		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1f);
+    }
 
 	protected void Awake ( ) {
 #if UNITY_EDITOR

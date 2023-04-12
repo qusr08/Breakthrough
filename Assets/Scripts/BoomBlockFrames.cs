@@ -68,33 +68,37 @@ public class BoomBlockFrames {
 		// Check to make sure the position is on the board
 		if (!board.IsPositionOnBoard(position)) {
 			return false;
-		}
+        }
 
-		// Make sure the position was not in the previous frame or the current frame
-		// This makes sure the boom block does not backtrack over previous positions
-		foreach (Vector2Int framePosition in frames[frameIndex - 1]) {
+        // Check to make sure the position is within the range of the boom block
+        if (!boomBlock.IsWithinRange(position)) {
+            return false;
+        }
+
+        // Make sure the position was not in the previous frame or the current frame
+        // This makes sure the boom block does not backtrack over previous positions
+		List<Vector2Int> checkPositions = new List<Vector2Int>();
+		if (frames.Count > frameIndex - 2 && frameIndex >= 2) {
+            checkPositions.AddRange(frames[frameIndex - 2]);
+        }
+		if (frames.Count > frameIndex - 1 && frameIndex >= 1) {
+			checkPositions.AddRange(frames[frameIndex - 1]);
+		}
+        if (frames.Count > frameIndex && frameIndex >= 0) {
+            checkPositions.AddRange(frames[frameIndex]);
+        }
+
+        foreach (Vector2Int framePosition in checkPositions) {
 			if (position == framePosition) {
 				return false;
 			}
 		}
-		if (frames.Count > frameIndex) {
-			foreach (Vector2Int framePosition in frames[frameIndex]) {
-				if (position == framePosition) {
-					return false;
-				}
-			}
-		}
-
-		// Check to make sure the position is within the range of the boom block
-		if (!boomBlock.IsWithinRange(position)) {
-			return false;
-		}
 
 		// Make sure there are enough frames for the position to be added
 		while (frames.Count <= frameIndex) {
-			frames.Add(new List<Vector2Int>( ));
-		}
-		frames[frameIndex].Add(position);
+            frames.Add(new List<Vector2Int>( ));
+        }
+        frames[frameIndex].Add(position);
 
 		return true;
 	}
