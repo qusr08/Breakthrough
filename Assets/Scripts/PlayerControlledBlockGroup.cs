@@ -45,6 +45,14 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 			HasBoomBlock = true;
 		}
+
+		// If the mino was generated with a boom block, then the boom block drought is over
+		// If the mino was not generated with a boom block, then the boom block drought continues and increases the chance of a boom block to spawn for the next mino
+		if (HasBoomBlock) {
+			gameManager.BoomBlockDrought = 0;
+		} else {
+			gameManager.BoomBlockDrought++;
+		}
 	}
 
 	private void Update ( ) {

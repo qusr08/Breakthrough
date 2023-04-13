@@ -114,11 +114,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6681043757095424035}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 559334426b803b740be8a10ba726f1d3, type: 3}
+  m_Script: {fileID: 11500000, guid: 498d1f378cb8ba44d84fc1a54809787b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody2D: {fileID: 6681043757095424060}
   maxVelocity: 15
-  minVelocity: 10
-  maxAngularVelocity: 270
-  minAngularVelocity: 180
+  minVelocity: 5
+  maxAngularVelocity: 100
+  minAngularVelocity: 45

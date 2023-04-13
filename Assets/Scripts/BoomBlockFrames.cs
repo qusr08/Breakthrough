@@ -105,6 +105,7 @@ public class BoomBlockFrames {
 		// Remove each block in the first boom block frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
 			board.DamageBlockAt(frames[0][i]);
+			gameManager.ParticleManager.SpawnBoomBlockParticle(frames[0][i], color);
 		}
 
 		// Remove the first frame

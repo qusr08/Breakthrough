@@ -278,14 +278,6 @@ public class Board : MonoBehaviour {
 		gameManager.ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Count)], minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
 		gameManager.ActiveMino.transform.SetParent(transform, true);
 		gameManager.ActiveMino.ID = blockGroupCount++;
-
-		// If the mino was generated with a boom block, then the boom block drought is over
-		// If the mino was not generated with a boom block, then the boom block drought continues and increases the chance of a boom block to spawn for the next mino
-		if (gameManager.ActiveMino.HasBoomBlock) {
-			gameManager.BoomBlockDrought = 0;
-		} else {
-			gameManager.BoomBlockDrought++;
-		}
 	}
 
 	/// <summary>

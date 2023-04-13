@@ -11,6 +11,8 @@ public enum PointsType {
 }
 
 public class GameManager : MonoBehaviour {
+	[Header("Components")]
+	[SerializeField] private ParticleManager _particleManager;
 	[Header("Point Values")]
 	[SerializeField, Min(0)] private int pointsPerDestroyedBlock = 6;
 	[SerializeField, Min(0)] private int pointsPerDroppedBlock = 12;
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float _rotateTimeAccelerated;
 	[SerializeField, Min(0f)] private float _placeTime;
 	[SerializeField, Min(0f)] private float _blockScale;
-	[SerializeField, Range(-1, 1)] private int _rotateDirection = 1;
+	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boomBlockAnimationSpeed;
 	[SerializeField, Min(0f)] private float _blockGroupAnimationSpeed;
 	[SerializeField, Min(1)] private int boomBlockGuarantee;
@@ -71,6 +73,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	public PlayerControlledBlockGroup ActiveMino { get => _activeMino; set => _activeMino = value; }
+
+	public ParticleManager ParticleManager => _particleManager;
 
 	public float FallTime { get => _fallTime; private set => _fallTime = value; }
 	public float FallTimeAccelerated => _fallTimeAccelerated;

@@ -91,7 +91,7 @@ public class Block : MonoBehaviour {
 		set {
 			// If the value is less than the current health, then the block was damaged
 			if (value < _health) {
-				particleManager.SpawnBlockDebrisParticle(Position, Color);
+				particleManager.SpawnBlockDebris(Position, Color);
 			}
 
 			_health = value;
