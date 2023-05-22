@@ -149,7 +149,8 @@ public class BlockGroup : MonoBehaviour {
             // If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
             // This block can just be destroyed in that case
             if (toBlockPosition.y < 0) {
-                board.DamageBlock(block, destroy: true);
+				gameManager.AddBoardPoints(PointsType.DROPPED_BLOCK);
+				board.DamageBlock(block, destroy: true);
             } else {
                 return false;
             }

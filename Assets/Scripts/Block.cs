@@ -140,10 +140,6 @@ public class Block : MonoBehaviour {
 		_OnValidate( );
 #endif
 	}
-
-	private void OnDestroy ( ) {
-		gameManager.AddBoardPoints(PointsType.DESTROYED_BLOCK);
-	}
 	#endregion
 
 	/// <summary>
