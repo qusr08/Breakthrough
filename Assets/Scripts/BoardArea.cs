@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class BoardArea : MonoBehaviour {
 	[Header("Components - Board Area")]
 	[SerializeField] protected Board board;
+	[SerializeField] protected GameManager gameManager;
 	[Space]
 	[SerializeField] protected Transform lineTransform;
 	[SerializeField] protected Transform areaTransform;
@@ -14,30 +15,21 @@ public abstract class BoardArea : MonoBehaviour {
 	[SerializeField] protected Sprite fillCircleBottom;
 	[SerializeField] protected Sprite fillCircleTop;
 	[Header("Properties - Board Area")]
-	[SerializeField, Min(0)] private int _height;
-	[SerializeField] protected Color color;
-	[SerializeField, Range(0, 1)] protected float areaOpacity;
+	[SerializeField, Min(0)] private int defaultHeight;
+	[SerializeField] protected Color lineColor;
+	[SerializeField] protected Color areaColor;
 	[SerializeField, Range(0, 0.5f)] protected float lineThickness;
 	[SerializeField] private bool _isAreaAbove;
 
-	private int defaultHeight;
+	private int _height;
+	private float fromHeight;
+	private float fromHeightVelocity;
 
 	#region Properties
 	public int Height {
 		get => _height;
 		set {
 			_height = value;
-
-			// Set the position of the board area
-			transform.position = new Vector3(-0.5f + (board.Width / 2.0f), -0.5f + _height, 0);
-
-			// Set the position and scale of the board area line
-			lineTransform.position = transform.position;
-			lineTransform.localScale = new Vector3(board.Width, lineThickness, 1);
-
-			// Set the position and size of the board area indicator
-			areaTransform.position = transform.position + Vector3.up * (IsAreaAbove ? (board.Height - _height) / 2.0f : -_height / 2.0f);
-			areaSpriteRenderer.size = new Vector2(board.Width, IsAreaAbove ? board.Height - _height : _height);
 		}
 	}
 	public bool IsAreaAbove => _isAreaAbove;
@@ -56,14 +48,17 @@ public abstract class BoardArea : MonoBehaviour {
 #endif
 
 		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
 
 		// Set sprites and colors of for the board area
-		lineSpriteRenderer.color = color;
+		lineSpriteRenderer.color = lineColor;
+		areaSpriteRenderer.color = areaColor;
 		areaSpriteRenderer.sprite = (IsAreaAbove ? fillCircleTop : fillCircleBottom);
-		areaSpriteRenderer.color = new Color(color.r, color.g, color.b, areaOpacity);
 
 		// Update the height
-		Height = Height;
+		Height = defaultHeight;
+		fromHeight = defaultHeight;
+		Recalculate( );
 	}
 
 	protected void Awake ( ) {
@@ -72,16 +67,31 @@ public abstract class BoardArea : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+	}
 
-		defaultHeight = Height;
+	protected void Update ( ) {
+		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BlockGroupAnimationSpeed);
+
+		if (fromHeight != Height) {
+			Recalculate( );
+		}
 	}
 	#endregion
 
-	public abstract void OnDestroyMino ( );
+	public abstract void OnDestroyActiveMino ( );
 	public abstract void OnUpdateBlockGroups ( );
 	public abstract void OnHeightChange ( );
 
-	public void ResetHeight ( ) {
-		Height = defaultHeight;
+	private void Recalculate ( ) {
+		// Set the position of the board area
+		transform.position = new Vector3(-0.5f + (board.Width / 2.0f), -0.5f + fromHeight, 0);
+
+		// Set the position and scale of the board area line
+		lineTransform.position = transform.position;
+		lineTransform.localScale = new Vector3(board.Width, lineThickness, 1);
+
+		// Set the position and size of the board area indicator
+		areaTransform.position = transform.position + Vector3.up * (IsAreaAbove ? (board.Height - fromHeight) / 2.0f : -fromHeight / 2.0f);
+		areaSpriteRenderer.size = new Vector2(board.Width, IsAreaAbove ? board.Height - fromHeight : fromHeight);
 	}
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -60,6 +61,15 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 		// Only move the player controlled block group while in this specific board state
 		if (board.BoardState != BoardState.PLACING_MINO) {
+			return;
+		}
+
+		// If the player controlled mino has been destroyed, then 
+		if (Count == 0) {
+			board.BreakthroughBoardArea.OnDestroyActiveMino( );
+			board.HazardBoardArea.OnDestroyActiveMino( );
+
+			Destroy(gameObject);
 			return;
 		}
 

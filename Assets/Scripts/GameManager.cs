@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GameState {
-	GAME, GAME_BREAKTHROUGH, GAME_PAUSED, GAME_GAMEOVER
-}
-
 public enum PointsType {
 	DESTROYED_BLOCK, DROPPED_BLOCK, BREAKTHROUGH, DESTROYED_MINO, FAST_DROP
 }
@@ -20,12 +16,12 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0)] private int pointsPerDestroyedMino = 60;
 	[SerializeField, Min(0)] private int pointsPerFastDrop = 2;
 	[Header("Properties")]
-	[SerializeField] private GameState _gameState;
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
 	[SerializeField, Min(0f)] private float _percentCleared;
 	[SerializeField, Min(0)] private int boardsGenerated;
 	[SerializeField] private PlayerControlledBlockGroup _activeMino;
+	[SerializeField] private bool _isPaused;
 	[Space]
 	[SerializeField, Min(0f)] private float _fallTime;
 	[SerializeField, Min(0f)] private float _fallTimeAccelerated;
@@ -45,9 +41,9 @@ public class GameManager : MonoBehaviour {
 
 	private Vector2 _wallHealthRange;
 	private int _wallHeight;
+	private float _hazardTime;
 
 	#region Properties
-	public GameState GameState => _gameState;
 	public int BoardPoints {
 		get => _boardPoints;
 		private set {
@@ -73,6 +69,7 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	public PlayerControlledBlockGroup ActiveMino { get => _activeMino; set => _activeMino = value; }
+	public bool IsPaused => _isPaused;
 
 	public ParticleManager ParticleManager => _particleManager;
 
@@ -91,6 +88,7 @@ public class GameManager : MonoBehaviour {
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockInitialChance) + boomBlockInitialChance;
 	public Vector2 WallHealthRange { get => _wallHealthRange; private set => _wallHealthRange = value; }
 	public int WallHeight { get => _wallHeight; private set => _wallHeight = value; }
+	public float HazardTime { get => _hazardTime; set => _hazardTime = value; }
 	#endregion
 
 	/// <summary>

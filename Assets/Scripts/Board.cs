@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public enum BoardState {
-	PLACING_MINO, MERGING_BLOCKGROUPS, UPDATING_BOOMBLOCKS, UPDATING_BLOCKGROUPS, GENERATE_WALL
+	PLACING_MINO, MERGING_BLOCKGROUPS, UPDATING_BOOMBLOCKS, UPDATING_BLOCKGROUPS, GENERATE_WALL, BREAKTHROUGH, GAMEOVER
 }
 
 public class Board : MonoBehaviour {
@@ -29,8 +29,9 @@ public class Board : MonoBehaviour {
 	[SerializeField] private int _width;
 	[SerializeField] private int _height;
 	[SerializeField] private float cameraPadding;
-	[SerializeField] private float borderThickness;
-	[SerializeField] private float glowThickness;
+	[SerializeField] private float _boardPadding;
+	[SerializeField] private float _borderThickness;
+	[SerializeField] private float _glowThickness;
 
 	private List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
 	private float boomBlockFrameTimer;
@@ -48,6 +49,10 @@ public class Board : MonoBehaviour {
 	#region Properties
 	public BoardArea BreakthroughBoardArea => breakthroughBoardArea;
 	public BoardArea HazardBoardArea => hazardBoardArea;
+
+	public float BoardPadding => _boardPadding;
+	public float BorderThickness => _borderThickness;
+	public float GlowThickness => _glowThickness;
 
 	public int Width => _width;
 	public int Height => _height;
@@ -75,6 +80,10 @@ public class Board : MonoBehaviour {
 				case BoardState.GENERATE_WALL:
 					needToUpdate = true;
 					StartCoroutine(GenerateWall( ));
+					break;
+				case BoardState.BREAKTHROUGH:
+					break;
+				case BoardState.GAMEOVER:
 					break;
 			}
 		}
@@ -105,8 +114,8 @@ public class Board : MonoBehaviour {
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the size of the border
-		borderSpriteRenderer.size = new Vector2(Width + (borderThickness * 2), Height + (borderThickness * 2));
-		glowSpriteRenderer.size = new Vector2(Width + (glowThickness * 2), Height + (glowThickness * 2));
+		borderSpriteRenderer.size = new Vector2(Width + (BorderThickness * 2), Height + (BorderThickness * 2));
+		glowSpriteRenderer.size = new Vector2(Width + (GlowThickness * 2), Height + (GlowThickness * 2));
 
 		// Set the camera orthographic size and position so it fits the entire board
 		gameCamera.orthographicSize = (Height + cameraPadding) / 2f;
@@ -191,6 +200,29 @@ public class Board : MonoBehaviour {
 		}
 
 		return null;
+	}
+
+	/// <summary>
+	/// Get the percentage of blocks cleared within a rectangle on the board
+	/// </summary>
+	/// <param name="x">The x value of the top left of the rectangular area</param>
+	/// <param name="y">The y value of the top left of the rectangular area</param>
+	/// <param name="width">The width of the rectangular area</param>
+	/// <param name="height">The height of the rectangular area</param>
+	/// <returns>The percentage value (0 - 1) of how cleared the rectangular area is</returns>
+	public float GetPercentageClear (int x, int y, int width, int height) {
+		// Count up all the blocks in the rectangular area
+		int blockCount = 0;
+		for (int i = x; i < x + width; i++) {
+			for (int j = y; j > y - height; j--) {
+				if (!GetBlockAt(new Vector2Int(i, j))) {
+					blockCount++;
+				}
+			}
+		}
+
+		// Return the amount counted divided by the total blocks
+		return (float) blockCount / (width * height);
 	}
 
 	/// <summary>
@@ -421,6 +453,9 @@ public class Board : MonoBehaviour {
 
 		// Once all of the block groups cannot move anymore, spawn another mino for the player
 		if (!blockGroupsCanMove) {
+			BreakthroughBoardArea.OnUpdateBlockGroups( );
+			HazardBoardArea.OnUpdateBlockGroups( );
+
 			BoardState = BoardState.MERGING_BLOCKGROUPS;
 		}
 	}

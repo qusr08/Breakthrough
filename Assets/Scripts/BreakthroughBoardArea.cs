@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BreakthroughBoardArea : BoardArea {
-	public override void OnDestroyMino ( ) {
-
+	public override void OnDestroyActiveMino ( ) {
+		board.BoardState = BoardState.BREAKTHROUGH;
 	}
 
-	public override void OnHeightChange ( ) {
-
-	}
+	public override void OnHeightChange ( ) { }
 
 	public override void OnUpdateBlockGroups ( ) {
 
