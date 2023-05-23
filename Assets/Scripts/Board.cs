@@ -241,6 +241,7 @@ public class Board : MonoBehaviour {
 			}
 
 			// Destroy the block game object
+			gameManager.AddBoardPoints(PointsType.DESTROYED_BLOCK);
 			Destroy(block.gameObject);
 
 			return true;

@@ -618,7 +618,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121609834475072667, guid: 4c1f03046719c6c4f80144e689232eb6, type: 3}
       propertyPath: m_Name
-      value: Mino
+      value: D Mino
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c1f03046719c6c4f80144e689232eb6, type: 3}

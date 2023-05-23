@@ -77,7 +77,11 @@ public abstract class BoardArea : MonoBehaviour {
 	}
 	#endregion
 
-	public void Reset ( ) {
+	public abstract void OnDestroyMino ( );
+	public abstract void OnUpdateBlockGroups ( );
+	public abstract void OnHeightChange ( );
+
+	public void ResetHeight ( ) {
 		Height = defaultHeight;
 	}
 }
