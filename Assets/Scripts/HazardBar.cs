@@ -68,7 +68,7 @@ public class HazardBar : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		if (board.BoardState == BoardState.GAMEOVER && board.BoardState == BoardState.BREAKTHROUGH) {
+		if (board.BoardState == BoardState.GAMEOVER || board.BoardState == BoardState.BREAKTHROUGH) {
 			return;
 		}
 

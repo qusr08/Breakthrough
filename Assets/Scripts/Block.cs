@@ -48,12 +48,12 @@ public class Block : MonoBehaviour {
 	public bool IsBoomBlock => (BlockType == BlockType.BOOM_PYRA || BlockType == BlockType.BOOM_LINE || BlockType == BlockType.BOOM_AREA);
 	public Vector2Int Position {
 		get {
-			_position = (Vector2Int) Utils.Vect3Round(transform.position);
+			_position = Utils.Vect2Round(transform.position);
 			return _position;
 		}
 		set {
 			_position = value;
-			transform.position = new Vector3(_position.x, _position.y);
+			transform.position = new Vector2(_position.x, _position.y);
 		}
 	}
 	public BlockColor BlockColor {

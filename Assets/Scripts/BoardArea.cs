@@ -26,12 +26,7 @@ public abstract class BoardArea : MonoBehaviour {
 	private float fromHeightVelocity;
 
 	#region Properties
-	public int Height {
-		get => _height;
-		set {
-			_height = value;
-		}
-	}
+	public int Height { get => _height; set => _height = value; }
 	public bool IsAreaAbove => _isAreaAbove;
 	#endregion
 

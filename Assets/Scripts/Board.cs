@@ -42,6 +42,8 @@ public class Board : MonoBehaviour {
 	private List<BlockGroup> blockGroups = new List<BlockGroup>( );
 	private int blockGroupCount;
 
+	private Block[ , ] blockArray;
+
 	private List<Block> blocksToUpdate = new List<Block>( );
 	private List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
 	private bool needToUpdate = false;
@@ -196,7 +198,12 @@ public class Board : MonoBehaviour {
 	public Block GetBlockAt (Vector2Int position) {
 		RaycastHit2D hit = Physics2D.Raycast((Vector3Int) position + Vector3.back, Vector3.forward);
 		if (hit) {
-			return hit.transform.GetComponent<Block>( );
+			Block block = hit.transform.GetComponent<Block>( );
+
+			// If the block is part of a player controlled block group, then it is not part of the board
+			if (block.BlockGroup != null && block.BlockGroup.GetComponent<PlayerControlledBlockGroup>( ) == null) {
+				return block;
+			}
 		}
 
 		return null;

@@ -10,6 +10,6 @@ public class BreakthroughBoardArea : BoardArea {
 	public override void OnHeightChange ( ) { }
 
 	public override void OnUpdateBlockGroups ( ) {
-
+		 
 	}
 }
