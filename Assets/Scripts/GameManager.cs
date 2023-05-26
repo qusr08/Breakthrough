@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum GameState {
+	GAME, PAUSED, GAMEOVER
+}
+
 public enum PointsType {
 	DESTROYED_BLOCK, DROPPED_BLOCK, BREAKTHROUGH, DESTROYED_MINO, FAST_DROP
 }
@@ -9,19 +13,20 @@ public enum PointsType {
 public class GameManager : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ParticleManager _particleManager;
+	[SerializeField] private BoardTextManager boardTextManager;
 	[Header("Point Values")]
-	[SerializeField, Min(0)] private int pointsPerDestroyedBlock = 6;
-	[SerializeField, Min(0)] private int pointsPerDroppedBlock = 12;
-	[SerializeField, Min(0)] private int pointsPerBreakthrough = 600;
-	[SerializeField, Min(0)] private int pointsPerDestroyedMino = 60;
-	[SerializeField, Min(0)] private int pointsPerFastDrop = 2;
+	[SerializeField, Min(0)] private int _pointsPerDestroyedBlock = 6;
+	[SerializeField, Min(0)] private int _pointsPerDroppedBlock = 12;
+	[SerializeField, Min(0)] private int _pointsPerBreakthrough = 600;
+	[SerializeField, Min(0)] private int _pointsPerDestroyedMino = 60;
+	[SerializeField, Min(0)] private int _pointsPerFastDrop = 2;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
 	[SerializeField, Min(0f)] private float _percentCleared;
 	[SerializeField, Min(0)] private int boardsGenerated;
 	[SerializeField] private PlayerControlledBlockGroup _activeMino;
-	[SerializeField] private bool _isPaused;
+	[SerializeField] private GameState _gameState;
 	[Space]
 	[SerializeField, Min(0f)] private float _fallTime;
 	[SerializeField, Min(0f)] private float _fallTimeAccelerated;
@@ -44,34 +49,36 @@ public class GameManager : MonoBehaviour {
 	private float _hazardTime;
 
 	#region Properties
-	public int BoardPoints {
-		get => _boardPoints;
-		private set {
-			_boardPoints = value;
-
-			/// TODO: Update UI
-		}
-	}
-	public int TotalPoints {
-		get => _totalPoints;
-		private set {
-			_totalPoints = value;
-
-			// TODO: Update UI
-		}
-	}
-	public float PercentCleared {
-		get => _percentCleared;
-		private set {
-			_percentCleared = value;
-
-			// TODO: Update UI
-		}
-	}
+	public int BoardPoints { get => _boardPoints; set => boardTextManager.BoardPointsBoardText.Value = _boardPoints = value; }
+	public int TotalPoints { get => _totalPoints; set => boardTextManager.TotalPointsBoardText.Value = _totalPoints = value; }
+	public float PercentCleared { get => _percentCleared; set => boardTextManager.PercentageClearBoardText.Value = _percentCleared = value; }
 	public PlayerControlledBlockGroup ActiveMino { get => _activeMino; set => _activeMino = value; }
-	public bool IsPaused => _isPaused;
+
+	public GameState GameState {
+		get => _gameState;
+		set {
+			_gameState = value;
+
+			Debug.Log("Set Game State: " + value.ToString( ));
+
+			switch (_gameState) {
+				case GameState.GAME:
+					break;
+				case GameState.PAUSED:
+					break;
+				case GameState.GAMEOVER:
+					break;
+			}
+		}
+	}
 
 	public ParticleManager ParticleManager => _particleManager;
+
+	public int PointsPerDestroyedBlock => _pointsPerDestroyedBlock;
+	public int PointsPerDroppedBlock => _pointsPerDroppedBlock;
+	public int PointsPerBreakthrough => _pointsPerBreakthrough;
+	public int PointsPerDestroyedMino => _pointsPerDestroyedMino;
+	public int PointsPerFastDrop => _pointsPerFastDrop;
 
 	public float FallTime { get => _fallTime; private set => _fallTime = value; }
 	public float FallTimeAccelerated => _fallTimeAccelerated;
@@ -90,28 +97,4 @@ public class GameManager : MonoBehaviour {
 	public int WallHeight { get => _wallHeight; private set => _wallHeight = value; }
 	public float HazardTime { get => _hazardTime; set => _hazardTime = value; }
 	#endregion
-
-	/// <summary>
-	/// Add board points
-	/// </summary>
-	/// <param name="pointsType">The type of points to add to the board points</param>
-	public void AddBoardPoints (PointsType pointsType) {
-		switch (pointsType) {
-			case PointsType.DESTROYED_BLOCK:
-				BoardPoints += pointsPerDestroyedBlock;
-				break;
-			case PointsType.DROPPED_BLOCK:
-				BoardPoints += pointsPerDroppedBlock;
-				break;
-			case PointsType.BREAKTHROUGH:
-				BoardPoints += pointsPerBreakthrough;
-				break;
-			case PointsType.DESTROYED_MINO:
-				BoardPoints += pointsPerDestroyedMino;
-				break;
-			case PointsType.FAST_DROP:
-				BoardPoints += pointsPerFastDrop;
-				break;
-		}
-	}
 }

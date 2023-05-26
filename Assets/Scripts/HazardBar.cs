@@ -47,7 +47,7 @@ public class HazardBar : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 
 		// Set background position
-		transform.localPosition = new Vector3(-(board.Width / 2) - board.BorderThickness - board.BoardPadding, 0f);
+		transform.localPosition = new Vector3(-(board.Width / 2) - (board.BorderThickness * 1.5f) - board.BoardPadding, 0f);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
 		backgroundSpriteRenderer.size = new Vector2(1, board.Height * (4f / 3f));
 
@@ -66,8 +66,12 @@ public class HazardBar : MonoBehaviour {
 #endif
 	}
 
+	public void ResetProgress ( ) {
+		Progress = toProgress = 0;
+	}
+
 	private void Update ( ) {
-		if (board.BoardState == BoardState.GAMEOVER || board.BoardState == BoardState.BREAKTHROUGH) {
+		if (gameManager.GameState == GameState.GAMEOVER || board.BoardState == BoardState.BREAKTHROUGH) {
 			return;
 		}
 

@@ -16,12 +16,12 @@ public class HazardBoardArea : BoardArea {
 	private void CheckForGameOver ( ) {
 		// If the state is already in game over, do not try and set it again
 		// This can happen if the game over board area changes in height after the block groups are updated
-		if (board.BoardState == BoardState.GAMEOVER) {
+		if (gameManager.GameState == GameState.GAMEOVER) {
 			return;
 		}
 
 		if (board.GetPercentageClear(0, Mathf.RoundToInt(board.HazardBoardArea.Height), board.Width, 1) < 1f) {
-			board.BoardState = BoardState.GAMEOVER;
+			gameManager.GameState = GameState.GAMEOVER;
 		}
 	}
 }

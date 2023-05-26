@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public enum BoardState {
-	PLACING_MINO, MERGING_BLOCKGROUPS, UPDATING_BOOMBLOCKS, UPDATING_BLOCKGROUPS, GENERATE_WALL, BREAKTHROUGH, GAMEOVER
+	PLACING_MINO, MERGING_BLOCKGROUPS, UPDATING_BOOMBLOCKS, UPDATING_BLOCKGROUPS, GENERATE_WALL, BREAKTHROUGH
 }
 
 public class Board : MonoBehaviour {
@@ -66,8 +66,11 @@ public class Board : MonoBehaviour {
 
 			switch (value) {
 				case BoardState.PLACING_MINO:
-					needToUpdate = true;
-					GenerateMino( );
+					if (gameManager.GameState != GameState.GAMEOVER) {
+						needToUpdate = true;
+						gameManager.PercentCleared = GetPercentageClear(0, HazardBoardArea.Height - 1, Width, HazardBoardArea.Height - BreakthroughBoardArea.Height) * 100;
+						GenerateMino( );
+					}
 					break;
 				case BoardState.MERGING_BLOCKGROUPS:
 					MergeBlockGroups( );
@@ -83,10 +86,7 @@ public class Board : MonoBehaviour {
 					StartCoroutine(GenerateWall( ));
 					break;
 				case BoardState.BREAKTHROUGH:
-					gameManager.AddBoardPoints(PointsType.BREAKTHROUGH);
 					StartCoroutine(Breakthrough( ));
-					break;
-				case BoardState.GAMEOVER:
 					break;
 			}
 		}
@@ -134,7 +134,7 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Start ( ) {
-		BoardState = BoardState.GENERATE_WALL;
+		BoardState = BoardState.BREAKTHROUGH;
 	}
 
 	private void Update ( ) {
@@ -274,12 +274,12 @@ public class Board : MonoBehaviour {
 
 				// If the mino index now has a size of 0, the entire mino has been destroyed
 				if (minos[block.MinoIndex].Count == 0) {
-					gameManager.AddBoardPoints(PointsType.DESTROYED_MINO);
+					gameManager.BoardPoints = gameManager.PointsPerDestroyedMino;
 				}
 			}
 
 			// Destroy the block game object
-			gameManager.AddBoardPoints(dropped ? PointsType.DROPPED_BLOCK : PointsType.DESTROYED_BLOCK);
+			gameManager.BoardPoints += (dropped ? gameManager.PointsPerDroppedBlock : gameManager.PointsPerDestroyedBlock);
 			Destroy(block.gameObject);
 
 			return true;
@@ -537,8 +537,13 @@ public class Board : MonoBehaviour {
 
 	private IEnumerator Breakthrough ( ) {
 		yield return StartCoroutine(ClearBoard(0f));
+
 		HazardBoardArea.ResetHeight( );
-		hazardBar.Progress = 0f;
+		hazardBar.ResetProgress( );
+
+		gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentCleared / 100f);
+		gameManager.BoardPoints = 0;
+
 		yield return StartCoroutine(GenerateWall( ));
 	}
 	#endregion

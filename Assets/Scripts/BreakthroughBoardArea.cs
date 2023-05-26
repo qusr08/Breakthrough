@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BreakthroughBoardArea : BoardArea {
 	public override void OnDestroyActiveMino ( ) {
+		gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
 		board.BoardState = BoardState.BREAKTHROUGH;
 	}
 

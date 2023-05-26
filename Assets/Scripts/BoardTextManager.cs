@@ -8,10 +8,12 @@ public class BoardTextManager : MonoBehaviour {
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Board board;
 	[Space]
+	[SerializeField] public BoardText TotalPointsBoardText;
+	[SerializeField] public BoardText BoardPointsBoardText;
+	[SerializeField] public BoardText PercentageClearBoardText;
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
-	[SerializeField] private BoardText totalPointsBoardText;
-	[SerializeField] private BoardText boardPointsBoardText;
-	[SerializeField] private BoardText percentageClearBoardText;
+	[SerializeField] private Transform backgroundTransform;
+	[SerializeField] private SpriteRenderer backgroundSpriteRenderer;
 	[Header("Properties - Board Text Manager")]
 	[SerializeField, Range(0f, 1f)] private float textSpacing;
 
@@ -29,16 +31,21 @@ public class BoardTextManager : MonoBehaviour {
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
 
-		// Set the position of the breakthrough tracker
-		transform.localPosition = new Vector3(
-			(board.Width / 2) + board.BorderThickness + board.BoardPadding + (totalPointsBoardText.Width / 2f),
-			(board.Height / 2)
-		);
+		// Set the position of the background panel
+		float width = TotalPointsBoardText.Width + (board.BorderThickness * 2);
+		float height = (TotalPointsBoardText.Height * 3) + (textSpacing * 2) + (board.BorderThickness * 2);
 
-		// TO BE CONTINUED
+		transform.localPosition = new Vector3((board.Width / 2f) + board.BorderThickness + board.BoardPadding, board.Height / 2);
+		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
+		backgroundSpriteRenderer.size = new Vector2(width, height);
+
+		// Set the position of the text objects
+		TotalPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness);
+		BoardPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness - TotalPointsBoardText.Height - textSpacing);
+		PercentageClearBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness - (TotalPointsBoardText.Height * 2f) - (textSpacing * 2f));
 
 		// Set glow size
-		glowSpriteRenderer.size = new Vector2(totalPointsBoardText.Width, (3 * totalPointsBoardText.Height) + (2 * textSpacing)) + (Vector2.one * (board.GlowThickness * 2));
+		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
 	}
 
 	private void Awake ( ) {
