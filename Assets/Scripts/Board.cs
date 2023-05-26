@@ -20,6 +20,7 @@ public class Board : MonoBehaviour {
 	[Space]
 	[SerializeField] private BoardArea breakthroughBoardArea;
 	[SerializeField] private BoardArea hazardBoardArea;
+	[SerializeField] private HazardBar hazardBar;
 	[Space]
 	[SerializeField] private List<GameObject> minoPrefabs;
 	[SerializeField] private GameObject blockGroupPrefab;
@@ -33,19 +34,17 @@ public class Board : MonoBehaviour {
 	[SerializeField] private float _borderThickness;
 	[SerializeField] private float _glowThickness;
 
-	private List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
+	private readonly List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
 	private float boomBlockFrameTimer;
 
-	private List<List<Block>> minos = new List<List<Block>>( );
+	private readonly List<List<Block>> minos = new List<List<Block>>( );
 	private Vector3 minoSpawnPosition;
 
 	private List<BlockGroup> blockGroups = new List<BlockGroup>( );
 	private int blockGroupCount;
 
-	private Block[ , ] blockArray;
-
-	private List<Block> blocksToUpdate = new List<Block>( );
-	private List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
+	private readonly List<Block> blocksToUpdate = new List<Block>( );
+	private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
 	private bool needToUpdate = false;
 
 	#region Properties
@@ -84,6 +83,8 @@ public class Board : MonoBehaviour {
 					StartCoroutine(GenerateWall( ));
 					break;
 				case BoardState.BREAKTHROUGH:
+					gameManager.AddBoardPoints(PointsType.BREAKTHROUGH);
+					StartCoroutine(Breakthrough( ));
 					break;
 				case BoardState.GAMEOVER:
 					break;
@@ -94,9 +95,9 @@ public class Board : MonoBehaviour {
 
 	#region Unity
 #if UNITY_EDITOR
-	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-	protected void _OnValidate ( ) {
+	private void _OnValidate ( ) {
 #if UNITY_EDITOR
 		EditorApplication.delayCall -= _OnValidate;
 		if (this == null) {
@@ -124,7 +125,7 @@ public class Board : MonoBehaviour {
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
 	}
 
-	protected void Awake ( ) {
+	private void Awake ( ) {
 #if UNITY_EDITOR
 		OnValidate( );
 #else
@@ -198,12 +199,7 @@ public class Board : MonoBehaviour {
 	public Block GetBlockAt (Vector2Int position) {
 		RaycastHit2D hit = Physics2D.Raycast((Vector3Int) position + Vector3.back, Vector3.forward);
 		if (hit) {
-			Block block = hit.transform.GetComponent<Block>( );
-
-			// If the block is part of a player controlled block group, then it is not part of the board
-			if (block.BlockGroup != null && block.BlockGroup.GetComponent<PlayerControlledBlockGroup>( ) == null) {
-				return block;
-			}
+			return hit.transform.GetComponent<Block>( );
 		}
 
 		return null;
@@ -222,7 +218,10 @@ public class Board : MonoBehaviour {
 		int blockCount = 0;
 		for (int i = x; i < x + width; i++) {
 			for (int j = y; j > y - height; j--) {
-				if (!GetBlockAt(new Vector2Int(i, j))) {
+				Block block = GetBlockAt(new Vector2Int(i, j));
+
+				// If the block is null or it is part of a player controlled block group, then the space is considered "empty"
+				if (block == null || (block.BlockGroup != null && block.BlockGroup.IsPlayerControlled)) {
 					blockCount++;
 				}
 			}
@@ -237,18 +236,18 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="block">The block to damage</param>
 	/// <param name="destroy">Whether or not to ignore the health of the block and completely destroy it</param>
+	/// <param name="dropped">Whether or not the block has been dropped below the bottom of the board (and to award different points to the player)</param>
 	/// <returns>true if the block was completely destroyed, false otherwise</returns>
-	public bool DamageBlock (Block block, bool destroy = false) {
-		return DamageBlockAt(block.Position, destroy);
-	}
+	public bool DamageBlock (Block block, bool destroy = false, bool dropped = false) => DamageBlockAt(block.Position, destroy, dropped);
 
 	/// <summary>
 	/// Damage the block at the specified position
 	/// </summary>
 	/// <param name="position">The position of the block to damage</param>
 	/// <param name="destroy">Whether or not to ignore the health of the block and completely destroy it</param>
+	/// <param name="dropped">Whether or not the block has been dropped below the bottom of the board (and to award different points to the player)</param>
 	/// <returns>true if the block at the specified position was completely destroyed, false otherwise</returns>
-	public bool DamageBlockAt (Vector2Int position, bool destroy = false) {
+	public bool DamageBlockAt (Vector2Int position, bool destroy = false, bool dropped = false) {
 		// If there is not a block at the specified position, then no block can be destroyed
 		if (!IsBlockAt(position, offBoardValue: false)) {
 			return false;
@@ -280,7 +279,7 @@ public class Board : MonoBehaviour {
 			}
 
 			// Destroy the block game object
-			gameManager.AddBoardPoints(PointsType.DESTROYED_BLOCK);
+			gameManager.AddBoardPoints(dropped ? PointsType.DROPPED_BLOCK : PointsType.DESTROYED_BLOCK);
 			Destroy(block.gameObject);
 
 			return true;
@@ -471,9 +470,9 @@ public class Board : MonoBehaviour {
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid
 		// float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, gameManager.WallHeight, gameManager.WallHealthRange.x, gameManager.WallHealthRange.y);
-		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, 5, 0, 3);
+		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, 3, 0, 3);
 		// for (int j = 0; j < gameManager.WallHeight; j++) {
-		for (int j = 0; j < 5; j++) {
+		for (int j = 0; j < 3; j++) {
 			for (int i = 0; i < Width; i++) {
 				// Round the random noise grid value to an integer
 				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
@@ -504,6 +503,43 @@ public class Board : MonoBehaviour {
 		}
 
 		BoardState = BoardState.MERGING_BLOCKGROUPS;
+	}
+
+	private IEnumerator ClearBoard (float speed) {
+		// This sequence will destroy each row of the board one by one
+		// Only keep looping if there is a block in the row
+		bool hasBlockInRow = true;
+		int y = BreakthroughBoardArea.Height;
+
+		while (hasBlockInRow) {
+			hasBlockInRow = false;
+
+			// Loop through the entire row at a certain y value
+			for (int x = 0; x < Width; x++) {
+				// If there is a block at the position, then remove it
+				if (DamageBlockAt(new Vector2Int(x, y), true)) {
+					hasBlockInRow = true;
+				}
+			}
+
+			y++;
+
+			// Wait a little bit before destroying the next row
+			yield return new WaitForSeconds(speed);
+		}
+
+		// Clear and reset variables
+		blockGroups.Clear( );
+		blockGroupCount = 0;
+		blockGroupsToUpdate.Clear( );
+		blocksToUpdate.Clear( );
+	}
+
+	private IEnumerator Breakthrough ( ) {
+		yield return StartCoroutine(ClearBoard(0f));
+		HazardBoardArea.ResetHeight( );
+		hazardBar.Progress = 0f;
+		yield return StartCoroutine(GenerateWall( ));
 	}
 	#endregion
 }

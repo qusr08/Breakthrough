@@ -51,9 +51,7 @@ public abstract class BoardArea : MonoBehaviour {
 		areaSpriteRenderer.sprite = (IsAreaAbove ? fillCircleTop : fillCircleBottom);
 
 		// Update the height
-		Height = defaultHeight;
-		fromHeight = defaultHeight;
-		Recalculate( );
+		ResetHeight( );
 	}
 
 	protected void Awake ( ) {
@@ -76,6 +74,12 @@ public abstract class BoardArea : MonoBehaviour {
 	public abstract void OnDestroyActiveMino ( );
 	public abstract void OnUpdateBlockGroups ( );
 	public abstract void OnHeightChange ( );
+
+	public void ResetHeight ( ) {
+		Height = defaultHeight;
+		fromHeight = defaultHeight;
+		Recalculate( );
+	}
 
 	private void Recalculate ( ) {
 		// Set the position of the board area

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class HazardBar : MonoBehaviour {
-	[Header("Components")]
+	[Header("Components - Hazard Bar")]
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Board board;
 	[Space]
@@ -13,9 +13,8 @@ public class HazardBar : MonoBehaviour {
 	[SerializeField] private SpriteRenderer backgroundSpriteRenderer;
 	[SerializeField] private SpriteRenderer fillSpriteRenderer;
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
-	[Header("Properties")]
+	[Header("Properties - Hazard Bar")]
 	[SerializeField, Range(0f, 1f)] private float _progress;
-	[SerializeField, Range(0f, 1f)] private float thickness;
 
 	private float toProgress;
 	private float toProgressVelocity;
@@ -49,7 +48,7 @@ public class HazardBar : MonoBehaviour {
 
 		// Set background position
 		transform.localPosition = new Vector3(-(board.Width / 2) - board.BorderThickness - board.BoardPadding, 0f);
-		backgroundTransform.localScale = new Vector3(thickness, thickness, 1);
+		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
 		backgroundSpriteRenderer.size = new Vector2(1, board.Height * (4f / 3f));
 
 		// Set glow size

@@ -102,7 +102,6 @@ public static class Utils {
 		return new Vector2Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
 	}
 
-
 	/// <summary>
 	/// Check to see if a value is even
 	/// </summary>

@@ -33,6 +33,7 @@ public class BlockGroup : MonoBehaviour {
     public bool CanFall { get => _canFall; set => _canFall = value; }
     public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
     public int Count => transform.childCount;
+    public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
     #endregion
 
     #region Unity 
@@ -149,8 +150,7 @@ public class BlockGroup : MonoBehaviour {
             // If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
             // This block can just be destroyed in that case
             if (toBlockPosition.y < 0) {
-				gameManager.AddBoardPoints(PointsType.DROPPED_BLOCK);
-				board.DamageBlock(block, destroy: true);
+				board.DamageBlock(block, destroy: true, dropped: true);
             } else {
                 return false;
             }
@@ -203,6 +203,7 @@ public class BlockGroup : MonoBehaviour {
         if (blockGroup1.GetType( ) == typeof(PlayerControlledBlockGroup)) {
             return blockGroup1.MergeToBlockGroup(blockGroup2);
         }
+
         // Merge the smaller block group into the larger block group to improve performance
         if (blockGroup1.Count >= blockGroup2.Count) {
             return blockGroup2.MergeToBlockGroup(blockGroup1);
