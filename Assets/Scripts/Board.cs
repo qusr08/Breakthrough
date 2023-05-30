@@ -402,6 +402,9 @@ public class Board : MonoBehaviour {
 		} else if (needToUpdate) {
 			BoardState = BoardState.UPDATING_BLOCKGROUPS;
 		} else {
+			BreakthroughBoardArea.OnMergeBlockGroups( );
+			HazardBoardArea.OnMergeBlockGroups( );
+
 			BoardState = BoardState.PLACING_MINO;
 		}
 	}
@@ -443,6 +446,12 @@ public class Board : MonoBehaviour {
 			// If the current block group has a count of 0, then destroy it
 			// This can happen as leftovers from merging the block groups or an entire block group can be destroyed by boom blocks
 			if (blockGroups[i].Count == 0) {
+				// If the player controlled mino has been destroyed, then update the board areas
+				if (blockGroups[i] is PlayerControlledBlockGroup) {
+					BreakthroughBoardArea.OnDestroyActiveMino( );
+					HazardBoardArea.OnDestroyActiveMino( );
+				}
+
 				Destroy(blockGroups[i].gameObject);
 				blockGroups.RemoveAt(i);
 
@@ -459,9 +468,6 @@ public class Board : MonoBehaviour {
 
 		// Once all of the block groups cannot move anymore, spawn another mino for the player
 		if (!blockGroupsCanMove) {
-			BreakthroughBoardArea.OnUpdateBlockGroups( );
-			HazardBoardArea.OnUpdateBlockGroups( );
-
 			BoardState = BoardState.MERGING_BLOCKGROUPS;
 		}
 	}
@@ -478,7 +484,7 @@ public class Board : MonoBehaviour {
 				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
 
 				// Randomly increase the health of the block
-				if (Random.Range(0f, 1f) < 0.5f) {
+				if (Random.Range(0f, 1f) < 0.1f) {
 					randomValue++;
 				}
 

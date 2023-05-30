@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody2D: {fileID: 6681043757095424060}
-  maxVelocity: 15
-  minVelocity: 5
-  maxAngularVelocity: 100
-  minAngularVelocity: 45
+  maxVelocity: 20
+  minVelocity: 12
+  maxAngularVelocity: 180
+  minAngularVelocity: 90

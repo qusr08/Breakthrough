@@ -10,7 +10,7 @@ public class BreakthroughBoardArea : BoardArea {
 
 	public override void OnHeightChange ( ) { }
 
-	public override void OnUpdateBlockGroups ( ) {
+	public override void OnMergeBlockGroups ( ) {
 		// Clear all blocks inside the breakthrough board area
 		for (int y = 0; y < Height; y++) {
 			for (int x = 0; x < board.Width; x++) {

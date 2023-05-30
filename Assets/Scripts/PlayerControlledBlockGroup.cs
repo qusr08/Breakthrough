@@ -64,15 +64,6 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			return;
 		}
 
-		// If the player controlled mino has been destroyed, then 
-		if (Count == 0) {
-			board.BreakthroughBoardArea.OnDestroyActiveMino( );
-			board.HazardBoardArea.OnDestroyActiveMino( );
-
-			Destroy(gameObject);
-			return;
-		}
-
 		// If the mino has landed, then do not update any more movement
 		if (HasLanded) {
 			return;

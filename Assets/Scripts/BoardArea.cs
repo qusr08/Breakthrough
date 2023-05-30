@@ -15,11 +15,11 @@ public abstract class BoardArea : MonoBehaviour {
 	[SerializeField] protected Sprite fillCircleBottom;
 	[SerializeField] protected Sprite fillCircleTop;
 	[Header("Properties - Board Area")]
-	[SerializeField, Min(0)] private int defaultHeight;
+	[SerializeField, Min(0)] protected int defaultHeight;
 	[SerializeField] protected Color lineColor;
 	[SerializeField] protected Color areaColor;
 	[SerializeField, Range(0, 0.5f)] protected float lineThickness;
-	[SerializeField] private bool _isAreaAbove;
+	[SerializeField] protected bool _isAreaAbove;
 
 	private int _height;
 	private float fromHeight;
@@ -32,9 +32,9 @@ public abstract class BoardArea : MonoBehaviour {
 
 	#region Unity
 #if UNITY_EDITOR
-	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-	protected void _OnValidate ( ) {
+	private void _OnValidate ( ) {
 #if UNITY_EDITOR
 		EditorApplication.delayCall -= _OnValidate;
 		if (this == null) {
@@ -54,7 +54,7 @@ public abstract class BoardArea : MonoBehaviour {
 		ResetHeight( );
 	}
 
-	protected void Awake ( ) {
+	private void Awake ( ) {
 #if UNITY_EDITOR
 		OnValidate( );
 #else
@@ -62,7 +62,7 @@ public abstract class BoardArea : MonoBehaviour {
 #endif
 	}
 
-	protected void Update ( ) {
+	private void Update ( ) {
 		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BlockGroupAnimationSpeed);
 
 		if (fromHeight != Height) {
@@ -72,7 +72,7 @@ public abstract class BoardArea : MonoBehaviour {
 	#endregion
 
 	public abstract void OnDestroyActiveMino ( );
-	public abstract void OnUpdateBlockGroups ( );
+	public abstract void OnMergeBlockGroups ( );
 	public abstract void OnHeightChange ( );
 
 	public void ResetHeight ( ) {
@@ -83,14 +83,14 @@ public abstract class BoardArea : MonoBehaviour {
 
 	private void Recalculate ( ) {
 		// Set the position of the board area
-		transform.position = new Vector3(-0.5f + (board.Width / 2.0f), -0.5f + fromHeight, 0);
+		transform.position = new Vector3(-0.5f + (board.Width / 2.0f), -0.5f + (IsAreaAbove ? board.Height - fromHeight : fromHeight), 0);
 
 		// Set the position and scale of the board area line
 		lineTransform.position = transform.position;
 		lineTransform.localScale = new Vector3(board.Width, lineThickness, 1);
 
 		// Set the position and size of the board area indicator
-		areaTransform.position = transform.position + Vector3.up * (IsAreaAbove ? (board.Height - fromHeight) / 2.0f : -fromHeight / 2.0f);
-		areaSpriteRenderer.size = new Vector2(board.Width, IsAreaAbove ? board.Height - fromHeight : fromHeight);
+		areaTransform.position = transform.position + Vector3.up * (fromHeight / (IsAreaAbove ? 2.0f : -2.0f));
+		areaSpriteRenderer.size = new Vector2(board.Width, fromHeight);
 	}
 }

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6677756551578485439}
   - component: {fileID: 6677756551578485432}
   m_Layer: 0
-  m_Name: Boom Block Debris Particle System
+  m_Name: Boom Block Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -8,12 +8,15 @@ public class BoardTextManager : MonoBehaviour {
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Board board;
 	[Space]
+	[SerializeField] public BoardText GameLevelBoardText;
 	[SerializeField] public BoardText TotalPointsBoardText;
 	[SerializeField] public BoardText BoardPointsBoardText;
 	[SerializeField] public BoardText PercentageClearBoardText;
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
 	[SerializeField] private Transform backgroundTransform;
 	[SerializeField] private SpriteRenderer backgroundSpriteRenderer;
+	[Space]
+	[SerializeField] private BoardText versionBoardText;
 	[Header("Properties - Board Text Manager")]
 	[SerializeField, Range(0f, 1f)] private float textSpacing;
 
@@ -33,19 +36,23 @@ public class BoardTextManager : MonoBehaviour {
 
 		// Set the position of the background panel
 		float width = TotalPointsBoardText.Width + (board.BorderThickness * 2);
-		float height = (TotalPointsBoardText.Height * 3) + (textSpacing * 2) + (board.BorderThickness * 2);
+		float height = (TotalPointsBoardText.Height + BoardPointsBoardText.Height + PercentageClearBoardText.Height + GameLevelBoardText.Height) + (textSpacing * 3) + (board.BorderThickness * 2);
 
 		transform.localPosition = new Vector3((board.Width / 2f) + board.BorderThickness + board.BoardPadding, board.Height / 2);
 		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
 		backgroundSpriteRenderer.size = new Vector2(width, height);
 
 		// Set the position of the text objects
-		TotalPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness);
-		BoardPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness - TotalPointsBoardText.Height - textSpacing);
-		PercentageClearBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness - (TotalPointsBoardText.Height * 2f) - (textSpacing * 2f));
+		GameLevelBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness);
+		TotalPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (TotalPointsBoardText.Height + textSpacing) * -1f);
+		BoardPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (BoardPointsBoardText.Height + textSpacing) * -2f);
+		PercentageClearBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (PercentageClearBoardText.Height + textSpacing) * -3f);
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
+
+		// Set misc. text positions
+		versionBoardText.transform.localPosition = new Vector3(board.BorderThickness, -height - board.BoardPadding);
 	}
 
 	private void Awake ( ) {

@@ -82,7 +82,7 @@ public class HazardBar : MonoBehaviour {
 
 		// If the progress of the bar reaches the top, then drop the hazard area down
 		if (Progress == 1f) {
-			board.HazardBoardArea.Height--;
+			board.HazardBoardArea.Height++;
 			board.HazardBoardArea.OnHeightChange( );
 
 			toProgress = 0f;

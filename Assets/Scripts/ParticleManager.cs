@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ParticleManager : MonoBehaviour {
-	[Header("Components")]
+	[Header("Components - Particle Manager")]
 	[SerializeField] private GameObject blockDebrisPrefab;
 	[SerializeField] private GameObject blockParticlePrefab;
 	[SerializeField] private GameObject boomBlockParticlePrefab;
@@ -21,9 +21,9 @@ public class ParticleManager : MonoBehaviour {
 	}
 
 	public void SpawnBoomBlockParticle (Vector2Int position, Color color) {
-		ParticleSystem boomBlockDebris = Instantiate(boomBlockParticlePrefab, (Vector3Int) position, Quaternion.identity).GetComponent<ParticleSystem>( );
-		ParticleSystem.MainModule boomBlockDebrisMainModule = boomBlockDebris.main;
-		boomBlockDebrisMainModule.startColor = color;
-		boomBlockDebris.Play( );
+		ParticleSystem boomBlockParticle = Instantiate(boomBlockParticlePrefab, (Vector3Int) position, Quaternion.identity).GetComponent<ParticleSystem>( );
+		ParticleSystem.MainModule boomBlockParticleMainModule = boomBlockParticle.main;
+		boomBlockParticleMainModule.startColor = color;
+		boomBlockParticle.Play( );
 	}
 }

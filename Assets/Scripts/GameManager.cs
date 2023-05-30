@@ -6,11 +6,13 @@ public enum GameState {
 	GAME, PAUSED, GAMEOVER
 }
 
-public enum PointsType {
-	DESTROYED_BLOCK, DROPPED_BLOCK, BREAKTHROUGH, DESTROYED_MINO, FAST_DROP
-}
-
 public class GameManager : MonoBehaviour {
+	public static int BOARD_WIDTH = 16;
+	public static int BOARD_HEIGHT = 28;
+	public static float HAZARD_TIME = 25f;
+	public static float MINO_SPEED = 1f;
+	public static float BOOM_BLOCK_INITIAL_CHANCE = 0.4f;
+
 	[Header("Components")]
 	[SerializeField] private ParticleManager _particleManager;
 	[SerializeField] private BoardTextManager boardTextManager;
@@ -20,6 +22,10 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0)] private int _pointsPerBreakthrough = 600;
 	[SerializeField, Min(0)] private int _pointsPerDestroyedMino = 60;
 	[SerializeField, Min(0)] private int _pointsPerFastDrop = 2;
+	[Header("Game Settings")]
+	[SerializeField] private Vector2 wallHealthRange;
+	[SerializeField] private int wallHeight;
+	[SerializeField] private float hazardTime;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
@@ -29,24 +35,16 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameState _gameState;
 	[Space]
 	[SerializeField, Min(0f)] private float _fallTime;
-	[SerializeField, Min(0f)] private float _fallTimeAccelerated;
 	[SerializeField, Min(0f)] private float _moveTime;
-	[SerializeField, Min(0f)] private float _moveTimeAccelerated;
 	[SerializeField, Min(0f)] private float _rotateTime;
-	[SerializeField, Min(0f)] private float _rotateTimeAccelerated;
 	[SerializeField, Min(0f)] private float _placeTime;
 	[SerializeField, Min(0f)] private float _blockScale;
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boomBlockAnimationSpeed;
 	[SerializeField, Min(0f)] private float _blockGroupAnimationSpeed;
 	[SerializeField, Min(1)] private int boomBlockGuarantee;
-	[SerializeField, Min(0f)] private float boomBlockInitialChance;
 
 	private int _boomBlockDrought;
-
-	private Vector2 _wallHealthRange;
-	private int _wallHeight;
-	private float _hazardTime;
 
 	#region Properties
 	public int BoardPoints { get => _boardPoints; set => boardTextManager.BoardPointsBoardText.Value = _boardPoints = value; }
@@ -80,21 +78,22 @@ public class GameManager : MonoBehaviour {
 	public int PointsPerDestroyedMino => _pointsPerDestroyedMino;
 	public int PointsPerFastDrop => _pointsPerFastDrop;
 
+	public Vector2 WallHealthRange { get => wallHealthRange; private set => wallHealthRange = value; }
+	public int WallHeight { get => wallHeight; private set => wallHeight = value; }
+	public float HazardTime { get => hazardTime; set => hazardTime = value; }
+
 	public float FallTime { get => _fallTime; private set => _fallTime = value; }
-	public float FallTimeAccelerated => _fallTimeAccelerated;
+	public float FallTimeAccelerated => FallTime / 20f;
 	public float MoveTime => _moveTime;
-	public float MoveTimeAccelerated => _moveTimeAccelerated;
+	public float MoveTimeAccelerated => MoveTime / 2f;
 	public float RotateTime => _rotateTime;
-	public float RotateTimeAccelerated => _rotateTimeAccelerated;
+	public float RotateTimeAccelerated => RotateTime / 2f;
 	public int RotateDirection => _rotateDirection;
 	public float PlaceTime => _placeTime;
 	public float BlockScale => _blockScale;
 	public float BoomBlockAnimationSpeed => _boomBlockAnimationSpeed;
 	public float BlockGroupAnimationSpeed => _blockGroupAnimationSpeed;
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
-	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockInitialChance) + boomBlockInitialChance;
-	public Vector2 WallHealthRange { get => _wallHealthRange; private set => _wallHealthRange = value; }
-	public int WallHeight { get => _wallHeight; private set => _wallHeight = value; }
-	public float HazardTime { get => _hazardTime; set => _hazardTime = value; }
+	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - BOOM_BLOCK_INITIAL_CHANCE) + BOOM_BLOCK_INITIAL_CHANCE;
 	#endregion
 }

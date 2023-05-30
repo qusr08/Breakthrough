@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class HazardBoardArea : BoardArea {
@@ -9,7 +10,7 @@ public class HazardBoardArea : BoardArea {
 		CheckForGameOver( );
 	}
 
-	public override void OnUpdateBlockGroups ( ) {
+	public override void OnMergeBlockGroups ( ) {
 		CheckForGameOver( );
 	}
 
@@ -20,7 +21,7 @@ public class HazardBoardArea : BoardArea {
 			return;
 		}
 
-		if (board.GetPercentageClear(0, Mathf.RoundToInt(board.HazardBoardArea.Height), board.Width, 1) < 1f) {
+		if (board.GetPercentageClear(0, board.Height - Height, board.Width, 1) < 1f) {
 			gameManager.GameState = GameState.GAMEOVER;
 		}
 	}
