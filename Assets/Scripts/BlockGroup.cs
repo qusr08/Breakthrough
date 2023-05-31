@@ -7,107 +7,110 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class BlockGroup : MonoBehaviour {
-    [Header("Components - Block Group")]
-    [SerializeField] protected Board board;
-    [SerializeField] protected GameManager gameManager;
-    [Header("Properties - Block Group")]
-    [SerializeField] private int _id = -1;
-    [SerializeField] private bool _isModified = false;
-    [Space]
-    [SerializeField] private bool _canFall;
-    [SerializeField] private bool _canFallBelow;
+	[Header("Components - Block Group")]
+	[SerializeField] protected Board board;
+	[SerializeField] protected GameManager gameManager;
+	[Header("Properties - Block Group")]
+	[SerializeField] private int _id = -1;
+	[SerializeField] private bool _isModified = false;
+	[Space]
+	[SerializeField] private bool _canFall;
+	[SerializeField] private bool _canFallBelow;
+	[SerializeField] private int _lowestBlockHeight;
 
-    protected Vector3 toPosition;
-    private Vector3 toPositionVelocity;
-    protected Vector3 toRotation;
-    private Vector3 toRotationVelocity;
-    protected bool isDoneTweening;
+	protected Vector3 toPosition;
+	private Vector3 toPositionVelocity;
+	protected Vector3 toRotation;
+	private Vector3 toRotationVelocity;
+	protected bool isDoneTweening;
 
-    protected float previousFallTime;
-    protected float previousMoveTime;
-    protected float previousRotateTime;
+	protected float previousFallTime;
+	protected float previousMoveTime;
+	protected float previousRotateTime;
+
+	protected Queue<Vector2Int> path;
 
 	#region Properties
 	public int ID { get => _id; set => _id = value; }
-    public bool IsModified { get => _isModified; set => _isModified = value; }
-    public bool CanFall { get => _canFall; set => _canFall = value; }
-    public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
-    public int Count => transform.childCount;
-    public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
-    #endregion
+	public bool IsModified { get => _isModified; set => _isModified = value; }
+	public bool CanFall { get => _canFall; set => _canFall = value; }
+	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
+	public int Count => transform.childCount;
+	public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
+	public int LowestBlockHeight { get => _lowestBlockHeight; set => _lowestBlockHeight = value; }
+	#endregion
 
-    #region Unity 
-    protected virtual void OnValidate ( ) {
-        board = FindObjectOfType<Board>( );
-        gameManager = FindObjectOfType<GameManager>( );
-    }
-
-    protected virtual void Awake ( ) {
-        OnValidate( );
-
-        toPosition = transform.position;
-        toRotation = transform.eulerAngles;
-        isDoneTweening = true;
-
-        previousFallTime = Time.time;
-		previousMoveTime = Time.time;
-		previousRotateTime = Time.time;
+	#region Unity 
+	protected virtual void OnValidate ( ) {
+		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
 	}
 
-    protected virtual void Start ( ) {
+	protected virtual void Awake ( ) {
+		OnValidate( );
 
-    }
+		toPosition = transform.position;
+		toRotation = transform.eulerAngles;
+		isDoneTweening = true;
 
-    private void Update ( ) {
-        UpdateTransform( );
+		previousFallTime = Time.time;
+		previousMoveTime = Time.time;
+		previousRotateTime = Time.time;
 
-        if (board.BoardState != BoardState.UPDATING_BLOCKGROUPS) {
-            return;
-        }
+		path = new Queue<Vector2Int>( );
+	}
 
-        if (Time.time - previousFallTime > gameManager.FallTimeAccelerated) {
-            CanFall = TryMove(Vector2Int.down);
+	protected virtual void Start ( ) {
 
-            if (CanFall) {
-                previousFallTime = Time.time;
-            }
-        }
-    }
-    #endregion
+	}
 
-    protected virtual void UpdateTransform ( ) {
-        transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BlockGroupAnimationSpeed);
-        transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BlockGroupAnimationSpeed);
-        isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
-    }
+	protected void Update ( ) {
+		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BlockGroupAnimationSpeed);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BlockGroupAnimationSpeed);
+		isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
+	}
 
-    /// <summary>
-    /// Try to move this block group in the input direction
-    /// </summary>
-    /// <param name="deltaPosition">The direction to move the block group in</param>
-    /// <returns>Returns true if the move was successful, false otherwise</returns>
-    protected bool TryMove (Vector2Int deltaPosition) {
-        // Check to see if every block can move in the direction specified
-        // If one block cannot, the entire block group cannot
-        for (int i = Count - 1; i >= 0; i--) {
-            if (!IsValidBlockPosition(GetBlock(i), deltaPosition, 0f)) {
-                return false;
-            }
-        }
+	public virtual void UpdateBlockGroup ( ) {
+		if (board.BoardState != BoardState.UPDATING_BLOCKGROUPS) {
+			return;
+		}
 
-        // Add the new delta position to the position this block group needs to move towards
-        toPosition += (Vector3Int) deltaPosition;
+		if (Time.time - previousFallTime > gameManager.FallTimeAccelerated) {
+			CanFall = TryMove(Vector2Int.down);
 
-        // If the block group has fallen at least one block above the breakthrough area, then it can fall into the breakthrough area
-        // if (!CanFallBelow && toPosition.y >= board.BreakthroughBoardArea.Height) {
-        if (!CanFallBelow && toPosition.y >= 2) {
-            CanFallBelow = true;
-        }
+			if (CanFall) {
+				previousFallTime = Time.time;
+			}
+		}
+	}
+	#endregion
 
-        return true;
-    }
+	/// <summary>
+	/// Try to move this block group in the input direction
+	/// </summary>
+	/// <param name="deltaPosition">The direction to move the block group in</param>
+	/// <returns>Returns true if the move was successful, false otherwise</returns>
+	protected bool TryMove (Vector2Int deltaPosition) {
+		// Check to see if every block can move in the direction specified
+		// If one block cannot, the entire block group cannot
+		for (int i = Count - 1; i >= 0; i--) {
+			if (!IsValidBlockPosition(GetBlock(i), deltaPosition, 0f)) {
+				return false;
+			}
+		}
 
-    protected bool TryRotate (float deltaRotation) {
+		// Add the new delta position to the position this block group needs to move towards
+		toPosition += (Vector3Int) deltaPosition;
+
+		// If the block group has fallen at least one block above the breakthrough area, then it can fall into the breakthrough area
+		if (!CanFallBelow && toPosition.y >= board.BreakthroughBoardArea.Height) {
+			CanFallBelow = true;
+		}
+
+		return true;
+	}
+
+	protected bool TryRotate (float deltaRotation) {
 		// Check to see if every block can move in the direction specified
 		// If one block cannot, the entire block group cannot
 		for (int i = Count - 1; i >= 0; i--) {
@@ -116,7 +119,7 @@ public class BlockGroup : MonoBehaviour {
 			}
 		}
 
-        // Add the new delta rotation to the rotation this block group needs to rotate towards
+		// Add the new delta rotation to the rotation this block group needs to rotate towards
 		toRotation += Vector3.forward * deltaRotation;
 
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
@@ -127,36 +130,48 @@ public class BlockGroup : MonoBehaviour {
 		return true;
 	}
 
-    /// <summary>
-    /// Check to see if the input position is valid for the input block to move to
-    /// </summary>
-    /// <param name="block">The block to be moved</param>
-    /// <param name="newPosition">The position to move the block to</param>
-    /// <returns>Returns true if the block can validly be moved to the input position, false otherwise</returns>
-    private bool IsValidBlockPosition (Block block, Vector2Int deltaPosition, float deltaRotation) {
-        // Get the current position of the block and the position that the block will move towards
-        // Doing some fancy stuff here to make sure it accounts for the position that the block group will move towards
+	/// <summary>
+	/// Check to see if the input position is valid for the input block to move to
+	/// </summary>
+	/// <param name="block">The block to be moved</param>
+	/// <param name="newPosition">The position to move the block to</param>
+	/// <returns>Returns true if the block can validly be moved to the input position, false otherwise</returns>
+	private bool IsValidBlockPosition (Block block, Vector2Int deltaPosition, float deltaRotation) {
+		// Get the current position of the block and the position that the block will move towards
+		// Doing some fancy stuff here to make sure it accounts for the position that the block group will move towards
 		Vector2Int currBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(toPosition + block.transform.localPosition, toPosition, toRotation.z));
 		Vector2Int toBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(currBlockPosition, toPosition, deltaRotation) + deltaPosition);
 
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
-		// if (!CanFallBelow && toBlockPosition.y < board.BreakthroughBoardArea.Height) {
-		if (!CanFallBelow && toBlockPosition.y < 2) {
-            return false;
-        }
+		if (!CanFallBelow && toBlockPosition.y < board.BreakthroughBoardArea.Height) {
+			return false;
+		}
 
-        // If there is a block at the position this block is trying to move towards, make sure the block group can't move down
-        if (board.IsBlockAt(toBlockPosition, blockGroupID: ID)) {
-            // If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
-            // This block can just be destroyed in that case
-            if (toBlockPosition.y < 0) {
+		// If there is a block at the position this block is trying to move towards, make sure the block group can't move down
+		if (board.IsBlockAt(toBlockPosition, blockGroupID: ID)) {
+			// If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
+			// This block can just be destroyed in that case
+			if (toBlockPosition.y < 0) {
 				board.DamageBlock(block, destroy: true, dropped: true);
-            } else {
-                return false;
-            }
-        }
+			} else {
+				return false;
+			}
+		}
 
-        return true;
+		return true;
+	}
+
+	public void RecalculatePath ( ) {
+		path.Clear( );
+
+		bool canMove = true;
+		int moveCount = 1;
+
+		while (canMove) {
+			if (canMove) {
+				// path.Enqueue(newPosition);
+			}
+		}
 	}
 
 	/// <summary>
@@ -177,57 +192,57 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	private BlockGroup MergeToBlockGroup (BlockGroup blockGroup) {
-        while (Count > 0) {
-            GetBlock(0).BlockGroup = blockGroup;
-        }
+		while (Count > 0) {
+			GetBlock(0).BlockGroup = blockGroup;
+		}
 
-        return blockGroup;
-    }
+		return blockGroup;
+	}
 
-    /// <summary>
-    /// Merge two block groups together
-    /// </summary>
-    /// <param name="blockGroup1">A block group to merge</param>
-    /// <param name="blockGroup2">A block group to merge</param>
-    /// <returns>Returns a block group that contains all the blocks from the two input block groups</returns>
-    public static BlockGroup MergeBlockGroups (BlockGroup blockGroup1, BlockGroup blockGroup2) {
-        // If the block groups are the same, then just return
-        if (blockGroup1.ID == blockGroup2.ID) {
-            return blockGroup1;
-        }
+	/// <summary>
+	/// Merge two block groups together
+	/// </summary>
+	/// <param name="blockGroup1">A block group to merge</param>
+	/// <param name="blockGroup2">A block group to merge</param>
+	/// <returns>Returns a block group that contains all the blocks from the two input block groups</returns>
+	public static BlockGroup MergeBlockGroups (BlockGroup blockGroup1, BlockGroup blockGroup2) {
+		// If the block groups are the same, then just return
+		if (blockGroup1.ID == blockGroup2.ID) {
+			return blockGroup1;
+		}
 
-        // If one of the block groups are a player controlled block group, make sure that one is always destroyed (as in all the blocks move out of it)
-        if (blockGroup2.GetType( ) == typeof(PlayerControlledBlockGroup)) {
-            return blockGroup2.MergeToBlockGroup(blockGroup1);
-        }
-        if (blockGroup1.GetType( ) == typeof(PlayerControlledBlockGroup)) {
-            return blockGroup1.MergeToBlockGroup(blockGroup2);
-        }
+		// If one of the block groups are a player controlled block group, make sure that one is always destroyed (as in all the blocks move out of it)
+		if (blockGroup2.GetType( ) == typeof(PlayerControlledBlockGroup)) {
+			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		}
+		if (blockGroup1.GetType( ) == typeof(PlayerControlledBlockGroup)) {
+			return blockGroup1.MergeToBlockGroup(blockGroup2);
+		}
 
-        // Merge the smaller block group into the larger block group to improve performance
-        if (blockGroup1.Count >= blockGroup2.Count) {
-            return blockGroup2.MergeToBlockGroup(blockGroup1);
-        } else {
-            return blockGroup1.MergeToBlockGroup(blockGroup2);
-        }
-    }
+		// Merge the smaller block group into the larger block group to improve performance
+		if (blockGroup1.Count >= blockGroup2.Count) {
+			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		} else {
+			return blockGroup1.MergeToBlockGroup(blockGroup2);
+		}
+	}
 
-    /// <summary>
-    /// Merge all block groups in the list together
-    /// </summary>
-    /// <param name="blockGroups">All the block groups that should be merged together</param>
-    /// <returns>Returns a block group that contains all the blocks from the list of block groups</returns>
-    public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
-        // This is the block group that all of the other block groups will be merged into
-        // The block group referenced by this object may change as the block groups are merged
-        BlockGroup mergedBlockGroup = blockGroups[0];
-        blockGroups.RemoveAt(0);
+	/// <summary>
+	/// Merge all block groups in the list together
+	/// </summary>
+	/// <param name="blockGroups">All the block groups that should be merged together</param>
+	/// <returns>Returns a block group that contains all the blocks from the list of block groups</returns>
+	public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
+		// This is the block group that all of the other block groups will be merged into
+		// The block group referenced by this object may change as the block groups are merged
+		BlockGroup mergedBlockGroup = blockGroups[0];
+		blockGroups.RemoveAt(0);
 
-        while (blockGroups.Count > 0) {
-            mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, blockGroups[0]);
-            blockGroups.RemoveAt(0);
-        }
+		while (blockGroups.Count > 0) {
+			mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, blockGroups[0]);
+			blockGroups.RemoveAt(0);
+		}
 
-        return mergedBlockGroup;
-    }
+		return mergedBlockGroup;
+	}
 }

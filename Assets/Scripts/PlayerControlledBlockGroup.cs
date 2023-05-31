@@ -16,12 +16,8 @@ public class PlayerControlledBlockGroup : BlockGroup {
 	private float placeTimer;
 
 	#region Properties
-	public bool HasBoomBlock {
-		get => _hasBoomBlock; private set => _hasBoomBlock = value;
-	}
-	public bool HasLanded {
-		get => _hasLanded; private set => _hasLanded = value;
-	}
+	public bool HasBoomBlock { get => _hasBoomBlock; private set => _hasBoomBlock = value; }
+	public bool HasLanded { get => _hasLanded; private set => _hasLanded = value; }
 	#endregion
 
 	#region Unity
@@ -56,11 +52,17 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		}
 	}
 
-	private void Update ( ) {
-		UpdateTransform( );
-
+	public override void UpdateBlockGroup ( ) {
 		// Only move the player controlled block group while in this specific board state
 		if (board.BoardState != BoardState.PLACING_MINO) {
+			return;
+		}
+
+		// If the player controlled mino has been destroyed, then update the board areas
+		if (Count == 0) {
+			board.BreakthroughBoardArea.OnDestroyActiveMino( );
+			board.HazardBoardArea.OnDestroyActiveMino( );
+
 			return;
 		}
 
@@ -135,5 +137,9 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 	public void OnRotate (InputValue value) {
 		rotateValue = Mathf.RoundToInt(value.Get<float>( ));
+	}
+
+	public void OnInstaDrop (InputValue value) {
+
 	}
 }

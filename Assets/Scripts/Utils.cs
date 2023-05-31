@@ -54,6 +54,7 @@ public static class Utils {
 	/// <param name="vector1">The first position vector</param>
 	/// <param name="vector2">The second position vector</param>
 	/// <returns>Whether the two position vectors are close enough to each other</returns>
+	public static bool CompareVectors (Vector2 vector1, Vector2 vector2) => CompareVectors((Vector3) vector1, (Vector3) vector2);
 	public static bool CompareVectors (Vector3 vector1, Vector3 vector2) {
 		return ((vector1 - vector2).magnitude < CLOSE_ENOUGH);
 	}

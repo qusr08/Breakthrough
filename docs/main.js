@@ -3,6 +3,7 @@ window.onload = () => {
 
     builds.forEach(element => {
         let date = element.getAttribute('date') || "Unreleased";
+        let name = element.getAttribute('name') || "";
         let version = element.getAttribute('version') || "X.X.X";
         let tags = element.getAttribute('tags') || "";
 
@@ -13,7 +14,7 @@ window.onload = () => {
         });
 
         element.innerHTML = `
-            <p><a href="./v${version}/"><strong>v${version}</strong></a> [${date}]</p>
+            <p><a href="./v${version}/"><strong>v${version}</strong></a> [${date}] <strong>${name}</strong></p>
             <div class="tag-list">${tagsHTML}</div>
         ` + element.innerHTML;
     });

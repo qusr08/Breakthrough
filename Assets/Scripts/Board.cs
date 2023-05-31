@@ -45,6 +45,7 @@ public class Board : MonoBehaviour {
 
 	private readonly List<Block> blocksToUpdate = new List<Block>( );
 	private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
+	private int blockGroupUpdateChecks = 0;
 	private bool needToUpdate = false;
 
 	#region Properties
@@ -139,6 +140,9 @@ public class Board : MonoBehaviour {
 
 	private void Update ( ) {
 		switch (BoardState) {
+			case BoardState.PLACING_MINO:
+				gameManager.ActiveMino.UpdateBlockGroup( );
+				break;
 			case BoardState.UPDATING_BOOMBLOCKS:
 				UpdateBoomBlockFrames( );
 				break;
@@ -389,11 +393,15 @@ public class Board : MonoBehaviour {
 		// Get all of the remaining block groups
 		blockGroups = GetComponentsInChildren<BlockGroup>( ).ToList( );
 
-		// Set that each block group can fall by default
-		// This will be updated eventually inside the Update() method in the block group class
-		foreach (BlockGroup blockGroup in blockGroups) {
-			blockGroup.CanFall = true;
+		// Sort all of the block groups in decending order of height
+		// This allows for the block groups that are lowest on the board to be updated first
+		for (int i = 0; i < blockGroups.Count; i++) {
+			blockGroups[i].LowestBlockHeight = Height;
+			for (int j = 0; j < blockGroups[i].Count; j++) {
+				blockGroups[i].LowestBlockHeight = Mathf.Min(blockGroups[i].GetBlock(j).Position.y, blockGroups[i].LowestBlockHeight);
+			}
 		}
+		blockGroups.Sort((a, b) => (b.LowestBlockHeight - a.LowestBlockHeight));
 
 		// If there are more boom blocks to explode, then update them
 		// If there are no more boom blocks to explode, then start to place another mino
@@ -438,7 +446,6 @@ public class Board : MonoBehaviour {
 	/// Update the block groups by checking to see if they are still falling
 	/// </summary>
 	private void UpdateBlockGroups ( ) {
-		// Wait until all block groups have finished moving
 		bool blockGroupsCanMove = false;
 
 		// Check to see if any of the block groups can fall (and are moving)
@@ -446,28 +453,31 @@ public class Board : MonoBehaviour {
 			// If the current block group has a count of 0, then destroy it
 			// This can happen as leftovers from merging the block groups or an entire block group can be destroyed by boom blocks
 			if (blockGroups[i].Count == 0) {
-				// If the player controlled mino has been destroyed, then update the board areas
-				if (blockGroups[i] is PlayerControlledBlockGroup) {
-					BreakthroughBoardArea.OnDestroyActiveMino( );
-					HazardBoardArea.OnDestroyActiveMino( );
-				}
-
 				Destroy(blockGroups[i].gameObject);
 				blockGroups.RemoveAt(i);
 
 				continue;
 			}
 
+			// Update the block group
+			blockGroups[i].UpdateBlockGroup( );
+
 			// If the block group can fall, then at least one block group on the board is still updating
 			if (blockGroups[i].CanFall) {
 				blockGroupsCanMove = true;
-
-				break;
 			}
 		}
 
-		// Once all of the block groups cannot move anymore, spawn another mino for the player
-		if (!blockGroupsCanMove) {
+		// Once all of the block groups cannot move anymore, add 1 to the checks variable
+		// If one of the block groups can move, then reset the check variable
+		blockGroupUpdateChecks += (blockGroupsCanMove ? -blockGroupUpdateChecks : 1);
+
+		Debug.Log(blockGroupUpdateChecks);
+
+		// If all of the block groups have not been able to move for two update checks, then it is safe to say that all of them have fallen all the way
+		// Due to edge cases the system needs to be set up like this. Doing this is more efficient than sorting the array of block groups based on their height every time the block groups are merged
+		if (blockGroupUpdateChecks > 1) {
+			blockGroupUpdateChecks = 0;
 			BoardState = BoardState.MERGING_BLOCKGROUPS;
 		}
 	}
@@ -550,7 +560,7 @@ public class Board : MonoBehaviour {
 		gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentCleared / 100f);
 		gameManager.BoardPoints = 0;
 
-		yield return StartCoroutine(GenerateWall( ));
+		BoardState = BoardState.GENERATE_WALL;
 	}
 	#endregion
 }

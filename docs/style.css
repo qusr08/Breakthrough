@@ -76,8 +76,13 @@ p {
     color: var(--color2);
 }
 
-.wip {
+.archived {
     background-color: #864781;
+    color: var(--color2);
+}
+
+.release {
+    background-color: #475c86;
     color: var(--color2);
 }
 
@@ -114,6 +119,6 @@ a:active {
 
 @media screen and (max-width: 1000px) {
     main {
-        margin:0px;
+        margin: 0px;
     }
 }
