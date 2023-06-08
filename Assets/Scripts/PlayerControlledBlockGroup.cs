@@ -53,11 +53,6 @@ public class PlayerControlledBlockGroup : BlockGroup {
 	}
 
 	public override void UpdateBlockGroup ( ) {
-		// Only move the player controlled block group while in this specific board state
-		if (board.BoardState != BoardState.PLACING_MINO) {
-			return;
-		}
-
 		// If the player controlled mino has been destroyed, then update the board areas
 		if (Count == 0) {
 			board.BreakthroughBoardArea.OnDestroyActiveMino( );
@@ -84,7 +79,8 @@ public class PlayerControlledBlockGroup : BlockGroup {
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
 					placeTimer = gameManager.PlaceTime;
 				}
-			} else if (isDoneTweening && placeTimer <= 0) {
+			// } else if (isDoneTweening && placeTimer <= 0) {
+			} else if (placeTimer <= 0) {
 				board.PlaceActiveMino( );
 				HasLanded = true;
 			}
@@ -113,7 +109,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			previousRotateTime = 0;
 		} else if (Time.time - previousRotateTime > gameManager.RotateTime) {
 			// If the mino was successfully rotated, then reset the place timer and rotate time
-			if (TryRotate(gameManager.RotateDirection * 90f)) {
+			if (TryRotate(gameManager.RotateDirection * 90)) {
 				// If the player holds down the button, the mino should rotate slightly faster
 				if (previousRotateTime == 0) {
 					previousRotateTime = Time.time;

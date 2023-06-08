@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,20 +17,17 @@ public class BlockGroup : MonoBehaviour {
 	[Space]
 	[SerializeField] private bool _canFall;
 	[SerializeField] private bool _canFallBelow;
-	[SerializeField] private int _lowestBlockHeight;
 
 	protected Vector3 toPosition;
 	private Vector3 toPositionVelocity;
 	protected Vector3 toRotation;
 	private Vector3 toRotationVelocity;
-	protected bool isDoneTweening;
+	// protected bool isDoneTweening;
 
 	protected float previousFallTime;
 	protected float previousMoveTime;
 	protected float previousRotateTime;
-
-	protected Queue<Vector2Int> path;
-
+	
 	#region Properties
 	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
@@ -37,7 +35,6 @@ public class BlockGroup : MonoBehaviour {
 	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
 	public int Count => transform.childCount;
 	public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
-	public int LowestBlockHeight { get => _lowestBlockHeight; set => _lowestBlockHeight = value; }
 	#endregion
 
 	#region Unity 
@@ -51,13 +48,11 @@ public class BlockGroup : MonoBehaviour {
 
 		toPosition = transform.position;
 		toRotation = transform.eulerAngles;
-		isDoneTweening = true;
+		// isDoneTweening = true;
 
 		previousFallTime = Time.time;
 		previousMoveTime = Time.time;
 		previousRotateTime = Time.time;
-
-		path = new Queue<Vector2Int>( );
 	}
 
 	protected virtual void Start ( ) {
@@ -65,16 +60,13 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	protected void Update ( ) {
-		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BlockGroupAnimationSpeed);
-		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BlockGroupAnimationSpeed);
-		isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
+		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BoardAnimationDelay);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BoardAnimationDelay);
+		// isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
 	}
+	#endregion
 
 	public virtual void UpdateBlockGroup ( ) {
-		if (board.BoardState != BoardState.UPDATING_BLOCKGROUPS) {
-			return;
-		}
-
 		if (Time.time - previousFallTime > gameManager.FallTimeAccelerated) {
 			CanFall = TryMove(Vector2Int.down);
 
@@ -83,7 +75,6 @@ public class BlockGroup : MonoBehaviour {
 			}
 		}
 	}
-	#endregion
 
 	/// <summary>
 	/// Try to move this block group in the input direction
@@ -94,7 +85,7 @@ public class BlockGroup : MonoBehaviour {
 		// Check to see if every block can move in the direction specified
 		// If one block cannot, the entire block group cannot
 		for (int i = Count - 1; i >= 0; i--) {
-			if (!IsValidBlockPosition(GetBlock(i), deltaPosition, 0f)) {
+			if (!IsValidBlockPosition(GetBlock(i), deltaPosition, 0)) {
 				return false;
 			}
 		}
@@ -110,7 +101,7 @@ public class BlockGroup : MonoBehaviour {
 		return true;
 	}
 
-	protected bool TryRotate (float deltaRotation) {
+	protected bool TryRotate (int deltaRotation) {
 		// Check to see if every block can move in the direction specified
 		// If one block cannot, the entire block group cannot
 		for (int i = Count - 1; i >= 0; i--) {
@@ -120,7 +111,7 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		// Add the new delta rotation to the rotation this block group needs to rotate towards
-		toRotation += Vector3.forward * deltaRotation;
+		toRotation += Vector3Int.forward * deltaRotation;
 
 		// Make sure to alter the direction of each of the blocks so boom blocks still explode in the right direction
 		foreach (Block block in GetComponentsInChildren<Block>( )) {
@@ -136,11 +127,13 @@ public class BlockGroup : MonoBehaviour {
 	/// <param name="block">The block to be moved</param>
 	/// <param name="newPosition">The position to move the block to</param>
 	/// <returns>Returns true if the block can validly be moved to the input position, false otherwise</returns>
-	private bool IsValidBlockPosition (Block block, Vector2Int deltaPosition, float deltaRotation) {
+	private bool IsValidBlockPosition (Block block, Vector2Int deltaPosition, int deltaRotation) {
 		// Get the current position of the block and the position that the block will move towards
 		// Doing some fancy stuff here to make sure it accounts for the position that the block group will move towards
 		Vector2Int currBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(toPosition + block.transform.localPosition, toPosition, toRotation.z));
 		Vector2Int toBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(currBlockPosition, toPosition, deltaRotation) + deltaPosition);
+
+
 
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
 		if (!CanFallBelow && toBlockPosition.y < board.BreakthroughBoardArea.Height) {
@@ -151,6 +144,7 @@ public class BlockGroup : MonoBehaviour {
 		if (board.IsBlockAt(toBlockPosition, blockGroupID: ID)) {
 			// If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
 			// This block can just be destroyed in that case
+			Debug.Log(currBlockPosition + " -> " + toBlockPosition);
 			if (toBlockPosition.y < 0) {
 				board.DamageBlock(block, destroy: true, dropped: true);
 			} else {
@@ -159,19 +153,6 @@ public class BlockGroup : MonoBehaviour {
 		}
 
 		return true;
-	}
-
-	public void RecalculatePath ( ) {
-		path.Clear( );
-
-		bool canMove = true;
-		int moveCount = 1;
-
-		while (canMove) {
-			if (canMove) {
-				// path.Enqueue(newPosition);
-			}
-		}
 	}
 
 	/// <summary>

@@ -1166,7 +1166,7 @@ MonoBehaviour:
   _placeTime: 0.75
   _blockScale: 0.95
   _rotateDirection: -1
-  _boomBlockAnimationSpeed: 0.05
+  _boardAnimationDelay: 0.05
   _blockGroupAnimationSpeed: 0.05
   boomBlockGuarantee: 6
 --- !u!4 &1065242838

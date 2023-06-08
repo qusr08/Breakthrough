@@ -78,7 +78,7 @@ public class HazardBar : MonoBehaviour {
 		// Increase the progress of the bar based on the allotted time
 		// Progress += Time.deltaTime / gameManager.HazardTime;
 		toProgress += Time.deltaTime / 10f;
-		Progress = Mathf.SmoothDamp(Progress, toProgress, ref toProgressVelocity, gameManager.BlockGroupAnimationSpeed);
+		Progress = Mathf.SmoothDamp(Progress, toProgress, ref toProgressVelocity, gameManager.BoardAnimationDelay);
 
 		// If the progress of the bar reaches the top, then drop the hazard area down
 		if (Progress == 1f) {

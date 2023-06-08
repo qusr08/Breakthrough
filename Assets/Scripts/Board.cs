@@ -45,7 +45,8 @@ public class Board : MonoBehaviour {
 
 	private readonly List<Block> blocksToUpdate = new List<Block>( );
 	private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
-	private int blockGroupUpdateChecks = 0;
+	private bool blockGroupsLocked = false;
+	private float blockGroupsLockedStartTime = 0f;
 	private bool needToUpdate = false;
 
 	#region Properties
@@ -258,7 +259,7 @@ public class Board : MonoBehaviour {
 		}
 
 		// Get a reference to the block and damage it
-		Block block = GetBlockAt(position);
+		Block block = GetBlockAt(position); 
 		block.Health -= (destroy ? block.Health : 1);
 
 		// If the block now has 0 health, as in the block has been completely destroyed
@@ -348,7 +349,10 @@ public class Board : MonoBehaviour {
 		// Add all of the blocks that are inside of the block groups to update
 		// This is easier to do here than to add each block individually as they need to be updated
 		while (blockGroupsToUpdate.Count > 0) {
-			blocksToUpdate.AddRange(blockGroupsToUpdate[0].GetBlocks( ));
+			if (blockGroupsToUpdate[0] != null) {
+				blocksToUpdate.AddRange(blockGroupsToUpdate[0].GetBlocks( ));
+			}
+
 			blockGroupsToUpdate.RemoveAt(0);
 		}
 
@@ -395,13 +399,13 @@ public class Board : MonoBehaviour {
 
 		// Sort all of the block groups in decending order of height
 		// This allows for the block groups that are lowest on the board to be updated first
-		for (int i = 0; i < blockGroups.Count; i++) {
+		/*for (int i = 0; i < blockGroups.Count; i++) {
 			blockGroups[i].LowestBlockHeight = Height;
 			for (int j = 0; j < blockGroups[i].Count; j++) {
 				blockGroups[i].LowestBlockHeight = Mathf.Min(blockGroups[i].GetBlock(j).Position.y, blockGroups[i].LowestBlockHeight);
 			}
 		}
-		blockGroups.Sort((a, b) => (b.LowestBlockHeight - a.LowestBlockHeight));
+		blockGroups.Sort((a, b) => (b.LowestBlockHeight - a.LowestBlockHeight));*/
 
 		// If there are more boom blocks to explode, then update them
 		// If there are no more boom blocks to explode, then start to place another mino
@@ -422,7 +426,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	private void UpdateBoomBlockFrames ( ) {
 		// If a certain amount of time has passed, destroy the next frame of blocks
-		if (Time.time - boomBlockFrameTimer >= gameManager.BoomBlockAnimationSpeed) {
+		if (Time.time - boomBlockFrameTimer >= gameManager.BoardAnimationDelay) {
 			// Loop through each of the boom blocks explosion frames
 			for (int i = boomBlockFrames.Count - 1; i >= 0; i--) {
 				boomBlockFrames[i].DestroyFirstFrame( );
@@ -446,7 +450,7 @@ public class Board : MonoBehaviour {
 	/// Update the block groups by checking to see if they are still falling
 	/// </summary>
 	private void UpdateBlockGroups ( ) {
-		bool blockGroupsCanMove = false;
+		bool canBlockGroupsFall = false;
 
 		// Check to see if any of the block groups can fall (and are moving)
 		for (int i = blockGroups.Count - 1; i >= 0; i--) {
@@ -464,24 +468,29 @@ public class Board : MonoBehaviour {
 
 			// If the block group can fall, then at least one block group on the board is still updating
 			if (blockGroups[i].CanFall) {
-				blockGroupsCanMove = true;
+				canBlockGroupsFall = true;
 			}
 		}
 
-		// Once all of the block groups cannot move anymore, add 1 to the checks variable
-		// If one of the block groups can move, then reset the check variable
-		blockGroupUpdateChecks += (blockGroupsCanMove ? -blockGroupUpdateChecks : 1);
+		// If one of the block groups can fall, then update whether or not the block groups are locked
+		// Block groups on the board are "locked" when all of them are finished moving
+		if (!blockGroupsLocked && !canBlockGroupsFall) {
+			blockGroupsLockedStartTime = Time.time;
+			blockGroupsLocked = true;
+		}
 
-		Debug.Log(blockGroupUpdateChecks);
-
-		// If all of the block groups have not been able to move for two update checks, then it is safe to say that all of them have fallen all the way
-		// Due to edge cases the system needs to be set up like this. Doing this is more efficient than sorting the array of block groups based on their height every time the block groups are merged
-		if (blockGroupUpdateChecks > 1) {
-			blockGroupUpdateChecks = 0;
-			BoardState = BoardState.MERGING_BLOCKGROUPS;
+		if (blockGroupsLocked) {
+			// If the block groups were locked but now one of the them can move again, then unlock them and restart the timer
+			// If the timer ends then switch the board states as the block groups have finished updating
+			if (canBlockGroupsFall) {
+				blockGroupsLocked = false;
+			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FallTimeAccelerated) {
+				blockGroupsLocked = false;
+				BoardState = BoardState.MERGING_BLOCKGROUPS;
+			}
 		}
 	}
-
+	
 	#region Sequences
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid

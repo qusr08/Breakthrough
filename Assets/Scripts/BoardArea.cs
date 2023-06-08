@@ -63,7 +63,7 @@ public abstract class BoardArea : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BlockGroupAnimationSpeed);
+		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BoardAnimationDelay);
 
 		if (fromHeight != Height) {
 			Recalculate( );

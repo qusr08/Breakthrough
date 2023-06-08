@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float _placeTime;
 	[SerializeField, Min(0f)] private float _blockScale;
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
-	[SerializeField, Min(0f)] private float _boomBlockAnimationSpeed;
+	[SerializeField, Min(0f)] private float _boardAnimationDelay;
 	[SerializeField, Min(0f)] private float _blockGroupAnimationSpeed;
 	[SerializeField, Min(1)] private int boomBlockGuarantee;
 
@@ -91,8 +91,7 @@ public class GameManager : MonoBehaviour {
 	public int RotateDirection => _rotateDirection;
 	public float PlaceTime => _placeTime;
 	public float BlockScale => _blockScale;
-	public float BoomBlockAnimationSpeed => _boomBlockAnimationSpeed;
-	public float BlockGroupAnimationSpeed => _blockGroupAnimationSpeed;
+	public float BoardAnimationDelay => _boardAnimationDelay;
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - BOOM_BLOCK_INITIAL_CHANCE) + BOOM_BLOCK_INITIAL_CHANCE;
 	#endregion
