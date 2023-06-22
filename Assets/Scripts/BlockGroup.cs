@@ -22,12 +22,12 @@ public class BlockGroup : MonoBehaviour {
 	private Vector3 toPositionVelocity;
 	protected Vector3 toRotation;
 	private Vector3 toRotationVelocity;
-	// protected bool isDoneTweening;
+	protected bool _isDoneTweening;
 
 	protected float previousFallTime;
 	protected float previousMoveTime;
 	protected float previousRotateTime;
-	
+
 	#region Properties
 	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
@@ -35,6 +35,7 @@ public class BlockGroup : MonoBehaviour {
 	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
 	public int Count => transform.childCount;
 	public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
+	public bool IsDoneTweening => _isDoneTweening;
 	#endregion
 
 	#region Unity 
@@ -48,7 +49,7 @@ public class BlockGroup : MonoBehaviour {
 
 		toPosition = transform.position;
 		toRotation = transform.eulerAngles;
-		// isDoneTweening = true;
+		_isDoneTweening = true;
 
 		previousFallTime = Time.time;
 		previousMoveTime = Time.time;
@@ -60,9 +61,10 @@ public class BlockGroup : MonoBehaviour {
 	}
 
 	protected void Update ( ) {
+		// Smoothly transition the block group to a certain position no matter what
 		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BoardAnimationDelay);
 		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BoardAnimationDelay);
-		// isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
+		_isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
 	}
 	#endregion
 
@@ -133,18 +135,15 @@ public class BlockGroup : MonoBehaviour {
 		Vector2Int currBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(toPosition + block.transform.localPosition, toPosition, toRotation.z));
 		Vector2Int toBlockPosition = Utils.Vect2Round(Utils.RotatePositionAroundPivot(currBlockPosition, toPosition, deltaRotation) + deltaPosition);
 
-
-
 		// If the block group cannot fall below the breakthrough line but the current block is trying to, return false
 		if (!CanFallBelow && toBlockPosition.y < board.BreakthroughBoardArea.Height) {
 			return false;
 		}
 
 		// If there is a block at the position this block is trying to move towards, make sure the block group can't move down
-		if (board.IsBlockAt(toBlockPosition, blockGroupID: ID)) {
+		if (board.IsBlockAt(toBlockPosition, out Block _, blockGroupID: ID)) {
 			// If the y position of the block is going to be below 0, as in below the bottom of the board, then that block has been dropped
 			// This block can just be destroyed in that case
-			Debug.Log(currBlockPosition + " -> " + toBlockPosition);
 			if (toBlockPosition.y < 0) {
 				board.DamageBlock(block, destroy: true, dropped: true);
 			} else {
@@ -172,6 +171,11 @@ public class BlockGroup : MonoBehaviour {
 		return transform.GetComponentsInChildren<Block>( ).ToList( );
 	}
 
+	/// <summary>
+	/// Merge this block group to another block group
+	/// </summary>
+	/// <param name="blockGroup">The block group to merge this block group to</param>
+	/// <returns>The new block group with all of the blocks in it</returns>
 	private BlockGroup MergeToBlockGroup (BlockGroup blockGroup) {
 		while (Count > 0) {
 			GetBlock(0).BlockGroup = blockGroup;

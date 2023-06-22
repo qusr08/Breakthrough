@@ -79,8 +79,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
 					placeTimer = gameManager.PlaceTime;
 				}
-			// } else if (isDoneTweening && placeTimer <= 0) {
-			} else if (placeTimer <= 0) {
+			} else if (IsDoneTweening && placeTimer <= 0) {
 				board.PlaceActiveMino( );
 				HasLanded = true;
 			}

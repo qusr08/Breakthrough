@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 public enum BoardState {
 	PLACING_MINO, MERGING_BLOCKGROUPS, UPDATING_BOOMBLOCKS, UPDATING_BLOCKGROUPS, GENERATE_WALL, BREAKTHROUGH
@@ -43,8 +44,8 @@ public class Board : MonoBehaviour {
 	private List<BlockGroup> blockGroups = new List<BlockGroup>( );
 	private int blockGroupCount;
 
-	private readonly List<Block> blocksToUpdate = new List<Block>( );
-	private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
+	// private List<Block> blocksToUpdate = new List<Block>( );
+	// private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
 	private bool blockGroupsLocked = false;
 	private float blockGroupsLockedStartTime = 0f;
 	private bool needToUpdate = false;
@@ -169,17 +170,20 @@ public class Board : MonoBehaviour {
 	/// Check to see if there is a block at the input position. You should use this method over doing GetBlockAt(...) == null.
 	/// </summary>
 	/// <param name="position">The position to check</param>
+	/// <param name="block">An output parameter for the block at the position</param>
 	/// <param name="blockGroupID">The block group ID to check</param>
 	/// <param name="offBoardValue">The return value of the input position being off the board</param>
 	/// <returns>true if there is a block at the input position, false otherwise. Also returns true if the position is out of bounds of the board. Also returns false if the block has the same specified block group ID</returns>
-	public bool IsBlockAt (Vector2Int position, int blockGroupID = -1, bool offBoardValue = true) {
+	public bool IsBlockAt (Vector2Int position, out Block block, int blockGroupID = -1, bool offBoardValue = true) {
+		block = null;
+
 		// Make sure the position is on the board before trying to get a block at the position
 		if (!IsPositionOnBoard(position)) {
 			return offBoardValue;
 		}
 
 		// Get a reference to the block at the input position
-		Block block = GetBlockAt(position);
+		block = GetBlockAt(position);
 
 		// If the reference to the block is null, then there is not a block at the input position
 		if (block == null) {
@@ -236,6 +240,29 @@ public class Board : MonoBehaviour {
 		return (float) blockCount / (width * height);
 	}
 
+	public List<BlockGroup> GetSurroundingBlockGroups (Block block) {
+		// A list to store the surrounding block groups
+		List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
+
+		// Get all of the surrounding block groups
+		foreach (Vector2Int neighborBlockPosition in Utils.GetCardinalPositions(block.Position)) {
+			// If there is not a block at the neighboring position, then continue to the next position
+			if (!IsBlockAt(neighborBlockPosition, out Block neighborBlock, offBoardValue: false)) {
+				continue;
+			}
+
+			// If the neighboring block group is modified, then ignore it because it will be removed later
+			if (neighborBlock.BlockGroup.IsModified) {
+				continue;
+			}
+
+			surroundingBlockGroups.Add(neighborBlock.BlockGroup);
+		}
+
+		// Make the surrounding block groups list distint, meaning all duplicate values will be removed
+		return surroundingBlockGroups.Distinct( ).ToList( );
+	}
+
 	/// <summary>
 	/// Damage the specified block
 	/// </summary>
@@ -243,23 +270,13 @@ public class Board : MonoBehaviour {
 	/// <param name="destroy">Whether or not to ignore the health of the block and completely destroy it</param>
 	/// <param name="dropped">Whether or not the block has been dropped below the bottom of the board (and to award different points to the player)</param>
 	/// <returns>true if the block was completely destroyed, false otherwise</returns>
-	public bool DamageBlock (Block block, bool destroy = false, bool dropped = false) => DamageBlockAt(block.Position, destroy, dropped);
-
-	/// <summary>
-	/// Damage the block at the specified position
-	/// </summary>
-	/// <param name="position">The position of the block to damage</param>
-	/// <param name="destroy">Whether or not to ignore the health of the block and completely destroy it</param>
-	/// <param name="dropped">Whether or not the block has been dropped below the bottom of the board (and to award different points to the player)</param>
-	/// <returns>true if the block at the specified position was completely destroyed, false otherwise</returns>
-	public bool DamageBlockAt (Vector2Int position, bool destroy = false, bool dropped = false) {
-		// If there is not a block at the specified position, then no block can be destroyed
-		if (!IsBlockAt(position, offBoardValue: false)) {
+	public bool DamageBlock (Block block, bool destroy = false, bool dropped = false) {
+		// If there is null, then do not try to destroy it
+		if (block == null) {
 			return false;
 		}
 
-		// Get a reference to the block and damage it
-		Block block = GetBlockAt(position); 
+		// Damage the block
 		block.Health -= (destroy ? block.Health : 1);
 
 		// If the block now has 0 health, as in the block has been completely destroyed
@@ -267,10 +284,7 @@ public class Board : MonoBehaviour {
 			// If the block has a block group, make sure the block group knows that it was modified
 			// The block group will be updated the next time merge block group is called
 			if (block.BlockGroupID != -1) {
-				// Make sure to only add the block group once
-				if (!blockGroupsToUpdate.Contains(block.BlockGroup)) {
-					blockGroupsToUpdate.Add(block.BlockGroup);
-				}
+				block.BlockGroup.IsModified = true;
 			}
 
 			// If the block has a mino index, remove the reference to the block in the mino list
@@ -294,17 +308,55 @@ public class Board : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Damage the block at the specified position
+	/// </summary>
+	/// <param name="position">The position of the block to damage</param>
+	/// <param name="destroy">Whether or not to ignore the health of the block and completely destroy it</param>
+	/// <param name="dropped">Whether or not the block has been dropped below the bottom of the board (and to award different points to the player)</param>
+	/// <returns>true if the block at the specified position was completely destroyed, false otherwise</returns>
+	public bool DamageBlockAt (Vector2Int position, bool destroy = false, bool dropped = false) {
+		// If there is not a block at the specified position, then no block can be destroyed
+		if (!IsBlockAt(position, out Block block, offBoardValue: false)) {
+			return false;
+		}
+
+		return DamageBlock(block, destroy: destroy, dropped: dropped);
+	}
+
+	public void RemoveBlockGroup (BlockGroup blockGroup) {
+		blockGroups.Remove(blockGroup);
+		Destroy(blockGroup);
+	}
+
+	/// <summary>
 	/// Create a new block
 	/// </summary>
 	/// <param name="position">The position to create the block at</param>
 	/// <param name="health">The health of the block to create</param>
-	public void CreateBlock (Vector2Int position, int health = 1, BlockType blockType = BlockType.NORMAL) {
+	public Block CreateBlock (Vector2Int position, int health = 1, BlockType blockType = BlockType.NORMAL) {
+		// Create the block object
 		Block block = Instantiate(blockPrefab, transform).GetComponent<Block>( );
+		block.transform.position = (Vector3Int) position;
 		block.Position = position;
 		block.BlockType = blockType;
 		block.Health = health;
 
-		blocksToUpdate.Add(block);
+		// Create a new block group object to manage the block object
+		// No block should be outside of a block group
+		block.BlockGroup = CreateBlockGroup( );
+
+		return block;
+	}
+
+	/// <summary>
+	/// Create a new block group
+	/// </summary>
+	/// <returns>The created block group object</returns>
+	public BlockGroup CreateBlockGroup ( ) {
+		BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
+		blockGroup.ID = blockGroupCount++;
+
+		return blockGroup;
 	}
 
 	/// <summary>
@@ -329,9 +381,6 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	public void PlaceActiveMino ( ) {
 		for (int i = 0; i < gameManager.ActiveMino.Count; i++) {
-			// Add all of the blocks that make up the mino to be updated and merged into other block groups
-			blocksToUpdate.Add(gameManager.ActiveMino.GetBlock(i));
-
 			// If the block is a boom block, generate boom blocks frames for it
 			if (gameManager.ActiveMino.GetBlock(i).IsBoomBlock) {
 				GenerateBoomBlockFrames(gameManager.ActiveMino.GetBlock(i));
@@ -346,66 +395,23 @@ public class Board : MonoBehaviour {
 	/// Update all of the block groups by merging them together or creating new ones
 	/// </summary>
 	private void MergeBlockGroups ( ) {
-		// Add all of the blocks that are inside of the block groups to update
-		// This is easier to do here than to add each block individually as they need to be updated
-		while (blockGroupsToUpdate.Count > 0) {
-			if (blockGroupsToUpdate[0] != null) {
-				blocksToUpdate.AddRange(blockGroupsToUpdate[0].GetBlocks( ));
-			}
+		// Get all of the blocks on the board
+		Block[ ] blocks = GetComponentsInChildren<Block>( );
 
-			blockGroupsToUpdate.RemoveAt(0);
+		for (int i = 0; i < blocks.Length; i++) {
+			// Merge all of the block groups together and set it to be the block group of the block
+			List<BlockGroup> surroundingBlockGroups = GetSurroundingBlockGroups(blocks[i]);
+
+			// If there are more than one surrounding block groups, then merge them together and set that new block group to
+			if (surroundingBlockGroups.Count > 0) {
+				blocks[i].BlockGroup = BlockGroup.MergeAllBlockGroups(surroundingBlockGroups);
+			} else {
+				blocks[i].BlockGroup = CreateBlockGroup( );
+			}
 		}
 
-		// Loop through all of the blocks that need to be updated and sort them into block groups
-		while (blocksToUpdate.Count > 0) {
-			// If the block is null, it was removed in another place and can just be ignored
-			if (blocksToUpdate[0] != null) {
-				// Get the surrounding block groups to the current block
-				List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
-
-				foreach (Vector2Int neighborBlockPosition in Utils.GetCardinalPositions(blocksToUpdate[0].Position)) {
-					// If there is not a block at the neighboring position, then continue to the next position
-					if (!IsBlockAt(neighborBlockPosition, offBoardValue: false)) {
-						continue;
-					}
-
-					Block neighborBlock = GetBlockAt(neighborBlockPosition);
-
-					// If the block at the neighboring position has the same block group as the current block, continue to the next position
-					// We don't want block groups to merge with themselves
-					if (neighborBlock.BlockGroupID == blocksToUpdate[0].BlockGroupID) {
-						continue;
-					}
-
-					surroundingBlockGroups.Add(neighborBlock.BlockGroup);
-				}
-
-				// If there are no surrounding block groups, create a new block group
-				// If there are surrounding block groups, merge all of them together
-				if (surroundingBlockGroups.Count == 0) {
-					BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
-					blockGroup.ID = blockGroupCount++;
-					blocksToUpdate[0].BlockGroup = blockGroup;
-				} else {
-					blocksToUpdate[0].BlockGroup = BlockGroup.MergeAllBlockGroups(surroundingBlockGroups);
-				}
-			}
-
-			blocksToUpdate.RemoveAt(0);
-		}
-
-		// Get all of the remaining block groups
+		// Get all of the block groups on the board
 		blockGroups = GetComponentsInChildren<BlockGroup>( ).ToList( );
-
-		// Sort all of the block groups in decending order of height
-		// This allows for the block groups that are lowest on the board to be updated first
-		/*for (int i = 0; i < blockGroups.Count; i++) {
-			blockGroups[i].LowestBlockHeight = Height;
-			for (int j = 0; j < blockGroups[i].Count; j++) {
-				blockGroups[i].LowestBlockHeight = Mathf.Min(blockGroups[i].GetBlock(j).Position.y, blockGroups[i].LowestBlockHeight);
-			}
-		}
-		blockGroups.Sort((a, b) => (b.LowestBlockHeight - a.LowestBlockHeight));*/
 
 		// If there are more boom blocks to explode, then update them
 		// If there are no more boom blocks to explode, then start to place another mino
@@ -467,7 +473,7 @@ public class Board : MonoBehaviour {
 			blockGroups[i].UpdateBlockGroup( );
 
 			// If the block group can fall, then at least one block group on the board is still updating
-			if (blockGroups[i].CanFall) {
+			if (blockGroups[i].CanFall || !blockGroups[i].IsDoneTweening) {
 				canBlockGroupsFall = true;
 			}
 		}
@@ -484,13 +490,13 @@ public class Board : MonoBehaviour {
 			// If the timer ends then switch the board states as the block groups have finished updating
 			if (canBlockGroupsFall) {
 				blockGroupsLocked = false;
-			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FallTimeAccelerated) {
+			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FallTimeAccelerated * 2f) {
 				blockGroupsLocked = false;
 				BoardState = BoardState.MERGING_BLOCKGROUPS;
 			}
 		}
 	}
-	
+
 	#region Sequences
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid
@@ -556,8 +562,8 @@ public class Board : MonoBehaviour {
 		// Clear and reset variables
 		blockGroups.Clear( );
 		blockGroupCount = 0;
-		blockGroupsToUpdate.Clear( );
-		blocksToUpdate.Clear( );
+		// blockGroupsToUpdate.Clear( );
+		// blocksToUpdate.Clear( );
 	}
 
 	private IEnumerator Breakthrough ( ) {
