@@ -47,12 +47,12 @@ public class HazardBar : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 
 		// Set background position
-		transform.localPosition = new Vector3(-(board.Width / 2) - (board.BorderThickness * 1.5f) - board.BoardPadding, 0f);
+		transform.localPosition = new Vector3(-(gameManager.GameSettings.BoardWidth / 2f) - (board.BorderThickness * 1.5f) - board.BoardPadding, 0f);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
-		backgroundSpriteRenderer.size = new Vector2(1, board.Height * (4f / 3f));
+		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f));
 
 		// Set glow size
-		glowSpriteRenderer.size = new Vector2(1, board.Height) + (Vector2.one * (board.GlowThickness * 2));
+		glowSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight) + (Vector2.one * (board.GlowThickness * 2));
 
 		// Update the progress
 		Progress = Progress;
@@ -78,7 +78,7 @@ public class HazardBar : MonoBehaviour {
 		// Increase the progress of the bar based on the allotted time
 		// Progress += Time.deltaTime / gameManager.HazardTime;
 		toProgress += Time.deltaTime / 10f;
-		Progress = Mathf.SmoothDamp(Progress, toProgress, ref toProgressVelocity, gameManager.BoardAnimationDelay);
+		Progress = Mathf.SmoothDamp(Progress, toProgress, ref toProgressVelocity, gameManager.BoardAnimationSpeed);
 
 		// If the progress of the bar reaches the top, then drop the hazard area down
 		if (Progress == 1f) {

@@ -69,7 +69,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		placeTimer -= Time.deltaTime;
 
 		// Fall down based on the fall time of the minos
-		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.FallTimeAccelerated : gameManager.FallTime)) {
+		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.FastMinoFallTime : gameManager.MinoFallTime)) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {
@@ -77,7 +77,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 
 				if (verticalValue > 0) {
 					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
-					placeTimer = gameManager.PlaceTime;
+					placeTimer = gameManager.MinoPlaceTime;
 				}
 			} else if (IsDoneTweening && placeTimer <= 0) {
 				board.PlaceActiveMino( );
@@ -89,34 +89,34 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		// If the mino is not moving horizontally, then reset the last time it moved
 		if (horizontalValue == 0) {
 			previousMoveTime = 0;
-		} else if (Time.time - previousMoveTime > gameManager.MoveTime) {
+		} else if (Time.time - previousMoveTime > gameManager.MinoMoveTime) {
 			// If the mino can move horizontally, reset the place timer and move time
 			if (TryMove(new Vector2Int(horizontalValue, 0))) {
 				// If the player holds down the button, the mino should move slightly faster
 				if (previousMoveTime == 0) {
 					previousMoveTime = Time.time;
 				} else {
-					previousMoveTime = Time.time - gameManager.MoveTimeAccelerated;
+					previousMoveTime = Time.time - gameManager.FastMinoMoveTime;
 				}
 
-				placeTimer = gameManager.PlaceTime;
+				placeTimer = gameManager.MinoPlaceTime;
 			}
 		}
 
 		// Try and rotate the mino
 		if (rotateValue == 0) {
 			previousRotateTime = 0;
-		} else if (Time.time - previousRotateTime > gameManager.RotateTime) {
+		} else if (Time.time - previousRotateTime > gameManager.MinoRotateTime) {
 			// If the mino was successfully rotated, then reset the place timer and rotate time
 			if (TryRotate(gameManager.RotateDirection * 90)) {
 				// If the player holds down the button, the mino should rotate slightly faster
 				if (previousRotateTime == 0) {
 					previousRotateTime = Time.time;
 				} else {
-					previousRotateTime = Time.time - gameManager.RotateTimeAccelerated;
+					previousRotateTime = Time.time - gameManager.FastMinoRotateTime;
 				}
 
-				placeTimer = gameManager.PlaceTime;
+				placeTimer = gameManager.MinoPlaceTime;
 			}
 		}
 	}

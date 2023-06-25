@@ -63,7 +63,7 @@ public abstract class BoardArea : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BoardAnimationDelay);
+		fromHeight = Mathf.SmoothDamp(fromHeight, Height, ref fromHeightVelocity, gameManager.BoardAnimationSpeed);
 
 		if (fromHeight != Height) {
 			Recalculate( );
@@ -83,14 +83,14 @@ public abstract class BoardArea : MonoBehaviour {
 
 	private void Recalculate ( ) {
 		// Set the position of the board area
-		transform.position = new Vector3(-0.5f + (board.Width / 2.0f), -0.5f + (IsAreaAbove ? board.Height - fromHeight : fromHeight), 0);
+		transform.position = new Vector3(-0.5f + (gameManager.GameSettings.BoardWidth / 2.0f), -0.5f + (IsAreaAbove ? gameManager.GameSettings.BoardHeight - fromHeight : fromHeight), 0);
 
 		// Set the position and scale of the board area line
 		lineTransform.position = transform.position;
-		lineTransform.localScale = new Vector3(board.Width, lineThickness, 1);
+		lineTransform.localScale = new Vector3(gameManager.GameSettings.BoardWidth, lineThickness, 1);
 
 		// Set the position and size of the board area indicator
 		areaTransform.position = transform.position + Vector3.up * (fromHeight / (IsAreaAbove ? 2.0f : -2.0f));
-		areaSpriteRenderer.size = new Vector2(board.Width, fromHeight);
+		areaSpriteRenderer.size = new Vector2(gameManager.GameSettings.BoardWidth, fromHeight);
 	}
 }

@@ -28,8 +28,6 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject blockPrefab;
 	[Header("Properties")]
 	[SerializeField] private BoardState _boardState;
-	[SerializeField] private int _width;
-	[SerializeField] private int _height;
 	[SerializeField] private float cameraPadding;
 	[SerializeField] private float _boardPadding;
 	[SerializeField] private float _borderThickness;
@@ -43,9 +41,6 @@ public class Board : MonoBehaviour {
 
 	private List<BlockGroup> blockGroups = new List<BlockGroup>( );
 	private int blockGroupCount;
-
-	// private List<Block> blocksToUpdate = new List<Block>( );
-	// private readonly List<BlockGroup> blockGroupsToUpdate = new List<BlockGroup>( );
 	private bool blockGroupsLocked = false;
 	private float blockGroupsLockedStartTime = 0f;
 	private bool needToUpdate = false;
@@ -58,8 +53,6 @@ public class Board : MonoBehaviour {
 	public float BorderThickness => _borderThickness;
 	public float GlowThickness => _glowThickness;
 
-	public int Width => _width;
-	public int Height => _height;
 	public BoardState BoardState {
 		get => _boardState;
 		set {
@@ -67,13 +60,17 @@ public class Board : MonoBehaviour {
 
 			Debug.Log("Set Board State: " + value.ToString( ));
 
-			switch (value) {
+			switch (_boardState) {
 				case BoardState.PLACING_MINO:
-					if (gameManager.GameState != GameState.GAMEOVER) {
-						needToUpdate = true;
-						gameManager.PercentCleared = GetPercentageClear(0, HazardBoardArea.Height - 1, Width, HazardBoardArea.Height - BreakthroughBoardArea.Height) * 100;
-						GenerateMino( );
-					}
+					needToUpdate = true;
+
+					int x = 0;
+					int y = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - 1;
+					int width = gameManager.GameSettings.BoardWidth;
+					int height = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - BreakthroughBoardArea.Height;
+					gameManager.PercentCleared = GetPercentageClear(x, y, width, height) * 100f;
+
+					GenerateMino( );
 					break;
 				case BoardState.MERGING_BLOCKGROUPS:
 					MergeBlockGroups( );
@@ -110,21 +107,28 @@ public class Board : MonoBehaviour {
 
 		gameManager = FindObjectOfType<GameManager>( );
 
-		minoSpawnPosition = new Vector3((Width / 2f) - 0.5f, Height - 2.5f);
+		float offsetX = gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0.0f;
+		minoSpawnPosition = new Vector3((gameManager.GameSettings.BoardWidth / 2f) - offsetX, gameManager.GameSettings.BoardHeight - 2.5f);
 
 		// Set the board size and position so the bottom left corner is at (0, 0)
 		// This makes it easier when converting from piece transform position to a board array index
-		float positionX = (Width / 2) - (Width % 2 == 0 ? 0.5f : 0f);
-		float positionY = (Height / 2) - (Height % 2 == 0 ? 0.5f : 0f);
-		spriteRenderer.size = new Vector2(Width, Height);
+		float positionX = (gameManager.GameSettings.BoardWidth / 2) - (gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0f);
+		float positionY = (gameManager.GameSettings.BoardHeight / 2) - (gameManager.GameSettings.BoardHeight % 2 == 0 ? 0.5f : 0f);
+		spriteRenderer.size = new Vector2(gameManager.GameSettings.BoardWidth, gameManager.GameSettings.BoardHeight);
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the size of the border
-		borderSpriteRenderer.size = new Vector2(Width + (BorderThickness * 2), Height + (BorderThickness * 2));
-		glowSpriteRenderer.size = new Vector2(Width + (GlowThickness * 2), Height + (GlowThickness * 2));
+		float borderWidth = gameManager.GameSettings.BoardWidth + (BorderThickness * 2);
+		float borderHeight = gameManager.GameSettings.BoardHeight + (BorderThickness * 2);
+		borderSpriteRenderer.size = new Vector2(borderWidth, borderHeight);
+
+		// Set the size of the glow around the board
+		float glowWidth = gameManager.GameSettings.BoardWidth + (GlowThickness * 2);
+		float glowHeight = gameManager.GameSettings.BoardHeight + (GlowThickness * 2);
+		glowSpriteRenderer.size = new Vector2(glowWidth, glowHeight);
 
 		// Set the camera orthographic size and position so it fits the entire board
-		gameCamera.orthographicSize = (Height + cameraPadding) / 2f;
+		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + cameraPadding) / 2f;
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
 	}
 
@@ -141,6 +145,10 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Update ( ) {
+		if (gameManager.GameState == GameState.GAMEOVER) {
+			return;
+		}
+
 		switch (BoardState) {
 			case BoardState.PLACING_MINO:
 				gameManager.ActiveMino.UpdateBlockGroup( );
@@ -161,8 +169,8 @@ public class Board : MonoBehaviour {
 	/// <param name="position">The position to check</param>
 	/// <returns>true if position is within the bounds of the board, false otherwise</returns>
 	public bool IsPositionOnBoard (Vector2Int position) {
-		bool inX = (position.x >= 0 && position.x < Width);
-		bool inY = (position.y >= 0 && position.y < Height);
+		bool inX = (position.x >= 0 && position.x < gameManager.GameSettings.BoardWidth);
+		bool inY = (position.y >= 0 && position.y < gameManager.GameSettings.BoardHeight);
 		return (inX && inY);
 	}
 
@@ -229,8 +237,8 @@ public class Board : MonoBehaviour {
 			for (int j = y; j > y - height; j--) {
 				Block block = GetBlockAt(new Vector2Int(i, j));
 
-				// If the block is null or it is part of a player controlled block group, then the space is considered "empty"
-				if (block == null || (block.BlockGroup != null && block.BlockGroup.IsPlayerControlled)) {
+				// If the block is null or it is part of a player controlled block group, then the space is considered empty
+				if (block == null || (block.BlockGroupID != -1 && block.BlockGroup.IsPlayerControlled)) {
 					blockCount++;
 				}
 			}
@@ -240,6 +248,11 @@ public class Board : MonoBehaviour {
 		return (float) blockCount / (width * height);
 	}
 
+	/// <summary>
+	/// Get all of the surround block groups to a block in all four cardinal directions
+	/// </summary>
+	/// <param name="block">The block to check</param>
+	/// <returns>A list of all the surrounding block groups</returns>
 	public List<BlockGroup> GetSurroundingBlockGroups (Block block) {
 		// A list to store the surrounding block groups
 		List<BlockGroup> surroundingBlockGroups = new List<BlockGroup>( );
@@ -323,11 +336,6 @@ public class Board : MonoBehaviour {
 		return DamageBlock(block, destroy: destroy, dropped: dropped);
 	}
 
-	public void RemoveBlockGroup (BlockGroup blockGroup) {
-		blockGroups.Remove(blockGroup);
-		Destroy(blockGroup);
-	}
-
 	/// <summary>
 	/// Create a new block
 	/// </summary>
@@ -371,7 +379,8 @@ public class Board : MonoBehaviour {
 	/// Generate a random mino on the board
 	/// </summary>
 	private void GenerateMino ( ) {
-		gameManager.ActiveMino = Instantiate(minoPrefabs[Random.Range(0, minoPrefabs.Count)], minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
+		GameObject randomMinoPrefab = minoPrefabs[Random.Range(0, minoPrefabs.Count)];
+		gameManager.ActiveMino = Instantiate(randomMinoPrefab, minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
 		gameManager.ActiveMino.transform.SetParent(transform, true);
 		gameManager.ActiveMino.ID = blockGroupCount++;
 	}
@@ -413,6 +422,19 @@ public class Board : MonoBehaviour {
 		// Get all of the block groups on the board
 		blockGroups = GetComponentsInChildren<BlockGroup>( ).ToList( );
 
+		// Reset any variables in each of the block groups, and remove empty ones
+		for (int i = blockGroups.Count - 1; i >= 0; i--) {
+			blockGroups[i].CanFallBelow = false;
+			blockGroups[i].IsModified = false;
+
+			if (blockGroups[i].Count == 0) {
+				Destroy(blockGroups[i].gameObject);
+				blockGroups.RemoveAt(i);
+
+				continue;
+			}
+		}
+
 		// If there are more boom blocks to explode, then update them
 		// If there are no more boom blocks to explode, then start to place another mino
 		if (boomBlockFrames.Count > 0) {
@@ -432,7 +454,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	private void UpdateBoomBlockFrames ( ) {
 		// If a certain amount of time has passed, destroy the next frame of blocks
-		if (Time.time - boomBlockFrameTimer >= gameManager.BoardAnimationDelay) {
+		if (Time.time - boomBlockFrameTimer >= gameManager.BoardAnimationSpeed) {
 			// Loop through each of the boom blocks explosion frames
 			for (int i = boomBlockFrames.Count - 1; i >= 0; i--) {
 				boomBlockFrames[i].DestroyFirstFrame( );
@@ -490,7 +512,7 @@ public class Board : MonoBehaviour {
 			// If the timer ends then switch the board states as the block groups have finished updating
 			if (canBlockGroupsFall) {
 				blockGroupsLocked = false;
-			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FallTimeAccelerated * 2f) {
+			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FastMinoFallTime * 2f) {
 				blockGroupsLocked = false;
 				BoardState = BoardState.MERGING_BLOCKGROUPS;
 			}
@@ -501,10 +523,10 @@ public class Board : MonoBehaviour {
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid
 		// float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, gameManager.WallHeight, gameManager.WallHealthRange.x, gameManager.WallHealthRange.y);
-		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, 3, 0, 3);
+		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(gameManager.GameSettings.BoardWidth, 3, 0, 3);
 		// for (int j = 0; j < gameManager.WallHeight; j++) {
 		for (int j = 0; j < 3; j++) {
-			for (int i = 0; i < Width; i++) {
+			for (int i = 0; i < gameManager.GameSettings.BoardWidth; i++) {
 				// Round the random noise grid value to an integer
 				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
 
@@ -546,7 +568,7 @@ public class Board : MonoBehaviour {
 			hasBlockInRow = false;
 
 			// Loop through the entire row at a certain y value
-			for (int x = 0; x < Width; x++) {
+			for (int x = 0; x < gameManager.GameSettings.BoardWidth; x++) {
 				// If there is a block at the position, then remove it
 				if (DamageBlockAt(new Vector2Int(x, y), true)) {
 					hasBlockInRow = true;
@@ -562,8 +584,6 @@ public class Board : MonoBehaviour {
 		// Clear and reset variables
 		blockGroups.Clear( );
 		blockGroupCount = 0;
-		// blockGroupsToUpdate.Clear( );
-		// blocksToUpdate.Clear( );
 	}
 
 	private IEnumerator Breakthrough ( ) {

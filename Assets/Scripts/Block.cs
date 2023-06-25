@@ -181,14 +181,14 @@ public class Block : MonoBehaviour {
 			case BlockType.BOOM_LINE:
 				if (Utils.IsEven((int) BlockDirection)) { // Horizontal
 					minX = 0;
-					maxX = board.Width;
+					maxX = gameManager.GameSettings.BoardWidth;
 					minY = Position.y;
 					maxY = Position.y;
 				} else { // Vertical
 					minX = Position.x;
 					maxX = Position.x;
 					minY = 0;
-					maxY = board.Height;
+					maxY = gameManager.GameSettings.BoardHeight;
 				}
 
 				break;

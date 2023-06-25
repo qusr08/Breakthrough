@@ -32,7 +32,7 @@ public class BlockGroup : MonoBehaviour {
 	public int ID { get => _id; set => _id = value; }
 	public bool IsModified { get => _isModified; set => _isModified = value; }
 	public bool CanFall { get => _canFall; set => _canFall = value; }
-	public bool CanFallBelow { get => _canFallBelow; protected set => _canFallBelow = value; }
+	public bool CanFallBelow { get => _canFallBelow; set => _canFallBelow = value; }
 	public int Count => transform.childCount;
 	public bool IsPlayerControlled => (this is PlayerControlledBlockGroup);
 	public bool IsDoneTweening => _isDoneTweening;
@@ -62,14 +62,14 @@ public class BlockGroup : MonoBehaviour {
 
 	protected void Update ( ) {
 		// Smoothly transition the block group to a certain position no matter what
-		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BoardAnimationDelay);
-		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BoardAnimationDelay);
+		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BoardAnimationSpeed);
+		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BoardAnimationSpeed);
 		_isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
 	}
 	#endregion
 
 	public virtual void UpdateBlockGroup ( ) {
-		if (Time.time - previousFallTime > gameManager.FallTimeAccelerated) {
+		if (Time.time - previousFallTime > gameManager.FastMinoFallTime) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {

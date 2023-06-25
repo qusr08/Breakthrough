@@ -44,6 +44,12 @@ TagManager:
   - name: Background
     uniqueID: 1017343173
     locked: 0
+  - name: Glow
+    uniqueID: 2163864457
+    locked: 0
+  - name: Board Background UI
+    uniqueID: 2904029289
+    locked: 0
   - name: Board
     uniqueID: 205540463
     locked: 0

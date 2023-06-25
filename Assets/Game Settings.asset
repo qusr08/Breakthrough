@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2252d3c2df40144785bf586926a84fb, type: 3}
   m_Name: Game Settings
   m_EditorClassIdentifier: 
-  _boardWidth: 0
-  _boardHeight: 0
-  _minoSpeedMultiplier: 0
-  _wallMultiplier: 0
-  _boomBlockChance: 0
+  _boardWidth: 7
+  _boardHeight: 7
+  _minoSpeedMultiplier: 3
+  _hazardSpeedMultiplier: 3
+  _wallMultiplier: 3
+  _boomBlockChance: 3
   _gameLevel: 0
   _allowedMinos: 0

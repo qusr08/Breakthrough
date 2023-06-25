@@ -21,7 +21,7 @@ public class HazardBoardArea : BoardArea {
 			return;
 		}
 
-		if (board.GetPercentageClear(0, board.Height - Height, board.Width, 1) < 1f) {
+		if (board.GetPercentageClear(0, gameManager.GameSettings.BoardHeight - Height, gameManager.GameSettings.BoardWidth, 1) < 1f) {
 			gameManager.GameState = GameState.GAMEOVER;
 		}
 	}

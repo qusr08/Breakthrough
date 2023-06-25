@@ -8,7 +8,7 @@ public class BoardTextManager : MonoBehaviour {
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Board board;
 	[Space]
-	[SerializeField] public BoardText GameLevelBoardText;
+	[SerializeField] public BoardText BreakthroughsBoardText;
 	[SerializeField] public BoardText TotalPointsBoardText;
 	[SerializeField] public BoardText BoardPointsBoardText;
 	[SerializeField] public BoardText PercentageClearBoardText;
@@ -35,18 +35,21 @@ public class BoardTextManager : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 
 		// Set the position of the background panel
+		float x = (gameManager.GameSettings.BoardWidth / 2f) + board.BorderThickness + board.BoardPadding;
+		float y = gameManager.GameSettings.BoardHeight / 2f;
 		float width = TotalPointsBoardText.Width + (board.BorderThickness * 2);
-		float height = (TotalPointsBoardText.Height + BoardPointsBoardText.Height + PercentageClearBoardText.Height + GameLevelBoardText.Height) + (textSpacing * 3) + (board.BorderThickness * 2);
+		// This height assumes that all of the board text objects are the same height (as they should be)
+		float height = (TotalPointsBoardText.Height * 4) + (textSpacing * 3) + (board.BorderThickness * 2);
 
-		transform.localPosition = new Vector3((board.Width / 2f) + board.BorderThickness + board.BoardPadding, board.Height / 2);
+		transform.localPosition = new Vector3(x, y);
 		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
 		backgroundSpriteRenderer.size = new Vector2(width, height);
 
 		// Set the position of the text objects
-		GameLevelBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness);
-		TotalPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (TotalPointsBoardText.Height + textSpacing) * -1f);
-		BoardPointsBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (BoardPointsBoardText.Height + textSpacing) * -2f);
-		PercentageClearBoardText.transform.localPosition = new Vector2(board.BorderThickness, -board.BorderThickness + (PercentageClearBoardText.Height + textSpacing) * -3f);
+		TotalPointsBoardText.transform.localPosition = GetTextPositionFromIndex(0);
+		BoardPointsBoardText.transform.localPosition = GetTextPositionFromIndex(1);
+		PercentageClearBoardText.transform.localPosition = GetTextPositionFromIndex(2);
+		BreakthroughsBoardText.transform.localPosition = GetTextPositionFromIndex(3);
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
@@ -61,5 +64,14 @@ public class BoardTextManager : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+	}
+
+	/// <summary>
+	/// Get the position for a board text based on its index
+	/// </summary>
+	/// <param name="index">The index of the board text</param>
+	/// <returns>The position of the board text</returns>
+	private Vector2 GetTextPositionFromIndex (int index) {
+		return new Vector2(board.BorderThickness, -board.BorderThickness + -(TotalPointsBoardText.Height + textSpacing) * index);
 	}
 }
