@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
 	public int TotalPoints { get => _totalPoints; set => boardTextManager.TotalPointsBoardText.Value = _totalPoints = value; }
 	public float PercentCleared { get => _percentCleared; set => boardTextManager.PercentageClearBoardText.Value = _percentCleared = value; }
 	public int Breakthroughs { get => _breakthroughs; set => boardTextManager.BreakthroughsBoardText.Value = _breakthroughs = value; }
-	
+
 	public PlayerControlledBlockGroup ActiveMino { get => _activeMino; set => _activeMino = value; }
 	public GameState GameState {
 		get => _gameState;
@@ -86,4 +86,8 @@ public class GameManager : MonoBehaviour {
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - GameSettings.BoomBlockChance) + GameSettings.BoomBlockChance;
 	#endregion
+
+	public void IncrementDifficulty ( ) {
+
+	}
 }
