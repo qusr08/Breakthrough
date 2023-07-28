@@ -7,6 +7,7 @@ public class HazardBoardArea : BoardArea {
 	public override void OnDestroyActiveMino ( ) { }
 
 	public override void OnHeightChange ( ) {
+		board.UpdatePercentageCleared( );
 		CheckForGameOver( );
 	}
 

@@ -9,14 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2252d3c2df40144785bf586926a84fb, type: 3}
-  m_Name: Game Settings
+  m_Script: {fileID: 11500000, guid: 534b890b34eeae14bb8a6cc158f79b22, type: 3}
+  m_Name: Theme Settings
   m_EditorClassIdentifier: 
-  _boardWidth: 7
-  _boardHeight: 7
-  _minoSpeedMultiplier: 3
-  _hazardSpeedMultiplier: 3
-  _wallMultiplier: 3
-  _boomBlockChance: 3
-  _gameLevel: 0
-  _allowedMinos: 0

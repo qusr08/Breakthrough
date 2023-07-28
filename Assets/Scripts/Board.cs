@@ -63,13 +63,7 @@ public class Board : MonoBehaviour {
 			switch (_boardState) {
 				case BoardState.PLACING_MINO:
 					needToUpdate = true;
-
-					int x = 0;
-					int y = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - 1;
-					int width = gameManager.GameSettings.BoardWidth;
-					int height = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - BreakthroughBoardArea.Height;
-					gameManager.PercentCleared = GetPercentageClear(x, y, width, height) * 100f;
-
+					UpdatePercentageCleared( );
 					GenerateMino( );
 					break;
 				case BoardState.MERGING_BLOCKGROUPS:
@@ -517,6 +511,14 @@ public class Board : MonoBehaviour {
 				BoardState = BoardState.MERGING_BLOCKGROUPS;
 			}
 		}
+	}
+
+	public void UpdatePercentageCleared () {
+		int x = 0;
+		int y = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - 1;
+		int width = gameManager.GameSettings.BoardWidth;
+		int height = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - BreakthroughBoardArea.Height;
+		gameManager.PercentCleared = GetPercentageClear(x, y, width, height) * 100f;
 	}
 
 	#region Sequences

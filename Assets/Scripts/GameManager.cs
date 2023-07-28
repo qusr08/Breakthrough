@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ParticleManager _particleManager;
 	[SerializeField] private BoardTextManager boardTextManager;
-	[SerializeField] private GameSettingsScriptableObject _gameSettings;
+	[SerializeField] private GameSettings _gameSettings;
+	[SerializeField] private ThemeSettings _themeSettings;
 	[Header("Point Values")]
 	[SerializeField, Min(0)] private int _pointsPerDestroyedBlock = 6;
 	[SerializeField, Min(0)] private int _pointsPerDroppedBlock = 12;
@@ -41,7 +42,8 @@ public class GameManager : MonoBehaviour {
 
 	#region Properties
 	public ParticleManager ParticleManager => _particleManager;
-	public GameSettingsScriptableObject GameSettings => _gameSettings;
+	public GameSettings GameSettings => _gameSettings;
+	public ThemeSettings ThemeSettings => _themeSettings;
 
 	public int BoardPoints { get => _boardPoints; set => boardTextManager.BoardPointsBoardText.Value = _boardPoints = value; }
 	public int TotalPoints { get => _totalPoints; set => boardTextManager.TotalPointsBoardText.Value = _totalPoints = value; }
@@ -86,8 +88,4 @@ public class GameManager : MonoBehaviour {
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - GameSettings.BoomBlockChance) + GameSettings.BoomBlockChance;
 	#endregion
-
-	public void IncrementDifficulty ( ) {
-
-	}
 }
