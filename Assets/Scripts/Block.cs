@@ -130,7 +130,7 @@ public class Block : MonoBehaviour {
 		gameManager = FindObjectOfType<GameManager>( );
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
-		transform.localScale = new Vector3(gameManager.BlockScale, gameManager.BlockScale, 1f);
+		transform.localScale = new Vector3(Constants.BLK_SCL, Constants.BLK_SCL, 1f);
 	}
 
 	protected void Awake ( ) {

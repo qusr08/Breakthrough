@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 534b890b34eeae14bb8a6cc158f79b22, type: 3}
-  m_Name: Theme Settings
+  m_Name: White Theme
   m_EditorClassIdentifier: 
   _backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   _detailColor: {r: 0.654902, g: 0.7647059, b: 0.8, a: 1}
-  _backgroundDetailColor: {r: 0.95686275, g: 0.96862745, b: 0.972549, a: 0.5019608}
+  _backgroundDetailColors:
+  - {r: 0.95686275, g: 0.96862745, b: 0.972549, a: 0.5019608}
+  - {r: 0.91764706, g: 0.9411765, b: 0.94509804, a: 0.5019608}
   _blockColors:
     m_keys: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b000000
     m_values:

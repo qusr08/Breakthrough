@@ -38,7 +38,6 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float defaultHazardFallTime;
 	[SerializeField, Min(0f)] private float minHazardFallTime;
 	[Space]
-	[SerializeField, Min(0f)] private float _blockScale;
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boardAnimationSpeed;
 	[SerializeField, Min(1)] private int boomBlockGuarantee;
@@ -99,7 +98,6 @@ public class GameManager : MonoBehaviour {
 	public float FastMinoRotateTime => MinoRotateTime / 2f;
 	public float MinoPlaceTime => _minoPlaceTime;
 
-	public float BlockScale => _blockScale;
 	public int RotateDirection => _rotateDirection;
 	public float BoardAnimationSpeed => Mathf.Min(_boardAnimationSpeed, MinMinoFallTime);
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }

@@ -5,7 +5,23 @@ using UnityEditor;
 using UnityEngine;
 
 public static class Utils {
-	public const float CLOSE_ENOUGH = 0.01f;
+	/// <summary>
+	/// Find the greatest common divisor between two numbers
+	/// </summary>
+	/// <param name="a">The first number</param>
+	/// <param name="b">The second number</param>
+	/// <returns>The integer greatest common divisor of the two inputted numbers</returns>
+	public static int GCD (int a, int b) {
+		while (a != 0 && b != 0) {
+			if (a > b) {
+				a %= b;
+			} else {
+				b %= a;
+			}
+		}
+
+		return a | b;
+	}
 
 	/// <summary>
 	/// SmoothDamp function for rotation vectors
@@ -56,7 +72,7 @@ public static class Utils {
 	/// <returns>Whether the two position vectors are close enough to each other</returns>
 	public static bool CompareVectors (Vector2 vector1, Vector2 vector2) => CompareVectors((Vector3) vector1, (Vector3) vector2);
 	public static bool CompareVectors (Vector3 vector1, Vector3 vector2) {
-		return ((vector1 - vector2).magnitude < CLOSE_ENOUGH);
+		return ((vector1 - vector2).magnitude < Constants.CLOSE_ENOUGH);
 	}
 
 	/// <summary>

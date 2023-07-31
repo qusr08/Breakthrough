@@ -57,7 +57,8 @@ public class BackgroundBlockSpawner : MonoBehaviour {
 	/// <param name="spawnInsideBounds">Whether or not to spawn the background block in the inside of the bounds or along the edges of the bounds.</param>
 	public void CalculateValues (BackgroundBlock backgroundBlock, bool spawnInsideBounds = false) {
 		// Set the block to the theme color
-		backgroundBlock.GetComponent<SpriteRenderer>( ).color = gameManager.ThemeSettings.BackgroundDetailColor;
+		// * This assumes there are only 2 detail colors being used
+		backgroundBlock.GetComponent<SpriteRenderer>( ).color = gameManager.ThemeSettings.BackgroundDetailColors[Random.Range(0, 2)];
 
 		// Get a random position for the background block
 		Vector3 position;
