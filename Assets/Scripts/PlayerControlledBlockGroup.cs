@@ -69,7 +69,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		placeTimer -= Time.deltaTime;
 
 		// Fall down based on the fall time of the minos
-		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.FastMinoFallTime : gameManager.MinoFallTime)) {
+		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.MinMinoFallTime : gameManager.MinoFallTime)) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {

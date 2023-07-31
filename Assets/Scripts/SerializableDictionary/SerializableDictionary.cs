@@ -107,5 +107,8 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 public class BlockColorStringDictionary : SerializableDictionary<BlockColor, string> { }
 
 [Serializable]
+public class BlockColorColorDictionary : SerializableDictionary<BlockColor, Color> { }
+
+[Serializable]
 public class BlockTypeSpriteDictionary : SerializableDictionary<BlockType, Sprite> { }
 #endregion

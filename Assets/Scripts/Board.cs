@@ -28,10 +28,10 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject blockPrefab;
 	[Header("Properties")]
 	[SerializeField] private BoardState _boardState;
-	[SerializeField] private float cameraPadding;
-	[SerializeField] private float _boardPadding;
-	[SerializeField] private float _borderThickness;
-	[SerializeField] private float _glowThickness;
+	[SerializeField, Min(0f)] private float cameraPadding;
+	[SerializeField, Min(0f)] private float _boardPadding;
+	[SerializeField, Min(0f)] private float _borderThickness;
+	[SerializeField, Min(0f)] private float _glowThickness;
 
 	private readonly List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
 	private float boomBlockFrameTimer;
@@ -101,6 +101,7 @@ public class Board : MonoBehaviour {
 
 		gameManager = FindObjectOfType<GameManager>( );
 
+		// Set the position of the mino spawn point
 		float offsetX = gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0.0f;
 		minoSpawnPosition = new Vector3((gameManager.GameSettings.BoardWidth / 2f) - offsetX, gameManager.GameSettings.BoardHeight - 2.5f);
 
@@ -109,21 +110,25 @@ public class Board : MonoBehaviour {
 		float positionX = (gameManager.GameSettings.BoardWidth / 2) - (gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0f);
 		float positionY = (gameManager.GameSettings.BoardHeight / 2) - (gameManager.GameSettings.BoardHeight % 2 == 0 ? 0.5f : 0f);
 		spriteRenderer.size = new Vector2(gameManager.GameSettings.BoardWidth, gameManager.GameSettings.BoardHeight);
+		spriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the size of the border
 		float borderWidth = gameManager.GameSettings.BoardWidth + (BorderThickness * 2);
 		float borderHeight = gameManager.GameSettings.BoardHeight + (BorderThickness * 2);
 		borderSpriteRenderer.size = new Vector2(borderWidth, borderHeight);
+		borderSpriteRenderer.color = gameManager.ThemeSettings.DetailColor;
 
 		// Set the size of the glow around the board
 		float glowWidth = gameManager.GameSettings.BoardWidth + (GlowThickness * 2);
 		float glowHeight = gameManager.GameSettings.BoardHeight + (GlowThickness * 2);
 		glowSpriteRenderer.size = new Vector2(glowWidth, glowHeight);
+		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
 
 		// Set the camera orthographic size and position so it fits the entire board
 		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + cameraPadding) / 2f;
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
+		gameCamera.backgroundColor = gameManager.ThemeSettings.BackgroundColor;
 	}
 
 	private void Awake ( ) {
@@ -135,6 +140,7 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Start ( ) {
+		gameManager.Breakthroughs = gameManager.GameSettings.GameLevel * 6;
 		BoardState = BoardState.BREAKTHROUGH;
 	}
 
@@ -506,14 +512,14 @@ public class Board : MonoBehaviour {
 			// If the timer ends then switch the board states as the block groups have finished updating
 			if (canBlockGroupsFall) {
 				blockGroupsLocked = false;
-			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.FastMinoFallTime * 2f) {
+			} else if (Time.time - blockGroupsLockedStartTime >= gameManager.MinMinoFallTime * 2f) {
 				blockGroupsLocked = false;
 				BoardState = BoardState.MERGING_BLOCKGROUPS;
 			}
 		}
 	}
 
-	public void UpdatePercentageCleared () {
+	public void UpdatePercentageCleared ( ) {
 		int x = 0;
 		int y = gameManager.GameSettings.BoardHeight - HazardBoardArea.Height - 1;
 		int width = gameManager.GameSettings.BoardWidth;
@@ -524,10 +530,9 @@ public class Board : MonoBehaviour {
 	#region Sequences
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid
-		// float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(Width, gameManager.WallHeight, gameManager.WallHealthRange.x, gameManager.WallHealthRange.y);
-		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(gameManager.GameSettings.BoardWidth, 3, 0, 3);
-		// for (int j = 0; j < gameManager.WallHeight; j++) {
-		for (int j = 0; j < 3; j++) {
+		Debug.Log(gameManager.WallStrength);
+		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(gameManager.GameSettings.BoardWidth, gameManager.WallHeight, gameManager.WallStrength - 1, gameManager.WallStrength + 1);
+		for (int j = 0; j < gameManager.WallHeight; j++) {
 			for (int i = 0; i < gameManager.GameSettings.BoardWidth; i++) {
 				// Round the random noise grid value to an integer
 				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
@@ -548,13 +553,12 @@ public class Board : MonoBehaviour {
 				// If the random value is greater than 0, then generate a block at the current position with the random value as its health
 				// A value of 0 means the block would have 0 health, so no block should be created there
 				if (randomValue > 0) {
-					// CreateBlock(new Vector2Int(i, j + breakthroughBoardArea.Height), health: randomValue);
-					CreateBlock(new Vector2Int(i, j + 2), health: randomValue, blockType: BlockType.WALL);
+					CreateBlock(new Vector2Int(i, j + BreakthroughBoardArea.DefaultHeight), health: randomValue, blockType: BlockType.WALL);
 				}
 			}
 
 			// Have each row of the wall generate slightly delayed of one another
-			yield return new WaitForSeconds(0.25f);
+			yield return new WaitForSeconds(gameManager.BoardAnimationSpeed);
 		}
 
 		BoardState = BoardState.MERGING_BLOCKGROUPS;
@@ -589,14 +593,22 @@ public class Board : MonoBehaviour {
 	}
 
 	private IEnumerator Breakthrough ( ) {
+		// Clear the board
 		yield return StartCoroutine(ClearBoard(0f));
 
+		// Reset the board areas
+		BreakthroughBoardArea.ResetHeight( );
 		HazardBoardArea.ResetHeight( );
 		hazardBar.ResetProgress( );
 
+		// Reset the board points
 		gameManager.TotalPoints += Mathf.RoundToInt(gameManager.BoardPoints * gameManager.PercentCleared / 100f);
 		gameManager.BoardPoints = 0;
 
+		// Update the difficulty of the game
+		gameManager.UpdateDifficulty( );
+
+		// Generate the wall
 		BoardState = BoardState.GENERATE_WALL;
 	}
 	#endregion

@@ -12,6 +12,7 @@ public class BoardTextManager : MonoBehaviour {
 	[SerializeField] public BoardText TotalPointsBoardText;
 	[SerializeField] public BoardText BoardPointsBoardText;
 	[SerializeField] public BoardText PercentageClearBoardText;
+	[Space]
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
 	[SerializeField] private Transform backgroundTransform;
 	[SerializeField] private SpriteRenderer backgroundSpriteRenderer;
@@ -41,9 +42,10 @@ public class BoardTextManager : MonoBehaviour {
 		// This height assumes that all of the board text objects are the same height (as they should be)
 		float height = (TotalPointsBoardText.Height * 4) + (textSpacing * 3) + (board.BorderThickness * 2);
 
-		transform.localPosition = new Vector3(x, y);
+		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
 		backgroundSpriteRenderer.size = new Vector2(width, height);
+		backgroundSpriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
 
 		// Set the position of the text objects
 		TotalPointsBoardText.transform.localPosition = GetTextPositionFromIndex(0);
@@ -53,6 +55,7 @@ public class BoardTextManager : MonoBehaviour {
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
+		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
 
 		// Set misc. text positions
 		versionBoardText.transform.localPosition = new Vector3(board.BorderThickness, -height - board.BoardPadding);
@@ -64,6 +67,9 @@ public class BoardTextManager : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+
+		// Add the game settings code to the version number to show more information
+		versionBoardText.Label += $" | {gameManager.GameSettings.GameSettingsCode}";
 	}
 
 	/// <summary>

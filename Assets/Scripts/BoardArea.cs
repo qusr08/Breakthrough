@@ -15,9 +15,7 @@ public abstract class BoardArea : MonoBehaviour {
 	[SerializeField] protected Sprite fillCircleBottom;
 	[SerializeField] protected Sprite fillCircleTop;
 	[Header("Properties - Board Area")]
-	[SerializeField, Min(0)] protected int defaultHeight;
-	[SerializeField] protected Color lineColor;
-	[SerializeField] protected Color areaColor;
+	[SerializeField, Min(0)] protected int _defaultHeight;
 	[SerializeField, Range(0, 0.5f)] protected float lineThickness;
 	[SerializeField] protected bool _isAreaAbove;
 
@@ -27,10 +25,11 @@ public abstract class BoardArea : MonoBehaviour {
 
 	#region Properties
 	public int Height { get => _height; set => _height = value; }
+	public int DefaultHeight => _defaultHeight;
 	public bool IsAreaAbove => _isAreaAbove;
 	#endregion
 
-	#region Unity
+	#region Unity Functions
 #if UNITY_EDITOR
 	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -45,14 +44,16 @@ public abstract class BoardArea : MonoBehaviour {
 		board = FindObjectOfType<Board>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
-		// Set sprites and colors of for the board area
-		lineSpriteRenderer.color = lineColor;
-		areaSpriteRenderer.color = areaColor;
+		// Set sprite for the board area
 		areaSpriteRenderer.sprite = (IsAreaAbove ? fillCircleTop : fillCircleBottom);
 
 		// Update the height
 		ResetHeight( );
+
+		OnChildValidate( );
 	}
+
+	protected abstract void OnChildValidate ( );
 
 	private void Awake ( ) {
 #if UNITY_EDITOR
@@ -76,8 +77,8 @@ public abstract class BoardArea : MonoBehaviour {
 	public abstract void OnHeightChange ( );
 
 	public void ResetHeight ( ) {
-		Height = defaultHeight;
-		fromHeight = defaultHeight;
+		Height = DefaultHeight;
+		fromHeight = DefaultHeight;
 		Recalculate( );
 	}
 

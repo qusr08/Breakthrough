@@ -46,13 +46,23 @@ public class HazardBar : MonoBehaviour {
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
 
+		// Calculate the position of the hazard bar
+		float x = -(gameManager.GameSettings.BoardWidth / 2f) - (board.BorderThickness * 1.5f) - board.BoardPadding;
+		float y = 0f;
+
 		// Set background position
-		transform.localPosition = new Vector3(-(gameManager.GameSettings.BoardWidth / 2f) - (board.BorderThickness * 1.5f) - board.BoardPadding, 0f);
+		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
 		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f));
+		backgroundSpriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
 
-		// Set glow size
+		// Set glow size and color
 		glowSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight) + (Vector2.one * (board.GlowThickness * 2));
+		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
+
+		// Set fill color
+		Color hazardColor = gameManager.ThemeSettings.HazardColor;
+		fillSpriteRenderer.color = new Color(hazardColor.r, hazardColor.g, hazardColor.b, 1f);
 
 		// Update the progress
 		Progress = Progress;

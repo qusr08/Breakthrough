@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BackgroundBlockSpawner : MonoBehaviour {
-	[Header("Prefabs")]
+	[Header("Components - Background Block Spawner")]
 	[SerializeField, Tooltip("The prefab for the background blocks that will spawn.")] private GameObject backgroundBlockPrefab;
-	[Header("Background Block Variables")]
+	[Space]
+	[SerializeField] private GameManager gameManager;
+	[Header("Properties - Background Block Spawner")]
 	[SerializeField, Min(0f), Tooltip("The maximum size that a background block can be.")] private float maxBlockSize;
 	[SerializeField, Min(0f), Tooltip("The minimum size that a background block can be.")] private float minBlockSize;
 	[SerializeField, Min(0f), Tooltip("The maximum speed that a background block can have.")] private float maxBlockSpeed;
 	[SerializeField, Min(0f), Tooltip("The minimum speed that a background block can have.")] private float minBlockSpeed;
 	[SerializeField, Min(0f), Tooltip("The maximum rotational speed that a background block can have.")] private float maxBlockRotateSpeed;
 	[SerializeField, Min(0f), Tooltip("The minimum rotational speed that a background block can have.")] private float minBlockRotateSpeed;
-	[SerializeField, Tooltip("A list of all the hex codes that the background blocks can change into. The background blocks will slowly fade to different colors as they move around to add more dynamicness to the background.")] private List<string> colors;
-	[SerializeField, Range(0f, 1f), Tooltip("The alpha of the color to set the background blocks to.")] private float alpha;
 	[Space]
 	[SerializeField, Tooltip("The bounds of the area that background blocks can occupy.")] private Bounds _backgroundBlockBounds;
 	[SerializeField, Min(0f), Tooltip("The maximum amount of blocks that the can be spawned in.")] private int blockCount;
@@ -30,6 +30,9 @@ public class BackgroundBlockSpawner : MonoBehaviour {
 	}
 
 	private void OnValidate ( ) {
+		gameManager = FindObjectOfType<GameManager>( );
+
+		// Calculate the dimensions of the bounds
 		boundsHeight = (maxBlockSize * Mathf.Sqrt(2)) + (Camera.main.orthographicSize * 2f);
 		boundsWidth = (maxBlockSize * Mathf.Sqrt(2)) + (Camera.main.aspect * Camera.main.orthographicSize * 2f);
 	}
@@ -53,10 +56,8 @@ public class BackgroundBlockSpawner : MonoBehaviour {
 	/// <param name="backgroundBlock">The background block to relocate</param>
 	/// <param name="spawnInsideBounds">Whether or not to spawn the background block in the inside of the bounds or along the edges of the bounds.</param>
 	public void CalculateValues (BackgroundBlock backgroundBlock, bool spawnInsideBounds = false) {
-		// Set the block to have a random color
-		Color color = Utils.GetColorFromHex(colors[Random.Range(0, colors.Count)]);
-		color.a = alpha;
-		backgroundBlock.GetComponent<SpriteRenderer>( ).color = color;
+		// Set the block to the theme color
+		backgroundBlock.GetComponent<SpriteRenderer>( ).color = gameManager.ThemeSettings.BackgroundDetailColor;
 
 		// Get a random position for the background block
 		Vector3 position;

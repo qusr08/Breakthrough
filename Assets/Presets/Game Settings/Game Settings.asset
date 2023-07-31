@@ -16,9 +16,9 @@ MonoBehaviour:
   boardHeightValue: 0
   minoSpeedMultiplierValue: 3
   hazardSpeedMultiplierValue: 3
-  wallMultiplierValue: 3
+  wallStrengthMultiplierValue: 3
   boomBlockChanceValue: 3
-  gameLevelValue: 0
+  gameLevelValue: 5
   allowedMinosValue: 510
-  _gameSettingsCode: 00AJVK3
-  gameSettingsLong: 17723523
+  _gameSettingsCode: 005R9JN
+  gameSettingsLong: 9670163

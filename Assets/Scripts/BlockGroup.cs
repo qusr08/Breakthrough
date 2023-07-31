@@ -69,7 +69,7 @@ public class BlockGroup : MonoBehaviour {
 	#endregion
 
 	public virtual void UpdateBlockGroup ( ) {
-		if (Time.time - previousFallTime > gameManager.FastMinoFallTime) {
+		if (Time.time - previousFallTime > gameManager.MinMinoFallTime) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {

@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class BoardText : MonoBehaviour {
 	[Header("Components - Board Text")]
+	[SerializeField] private GameManager gameManager;
+	[Space]
 	[SerializeField] private TextMeshPro labelText;
 	[SerializeField] private TextMeshPro valueText;
 	[SerializeField] private RectTransform labelRectTransform;
@@ -16,7 +18,7 @@ public class BoardText : MonoBehaviour {
 	[SerializeField, Min(0f)] private float labelHeight;
 	[SerializeField, Min(0f)] private float valueHeight;
 
-	public string Label => labelText.text;
+	public string Label { get => labelText.text; set => labelText.text = value; }
 	public float Value {
 		get => float.Parse(valueText.text.Replace(",", "").Replace("%", "").Replace(".", ""));
 		set => valueText.text = (isPercentange ? $"{value:0.##}%" : $"{value:n0}");
@@ -36,11 +38,17 @@ public class BoardText : MonoBehaviour {
 		}
 #endif
 
+		gameManager = FindObjectOfType<GameManager>( );
+
 		// Set the size and position of the text boxes
 		labelRectTransform.localPosition = new Vector3(Width / 2f, -labelHeight / 2f);
 		labelRectTransform.sizeDelta = new Vector2(Width, labelHeight);
 		valueRectTransform.localPosition = new Vector3(Width / 2f, -labelHeight - (valueHeight / 2f));
 		valueRectTransform.sizeDelta = new Vector2(Width, valueHeight);
+
+		// Set the color of the text
+		labelText.color = gameManager.ThemeSettings.DetailColor;
+		valueText.color = gameManager.ThemeSettings.DetailColor;
 	}
 
 	private void Awake ( ) {
