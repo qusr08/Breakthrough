@@ -488,8 +488,8 @@ public class SerializableDictionaryStoragePropertyDrawer : PropertyDrawer {
 }
 
 #region Custom Dictionaries
-[CustomPropertyDrawer(typeof(BlockColorStringDictionary))]
 [CustomPropertyDrawer(typeof(BlockColorColorDictionary))]
 [CustomPropertyDrawer(typeof(BlockTypeSpriteDictionary))]
+[CustomPropertyDrawer(typeof(ThemeStateDictionary))]
 public class AnySerializableDictionaryPropertyDrawer : SerializableDictionaryPropertyDrawer { }
 #endregion

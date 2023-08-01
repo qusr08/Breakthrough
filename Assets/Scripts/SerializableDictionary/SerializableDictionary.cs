@@ -103,12 +103,13 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 }
 
 #region Custom Dictionaries
-[Serializable]
-public class BlockColorStringDictionary : SerializableDictionary<BlockColor, string> { }
 
 [Serializable]
 public class BlockColorColorDictionary : SerializableDictionary<BlockColor, Color> { }
 
 [Serializable]
 public class BlockTypeSpriteDictionary : SerializableDictionary<BlockType, Sprite> { }
+
+[Serializable]
+public class ThemeStateDictionary : SerializableDictionary<ThemeState, ThemeSettings> { }
 #endregion

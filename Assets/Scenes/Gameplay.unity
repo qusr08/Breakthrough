@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 277239530}
   - component: {fileID: 277239531}
   m_Layer: 0
-  m_Name: Background Block Spawner
+  m_Name: Background Block Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1082,7 +1082,6 @@ MonoBehaviour:
   _minoPlaceTime: 0.75
   defaultHazardFallTime: 15
   minHazardFallTime: 4
-  _blockScale: 0.95
   _rotateDirection: -1
   _boardAnimationSpeed: 0.05
   boomBlockGuarantee: 6

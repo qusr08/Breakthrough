@@ -20,6 +20,7 @@ public class Block : MonoBehaviour {
 	[SerializeField] private Board board;
 	[SerializeField] private ParticleManager particleManager;
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private ThemeManager themeManager;
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private SpriteRenderer iconSpriteRenderer;
@@ -32,7 +33,6 @@ public class Block : MonoBehaviour {
 	[SerializeField] private int _health = 1;
 	[SerializeField] private int _minoIndex = -1;
 	[Space]
-	[SerializeField] private BlockColorStringDictionary blockColors;
 	[SerializeField] private BlockTypeSpriteDictionary blockIcons;
 	[SerializeField] private int areaBoomBlockSize = 2;
 	[SerializeField] private int pyraBoomBlockSize = 3;
@@ -60,7 +60,7 @@ public class Block : MonoBehaviour {
 		get => _blockColor;
 		set {
 			_blockColor = value;
-			spriteRenderer.color = Utils.GetColorFromHex(blockColors[value]);
+			spriteRenderer.color = themeManager.ActiveThemeSettings.BlockColors[_blockColor];
 		}
 	}
 	public BlockType BlockType {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BackgroundBlock : MonoBehaviour {
 	[Header("Components")]
-	[SerializeField] public BackgroundBlockSpawner BackgroundBlockSpawner;
+	[SerializeField] public BackgroundBlockManager BackgroundBlockSpawner;
 
 	private void Update ( ) {
 		// If the background block is no longer inside the bounds of the background, then recalculate its values

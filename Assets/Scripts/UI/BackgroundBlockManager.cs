@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BackgroundBlockSpawner : MonoBehaviour {
-	[Header("Components - Background Block Spawner")]
+public class BackgroundBlockManager : MonoBehaviour {
+	[Header("Components - Background Block Manager")]
 	[SerializeField, Tooltip("The prefab for the background blocks that will spawn.")] private GameObject backgroundBlockPrefab;
 	[Space]
 	[SerializeField] private GameManager gameManager;
-	[Header("Properties - Background Block Spawner")]
+	[Header("Properties - Background Block Manager")]
 	[SerializeField, Min(0f), Tooltip("The maximum size that a background block can be.")] private float maxBlockSize;
 	[SerializeField, Min(0f), Tooltip("The minimum size that a background block can be.")] private float minBlockSize;
 	[SerializeField, Min(0f), Tooltip("The maximum speed that a background block can have.")] private float maxBlockSpeed;
