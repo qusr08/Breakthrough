@@ -220,26 +220,26 @@ public static class Utils {
 	/// <param name="excludedIndex">The index to exclude from the array</param>
 	/// <returns>A random element from the array that is not at the excluded index</returns>
 	public static T GetRandomArrayElementExcluded<T> (List<T> array, int excludedIndex) {
-		return array[GetRandomArrayIndexExcluded(array, excludedIndex)];
+		return array[GetRandomArrayIndexExcluded(array.Count, excludedIndex)];
 	}
 
 	/// <summary>
 	/// Get a random array index with an excluded index
 	/// </summary>
 	/// <typeparam name="T">The type of the values contained within the array</typeparam>
-	/// <param name="array">The array to get the index from</param>
+	/// <param name="arraySize">The size of the array</param>
 	/// <param name="excludedIndex">The index to exclude</param>
 	/// <returns>A random index that is not the excluded index</returns>
-	public static int GetRandomArrayIndexExcluded<T> (List<T> array, int excludedIndex) {
-		List<int> copy = new List<int>( );
-		for (int i = 0; i < array.Count; i++) {
+	public static int GetRandomArrayIndexExcluded (int arraySize, int excludedIndex) {
+		List<int> indices = new List<int>( );
+		for (int i = 0; i < arraySize; i++) {
 			if (i == excludedIndex) {
 				continue;
 			}
 
-			copy.Add(i);
+			indices.Add(i);
 		}
 
-		return UnityEngine.Random.Range(0, copy.Count);
+		return indices[UnityEngine.Random.Range(0, indices.Count)];
 	}
 }

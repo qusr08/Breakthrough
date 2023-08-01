@@ -9,17 +9,9 @@ public enum GameState {
 
 public class GameManager : MonoBehaviour {
 	[Header("Components")]
-	[SerializeField] private ParticleManager _particleManager;
 	[SerializeField] private BoardTextManager boardTextManager;
 	[SerializeField] private GameSettings _gameSettings;
-	[SerializeField] private ThemeSettings _themeSettings;
 	[SerializeField] private Board board;
-	[Header("Point Values")]
-	[SerializeField, Min(0)] private int _pointsPerDestroyedBlock = 6;
-	[SerializeField, Min(0)] private int _pointsPerDroppedBlock = 12;
-	[SerializeField, Min(0)] private int _pointsPerBreakthrough = 600;
-	[SerializeField, Min(0)] private int _pointsPerDestroyedMino = 60;
-	[SerializeField, Min(0)] private int _pointsPerFastDrop = 2;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
@@ -50,9 +42,7 @@ public class GameManager : MonoBehaviour {
 	private int _wallHeight;
 
 	#region Properties
-	public ParticleManager ParticleManager => _particleManager;
 	public GameSettings GameSettings => _gameSettings;
-	public ThemeSettings ThemeSettings => _themeSettings;
 
 	public int BoardPoints { get => _boardPoints; set => boardTextManager.BoardPointsBoardText.Value = _boardPoints = value; }
 	public int TotalPoints { get => _totalPoints; set => boardTextManager.TotalPointsBoardText.Value = _totalPoints = value; }
@@ -77,12 +67,6 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
-
-	public int PointsPerDestroyedBlock => _pointsPerDestroyedBlock;
-	public int PointsPerDroppedBlock => _pointsPerDroppedBlock;
-	public int PointsPerBreakthrough => _pointsPerBreakthrough;
-	public int PointsPerDestroyedMino => _pointsPerDestroyedMino;
-	public int PointsPerFastDrop => _pointsPerFastDrop;
 
 	public float MinoFallTime { get => _minoFallTime; private set => _minoFallTime = value; }
 	public float MinMinoFallTime => _minMinoFallTime;

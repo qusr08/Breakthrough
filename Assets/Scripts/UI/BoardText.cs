@@ -5,14 +5,14 @@ using UnityEditor;
 using UnityEngine;
 
 public class BoardText : MonoBehaviour {
-	[Header("Components - Board Text")]
+	[Header("Components")]
+	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
-	[Space]
 	[SerializeField] private TextMeshPro labelText;
 	[SerializeField] private TextMeshPro valueText;
 	[SerializeField] private RectTransform labelRectTransform;
 	[SerializeField] private RectTransform valueRectTransform;
-	[Header("Properties - Board Text")]
+	[Header("Properties")]
 	[SerializeField] private bool isPercentange;
 	[SerializeField, Min(0f)] private float _width;
 	[SerializeField, Min(0f)] private float labelHeight;
@@ -38,6 +38,7 @@ public class BoardText : MonoBehaviour {
 		}
 #endif
 
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
 		// Set the size and position of the text boxes
@@ -47,8 +48,8 @@ public class BoardText : MonoBehaviour {
 		valueRectTransform.sizeDelta = new Vector2(Width, valueHeight);
 
 		// Set the color of the text
-		labelText.color = gameManager.ThemeSettings.DetailColor;
-		valueText.color = gameManager.ThemeSettings.DetailColor;
+		labelText.color = themeManager.ActiveTheme.TextColor;
+		valueText.color = themeManager.ActiveTheme.TextColor;
 	}
 
 	private void Awake ( ) {

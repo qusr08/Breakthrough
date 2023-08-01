@@ -548,6 +548,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundBlockPrefab: {fileID: 4925251009261073296, guid: fdd8c907d78823647afb4660b85d6497, type: 3}
+  themeManager: {fileID: 0}
   gameManager: {fileID: 1065242837}
   maxBlockSize: 10
   minBlockSize: 3
@@ -605,6 +606,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 1065242837}
+  themeManager: {fileID: 0}
   board: {fileID: 1478095446}
   backgroundTransform: {fileID: 11189151}
   fillTransform: {fileID: 1447708996}
@@ -948,6 +950,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &1022718272
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960755, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286332648429960756, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
+      propertyPath: m_Name
+      value: Theme Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7ac5cd68b5f28ad48ae644b96b68ad8e, type: 3}
 --- !u!1 &1027151998
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,10 +1118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b735e589d76b7664e87111cfd52beed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _particleManager: {fileID: 158663792}
   boardTextManager: {fileID: 1310361323}
   _gameSettings: {fileID: 11400000, guid: 6635955c6f236f848aa21d8f84d03dc4, type: 2}
-  _themeSettings: {fileID: 11400000, guid: 1ec8e395a047cfc48ae3347316e8fac0, type: 2}
   board: {fileID: 1478095446}
   _pointsPerDestroyedBlock: 6
   _pointsPerDroppedBlock: 12
@@ -1145,8 +1202,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4dc3052459457144be72c20e1e06770, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 1478095446}
+  themeManager: {fileID: 0}
   gameManager: {fileID: 1065242837}
+  board: {fileID: 1478095446}
   lineTransform: {fileID: 1027151999}
   areaTransform: {fileID: 1479815864}
   lineSpriteRenderer: {fileID: 1027152000}
@@ -1201,8 +1259,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dca4e75f61bd204da0f03d0d5dff49a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 1478095446}
+  themeManager: {fileID: 0}
   gameManager: {fileID: 1065242837}
+  board: {fileID: 1478095446}
   lineTransform: {fileID: 1009256226}
   areaTransform: {fileID: 215213626}
   lineSpriteRenderer: {fileID: 1009256227}
@@ -1343,6 +1402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc67b9e08d2d0b14388905691585b918, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  themeManager: {fileID: 0}
   gameManager: {fileID: 1065242837}
   board: {fileID: 1478095446}
   BreakthroughsBoardText: {fileID: 1626774005}
@@ -1623,14 +1683,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aba4d5fc022b0f042ab885d84222c502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  themeManager: {fileID: 0}
   gameManager: {fileID: 1065242837}
-  spriteRenderer: {fileID: 1478095445}
-  borderSpriteRenderer: {fileID: 1308188628}
-  glowSpriteRenderer: {fileID: 2096878843}
-  gameCamera: {fileID: 674106559}
+  particleManager: {fileID: 0}
   breakthroughBoardArea: {fileID: 1287335628}
   hazardBoardArea: {fileID: 1186843077}
   hazardBar: {fileID: 635352585}
+  gameCamera: {fileID: 674106559}
+  spriteRenderer: {fileID: 1478095445}
+  borderSpriteRenderer: {fileID: 1308188628}
+  glowSpriteRenderer: {fileID: 2096878843}
   minoPrefabs:
   - {fileID: 8907610463685383984, guid: 0044d3d80af4acd448fbcaef16562718, type: 3}
   - {fileID: 2824748411110917681, guid: f6229cd0d6e43c140959ee41b376ea7f, type: 3}

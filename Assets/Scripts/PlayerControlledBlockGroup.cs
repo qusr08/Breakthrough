@@ -76,7 +76,7 @@ public class PlayerControlledBlockGroup : BlockGroup {
 				previousFallTime = Time.time;
 
 				if (verticalValue > 0) {
-					gameManager.BoardPoints += gameManager.PointsPerFastDrop;
+					gameManager.BoardPoints += Constants.POINT_FAST_DROP;
 					placeTimer = gameManager.MinoPlaceTime;
 				}
 			} else if (IsDoneTweening && placeTimer <= 0) {

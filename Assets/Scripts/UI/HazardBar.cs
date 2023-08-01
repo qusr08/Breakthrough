@@ -6,6 +6,7 @@ using UnityEngine;
 public class HazardBar : MonoBehaviour {
 	[Header("Components - Hazard Bar")]
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private Board board;
 	[Space]
 	[SerializeField] private Transform backgroundTransform;
@@ -43,6 +44,7 @@ public class HazardBar : MonoBehaviour {
 		}
 #endif
 
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
 
@@ -54,14 +56,14 @@ public class HazardBar : MonoBehaviour {
 		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
 		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f));
-		backgroundSpriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
+		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 
 		// Set glow size and color
 		glowSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight) + (Vector2.one * (board.GlowThickness * 2));
-		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
+		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
 		// Set fill color
-		Color hazardColor = gameManager.ThemeSettings.HazardColor;
+		Color hazardColor = themeManager.ActiveTheme.HazardColor;
 		fillSpriteRenderer.color = new Color(hazardColor.r, hazardColor.g, hazardColor.b, 1f);
 
 		// Update the progress

@@ -5,14 +5,14 @@ using UnityEngine;
 public class BreakthroughBoardArea : BoardArea {
 	#region Unity Functions
 	protected override void OnChildValidate ( ) {
-		Color breakthroughColor = gameManager.ThemeSettings.BreakthroughColor;
+		Color breakthroughColor = themeManager.ActiveTheme.BreakthroughColor;
 		areaSpriteRenderer.color = breakthroughColor;
 		lineSpriteRenderer.color = new Color(breakthroughColor.r, breakthroughColor.g, breakthroughColor.b, 1f);
 	}
 	#endregion
 
 	public override void OnDestroyActiveMino ( ) {
-		gameManager.BoardPoints += gameManager.PointsPerBreakthrough;
+		gameManager.BoardPoints += Constants.POINT_BRKTH;
 		gameManager.Breakthroughs++;
 		board.BoardState = BoardState.BREAKTHROUGH;
 	}

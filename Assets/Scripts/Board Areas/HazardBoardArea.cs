@@ -6,7 +6,7 @@ using UnityEngine;
 public class HazardBoardArea : BoardArea {
 	#region Unity Functions
 	protected override void OnChildValidate ( ) {
-		Color hazardColor = gameManager.ThemeSettings.HazardColor;
+		Color hazardColor = themeManager.ActiveTheme.HazardColor;
 		areaSpriteRenderer.color = hazardColor;
 		lineSpriteRenderer.color = new Color(hazardColor.r, hazardColor.g, hazardColor.b, 1f);
 	}

@@ -17,7 +17,7 @@ public class ThemeManager : MonoBehaviour {
 	#region Properties
 	public static ThemeManager Instance { get => _instance; private set => _instance = value; }
 	public ThemeState ThemeState { get => _themeState; set => _themeState = value; }
-	public ThemeSettings ActiveThemeSettings => themeSettingsList[ThemeState];
+	public ThemeSettings ActiveTheme => themeSettingsList[ThemeState];
 	#endregion
 
 	#region Unity Functions
@@ -33,4 +33,15 @@ public class ThemeManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 	#endregion
+
+	public Color GetRandomButtonColor ( ) {
+		int _ = -1;
+		return GetRandomButtonColor(ref _);
+	}
+
+	public Color GetRandomButtonColor (ref int excludedIndex) {
+		int buttonColorCount = ActiveTheme.ButtonColors.Count;
+		excludedIndex = Utils.GetRandomArrayIndexExcluded(buttonColorCount, excludedIndex);
+		return ActiveTheme.ButtonColors[excludedIndex];
+	}
 }

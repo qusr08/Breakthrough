@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BoardTextManager : MonoBehaviour {
 	[Header("Components - Board Text Manager")]
+	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private Board board;
 	[Space]
@@ -32,6 +33,7 @@ public class BoardTextManager : MonoBehaviour {
 		}
 #endif
 
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
 
@@ -40,25 +42,26 @@ public class BoardTextManager : MonoBehaviour {
 		float y = gameManager.GameSettings.BoardHeight / 2f;
 		float width = TotalPointsBoardText.Width + (board.BorderThickness * 2);
 		// This height assumes that all of the board text objects are the same height (as they should be)
-		float height = (TotalPointsBoardText.Height * 4) + (textSpacing * 3) + (board.BorderThickness * 2);
+		float height = (TotalPointsBoardText.Height * 4) + versionBoardText.Height + (textSpacing * 3) + (board.BorderThickness * 2);
 
 		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
 		backgroundSpriteRenderer.size = new Vector2(width, height);
-		backgroundSpriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
+		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 
 		// Set the position of the text objects
 		TotalPointsBoardText.transform.localPosition = GetTextPositionFromIndex(0);
 		BoardPointsBoardText.transform.localPosition = GetTextPositionFromIndex(1);
 		PercentageClearBoardText.transform.localPosition = GetTextPositionFromIndex(2);
 		BreakthroughsBoardText.transform.localPosition = GetTextPositionFromIndex(3);
+		versionBoardText.transform.localPosition = GetTextPositionFromIndex(4);
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
-		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
+		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
 		// Set misc. text positions
-		versionBoardText.transform.localPosition = new Vector3(board.BorderThickness, -height - board.BoardPadding);
+		// versionBoardText.transform.localPosition = new Vector3(board.BorderThickness, -height - board.BoardPadding);
 	}
 
 	private void Awake ( ) {

@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2252d3c2df40144785bf586926a84fb, type: 3}
   m_Name: Game Settings
   m_EditorClassIdentifier: 
-  boardWidthValue: 0
-  boardHeightValue: 0
+  boardWidthValue: 7
+  boardHeightValue: 7
   minoSpeedMultiplierValue: 3
   hazardSpeedMultiplierValue: 3
   wallStrengthMultiplierValue: 3
   boomBlockChanceValue: 3
-  gameLevelValue: 5
+  gameLevelValue: 0
   allowedMinosValue: 510
-  _gameSettingsCode: 005R9JN
-  gameSettingsLong: 9670163
+  _gameSettingsCode: 1XO6M8O
+  gameSettingsLong: 4212785688

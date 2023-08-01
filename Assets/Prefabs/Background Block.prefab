@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4925251009261073296}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6ed454e51ba5444a9fb23b3ffb4b386, type: 3}
+  m_Script: {fileID: 11500000, guid: fa5f36104b01fb644bf2fb17f2496ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BackgroundBlockSpawner: {fileID: 0}

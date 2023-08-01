@@ -6,6 +6,7 @@ public class BackgroundBlockManager : MonoBehaviour {
 	[Header("Components - Background Block Manager")]
 	[SerializeField, Tooltip("The prefab for the background blocks that will spawn.")] private GameObject backgroundBlockPrefab;
 	[Space]
+	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
 	[Header("Properties - Background Block Manager")]
 	[SerializeField, Min(0f), Tooltip("The maximum size that a background block can be.")] private float maxBlockSize;
@@ -30,6 +31,7 @@ public class BackgroundBlockManager : MonoBehaviour {
 	}
 
 	private void OnValidate ( ) {
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
 		// Calculate the dimensions of the bounds
@@ -58,7 +60,7 @@ public class BackgroundBlockManager : MonoBehaviour {
 	public void CalculateValues (BackgroundBlock backgroundBlock, bool spawnInsideBounds = false) {
 		// Set the block to the theme color
 		// * This assumes there are only 2 detail colors being used
-		backgroundBlock.GetComponent<SpriteRenderer>( ).color = gameManager.ThemeSettings.BackgroundDetailColors[Random.Range(0, 2)];
+		backgroundBlock.GetComponent<SpriteRenderer>( ).color = themeManager.ActiveTheme.BackgroundDetailColors[Random.Range(0, 2)];
 
 		// Get a random position for the background block
 		Vector3 position;

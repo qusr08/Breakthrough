@@ -5,8 +5,9 @@ using UnityEngine;
 
 public abstract class BoardArea : MonoBehaviour {
 	[Header("Components - Board Area")]
-	[SerializeField] protected Board board;
+	[SerializeField] protected ThemeManager themeManager;
 	[SerializeField] protected GameManager gameManager;
+	[SerializeField] protected Board board;
 	[Space]
 	[SerializeField] protected Transform lineTransform;
 	[SerializeField] protected Transform areaTransform;
@@ -41,8 +42,9 @@ public abstract class BoardArea : MonoBehaviour {
 		}
 #endif
 
-		board = FindObjectOfType<Board>( );
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
+		board = FindObjectOfType<Board>( );
 
 		// Set sprite for the board area
 		areaSpriteRenderer.sprite = (IsAreaAbove ? fillCircleTop : fillCircleBottom);

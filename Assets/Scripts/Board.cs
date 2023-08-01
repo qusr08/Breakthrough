@@ -12,16 +12,17 @@ public enum BoardState {
 
 public class Board : MonoBehaviour {
 	[Header("Components")]
+	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private ParticleManager particleManager;
+	[SerializeField] private BoardArea breakthroughBoardArea;
+	[SerializeField] private BoardArea hazardBoardArea;
+	[SerializeField] private HazardBar hazardBar;
+	[SerializeField] private Camera gameCamera;
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
-	[SerializeField] private Camera gameCamera;
-	[Space]
-	[SerializeField] private BoardArea breakthroughBoardArea;
-	[SerializeField] private BoardArea hazardBoardArea;
-	[SerializeField] private HazardBar hazardBar;
 	[Space]
 	[SerializeField] private List<GameObject> minoPrefabs;
 	[SerializeField] private GameObject blockGroupPrefab;
@@ -99,7 +100,9 @@ public class Board : MonoBehaviour {
 		}
 #endif
 
+		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
+		particleManager = FindObjectOfType<ParticleManager>( );
 
 		// Set the position of the mino spawn point
 		float offsetX = gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0.0f;
@@ -110,25 +113,25 @@ public class Board : MonoBehaviour {
 		float positionX = (gameManager.GameSettings.BoardWidth / 2) - (gameManager.GameSettings.BoardWidth % 2 == 0 ? 0.5f : 0f);
 		float positionY = (gameManager.GameSettings.BoardHeight / 2) - (gameManager.GameSettings.BoardHeight % 2 == 0 ? 0.5f : 0f);
 		spriteRenderer.size = new Vector2(gameManager.GameSettings.BoardWidth, gameManager.GameSettings.BoardHeight);
-		spriteRenderer.color = gameManager.ThemeSettings.BackgroundColor;
+		spriteRenderer.color = themeManager.ActiveTheme.BackgroundColor;
 		transform.position = new Vector3(positionX, positionY);
 
 		// Set the size of the border
 		float borderWidth = gameManager.GameSettings.BoardWidth + (BorderThickness * 2);
 		float borderHeight = gameManager.GameSettings.BoardHeight + (BorderThickness * 2);
 		borderSpriteRenderer.size = new Vector2(borderWidth, borderHeight);
-		borderSpriteRenderer.color = gameManager.ThemeSettings.DetailColor;
+		borderSpriteRenderer.color = themeManager.ActiveTheme.DetailColor;
 
 		// Set the size of the glow around the board
 		float glowWidth = gameManager.GameSettings.BoardWidth + (GlowThickness * 2);
 		float glowHeight = gameManager.GameSettings.BoardHeight + (GlowThickness * 2);
 		glowSpriteRenderer.size = new Vector2(glowWidth, glowHeight);
-		glowSpriteRenderer.color = gameManager.ThemeSettings.GlowColor;
+		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
 		// Set the camera orthographic size and position so it fits the entire board
 		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + cameraPadding) / 2f;
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
-		gameCamera.backgroundColor = gameManager.ThemeSettings.BackgroundColor;
+		gameCamera.backgroundColor = themeManager.ActiveTheme.BackgroundColor;
 	}
 
 	private void Awake ( ) {
@@ -306,12 +309,12 @@ public class Board : MonoBehaviour {
 
 				// If the mino index now has a size of 0, the entire mino has been destroyed
 				if (minos[block.MinoIndex].Count == 0) {
-					gameManager.BoardPoints = gameManager.PointsPerDestroyedMino;
+					gameManager.BoardPoints = Constants.POINT_DSTRY_MINO;
 				}
 			}
 
 			// Destroy the block game object
-			gameManager.BoardPoints += (dropped ? gameManager.PointsPerDroppedBlock : gameManager.PointsPerDestroyedBlock);
+			gameManager.BoardPoints += (dropped ? Constants.POINT_DROP_BLOCK : Constants.POINT_DSTRY_BLOCK);
 			Destroy(block.gameObject);
 
 			return true;
@@ -372,7 +375,7 @@ public class Board : MonoBehaviour {
 	/// </summary>
 	/// <param name="block">The block to create boom block frames from</param>
 	private void GenerateBoomBlockFrames (Block block) {
-		boomBlockFrames.Add(new BoomBlockFrames(this, gameManager, block));
+		boomBlockFrames.Add(new BoomBlockFrames(this, particleManager, block));
 	}
 
 	/// <summary>

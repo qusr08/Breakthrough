@@ -60,7 +60,7 @@ public class Block : MonoBehaviour {
 		get => _blockColor;
 		set {
 			_blockColor = value;
-			spriteRenderer.color = themeManager.ActiveThemeSettings.BlockColors[_blockColor];
+			spriteRenderer.color = themeManager.ActiveTheme.BlockColors[_blockColor];
 		}
 	}
 	public BlockType BlockType {
@@ -113,7 +113,7 @@ public class Block : MonoBehaviour {
 	}
 	#endregion
 
-	#region Unity
+	#region Unity Functions
 #if UNITY_EDITOR
 	protected void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -125,12 +125,14 @@ public class Block : MonoBehaviour {
 		}
 #endif
 
+		themeManager = FindObjectOfType<ThemeManager>( );
 		board = FindObjectOfType<Board>( );
 		particleManager = FindObjectOfType<ParticleManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
-		transform.localScale = new Vector3(Constants.BLK_SCL, Constants.BLK_SCL, 1f);
+		transform.localScale = new Vector3(Constants.BLOCK_SCALE, Constants.BLOCK_SCALE, 1f);
+		iconSpriteRenderer.color = new Color(1f, 1f, 1f, Constants.BLOCK_ICON_ALPHA);
 	}
 
 	protected void Awake ( ) {

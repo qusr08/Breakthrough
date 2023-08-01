@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoomBlockFrames {
 	private Board board;
-	private GameManager gameManager;
+	private ParticleManager particleManager;
 	private Block boomBlock;
 	private Color color;
 
@@ -15,9 +15,9 @@ public class BoomBlockFrames {
 	public int Count => frames.Count;
 	#endregion
 
-	public BoomBlockFrames (Board board, GameManager gameManager, Block boomBlock) {
+	public BoomBlockFrames (Board board, ParticleManager particleManager, Block boomBlock) {
 		this.board = board;
-		this.gameManager = gameManager;
+		this.particleManager = particleManager;
 		this.boomBlock = boomBlock;
 
 		color = boomBlock.Color;
@@ -44,7 +44,7 @@ public class BoomBlockFrames {
 
 			// For each position in the previous frame, add all the cardinal positions around the current position to the next frame
 			foreach (Vector2Int position in frames[frameIndex]) {
-                List<Vector2Int> neighbors = Utils.GetCardinalPositions(position);
+				List<Vector2Int> neighbors = Utils.GetCardinalPositions(position);
 				foreach (Vector2Int neighborPosition in neighbors) {
 					if (TryAddPositionToFrame(neighborPosition, frameIndex + 1)) {
 						hasBlockInRange = true;
@@ -66,27 +66,27 @@ public class BoomBlockFrames {
 		// Check to make sure the position is on the board
 		if (!board.IsPositionOnBoard(position)) {
 			return false;
-        }
+		}
 
-        // Check to make sure the position is within the range of the boom block
-        if (!boomBlock.IsWithinRange(position)) {
-            return false;
-        }
+		// Check to make sure the position is within the range of the boom block
+		if (!boomBlock.IsWithinRange(position)) {
+			return false;
+		}
 
-        // Make sure the position was not in the previous frame or the current frame
-        // This makes sure the boom block does not backtrack over previous positions
-		List<Vector2Int> checkPositions = new List<Vector2Int>();
+		// Make sure the position was not in the previous frame or the current frame
+		// This makes sure the boom block does not backtrack over previous positions
+		List<Vector2Int> checkPositions = new List<Vector2Int>( );
 		if (frames.Count > frameIndex - 2 && frameIndex >= 2) {
-            checkPositions.AddRange(frames[frameIndex - 2]);
-        }
+			checkPositions.AddRange(frames[frameIndex - 2]);
+		}
 		if (frames.Count > frameIndex - 1 && frameIndex >= 1) {
 			checkPositions.AddRange(frames[frameIndex - 1]);
 		}
-        if (frames.Count > frameIndex && frameIndex >= 0) {
-            checkPositions.AddRange(frames[frameIndex]);
-        }
+		if (frames.Count > frameIndex && frameIndex >= 0) {
+			checkPositions.AddRange(frames[frameIndex]);
+		}
 
-        foreach (Vector2Int framePosition in checkPositions) {
+		foreach (Vector2Int framePosition in checkPositions) {
 			if (position == framePosition) {
 				return false;
 			}
@@ -94,9 +94,9 @@ public class BoomBlockFrames {
 
 		// Make sure there are enough frames for the position to be added
 		while (frames.Count <= frameIndex) {
-            frames.Add(new List<Vector2Int>( ));
-        }
-        frames[frameIndex].Add(position);
+			frames.Add(new List<Vector2Int>( ));
+		}
+		frames[frameIndex].Add(position);
 
 		return true;
 	}
@@ -105,7 +105,7 @@ public class BoomBlockFrames {
 		// Remove each block in the first boom block frame
 		for (int i = frames[0].Count - 1; i >= 0; i--) {
 			board.DamageBlockAt(frames[0][i]);
-			gameManager.ParticleManager.SpawnBoomBlockParticle(frames[0][i], color);
+			particleManager.SpawnBoomBlockParticle(frames[0][i], color);
 		}
 
 		// Remove the first frame
