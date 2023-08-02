@@ -5,7 +5,6 @@ using UnityEngine;
 public static class Constants {
 	#region Blocks
 	public const float BLOCK_SCALE = 0.95f; // Blocks are scaled down this amount on the board
-	public const float BLOCK_ICON_ALPHA = 1f; // The alpha value of the boom block icons on top of blocks
 	#endregion
 
 	#region Points
@@ -18,6 +17,7 @@ public static class Constants {
 
 	#region UI
 	public const float UI_FADE_TIME = 0.25f; // The fade time for all UI element transitions
+	public const float UI_TEXT_SIZE = 1.1f; // The scale increase that text will be set to when focussed
 	public const int UI_GRID_SIZE = 120; // The grid size for all UI elements
 	#endregion
 

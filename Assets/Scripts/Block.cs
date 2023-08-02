@@ -132,7 +132,7 @@ public class Block : MonoBehaviour {
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
 		transform.localScale = new Vector3(Constants.BLOCK_SCALE, Constants.BLOCK_SCALE, 1f);
-		iconSpriteRenderer.color = new Color(1f, 1f, 1f, Constants.BLOCK_ICON_ALPHA);
+		iconSpriteRenderer.color = Color.white;
 	}
 
 	protected void Awake ( ) {

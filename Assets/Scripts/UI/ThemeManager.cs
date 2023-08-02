@@ -44,4 +44,9 @@ public class ThemeManager : MonoBehaviour {
 		excludedIndex = Utils.GetRandomArrayIndexExcluded(buttonColorCount, excludedIndex);
 		return ActiveTheme.ButtonColors[excludedIndex];
 	}
+
+	public Color GetRandomBackgrounDetailColor ( ) {
+		int backgroundDetailColorCount = ActiveTheme.BackgroundDetailColors.Count;
+		return ActiveTheme.BackgroundDetailColors[Random.Range(0, backgroundDetailColorCount)];
+	}
 }
