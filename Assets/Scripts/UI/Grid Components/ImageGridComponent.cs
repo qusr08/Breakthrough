@@ -7,12 +7,13 @@ using UnityEngine.UI;
 public class ImageGridComponent : GridComponent {
 	[Space]
 	[SerializeField] protected RectTransform imageRectTransform;
+	[SerializeField] protected Image image;
 
 	#region Unity Functions
 	protected override void Awake ( ) {
 		base.Awake( );
 
-		LeanTween.color(imageRectTransform, Color.white, 0f);
+		image.color = Color.white;
 	}
 	#endregion
 }

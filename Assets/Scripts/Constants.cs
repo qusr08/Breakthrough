@@ -16,9 +16,10 @@ public static class Constants {
 	#endregion
 
 	#region UI
-	public const float UI_FADE_TIME = 0.25f; // The fade time for all UI element transitions
+	public const float UI_FADE_TIME = 0.15f; // The fade time for all UI element transitions
 	public const float UI_TEXT_SIZE = 1.1f; // The scale increase that text will be set to when focussed
 	public const int UI_GRID_SIZE = 120; // The grid size for all UI elements
+	public const float UI_MENU_TRANS_TIME = 0.3f; // How long it takes for the menus to change levels
 	#endregion
 
 	public const float CLOSE_ENOUGH = 0.01f;

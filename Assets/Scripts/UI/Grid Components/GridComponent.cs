@@ -40,14 +40,13 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	protected virtual void Awake ( ) {
 		OnValidate( );
 
-		Color toColor = themeManager.GetRandomButtonColor(ref backgroundColorIndex);
-		LeanTween.color(backgroundRectTransform, toColor, 0f);
+		backgroundImage.color = themeManager.GetRandomButtonColor(ref backgroundColorIndex);
 	}
 	#endregion
 
 	public virtual void OnPointerEnter (PointerEventData eventData) {
 		Color toColor = themeManager.GetRandomButtonColor(ref backgroundColorIndex);
-		LeanTween.color(backgroundRectTransform, toColor, Constants.UI_FADE_TIME);
+		LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, toColor, Constants.UI_FADE_TIME);
 	}
 
 	public virtual void OnPointerExit (PointerEventData eventData) {

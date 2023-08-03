@@ -226,3 +226,4 @@ MonoBehaviour:
   gridPosition: {x: 0, y: 0}
   gridDimensions: {x: 1, y: 1}
   imageRectTransform: {fileID: 7112828902518903878}
+  image: {fileID: 4525982808733155737}

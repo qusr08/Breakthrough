@@ -13,7 +13,7 @@ public class TextGridComponent : GridComponent {
 	protected override void Awake ( ) {
 		base.Awake( );
 
-		LeanTween.color(textRectTransform, themeManager.ActiveTheme.TextColor, 0f);
+		textMeshProUGUI.color = themeManager.ActiveTheme.TextColor;
 	}
 	#endregion
 }
