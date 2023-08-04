@@ -168,3 +168,6 @@ MonoBehaviour:
   gridDimensions: {x: 1, y: 1}
   textRectTransform: {fileID: 3815787077346123991}
   textMeshProUGUI: {fileID: 3815787077346123992}
+  onClickEvents:
+    m_PersistentCalls:
+      m_Calls: []

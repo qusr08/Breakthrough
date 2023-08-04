@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum ThemeState {
-	WHITE
+	LIGHT, DARK
 }
 
 public class ThemeManager : MonoBehaviour {

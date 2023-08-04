@@ -9,6 +9,7 @@ public class ThemeSettings : ScriptableObject {
 	[SerializeField] private Color _detailColor;
 	[SerializeField] private List<Color> _backgroundDetailColors;
 	[SerializeField] private BlockColorColorDictionary _blockColors;
+	[SerializeField] private BlockColorColorDictionary _wallColors;
 	[SerializeField] private List<Color> _buttonColors;
 	[SerializeField] private Color _textColor;
 	[SerializeField] private Color _glowColor;
@@ -20,6 +21,7 @@ public class ThemeSettings : ScriptableObject {
 	public Color DetailColor => _detailColor;
 	public List<Color> BackgroundDetailColors => _backgroundDetailColors;
 	public BlockColorColorDictionary BlockColors => _blockColors;
+	public BlockColorColorDictionary WallColors => _wallColors;
 	public List<Color> ButtonColors => _buttonColors;
 	public Color TextColor => _textColor;
 	public Color GlowColor => _glowColor;

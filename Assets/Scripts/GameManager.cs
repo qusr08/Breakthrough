@@ -30,9 +30,10 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float defaultHazardFallTime;
 	[SerializeField, Min(0f)] private float minHazardFallTime;
 	[Space]
+	[SerializeField, Min(1)] private int boomBlockGuarantee;
+	[Space]
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boardAnimationSpeed;
-	[SerializeField, Min(1)] private int boomBlockGuarantee;
 	[SerializeField, Range(0f, 1f)] private float difficultyScaling;
 
 	private int _boomBlockDrought;
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour {
 	private float _hazardFallTime;
 	private float _wallStrength;
 	private int _wallHeight;
+	private float _boomBlockChance;
 
 	#region Properties
 	public GameSettings GameSettings => _gameSettings;
@@ -76,6 +78,8 @@ public class GameManager : MonoBehaviour {
 	public float WallStrength { get => _wallStrength; private set => _wallStrength = value; }
 	public int WallHeight { get => _wallHeight; private set => _wallHeight = value; }
 
+	public float BoomBlockChance { get => _boomBlockChance; set => _boomBlockChance = value; }
+
 	public float MinoMoveTime => _minoMoveTime;
 	public float FastMinoMoveTime => MinoMoveTime / 2f;
 	public float MinoRotateTime => _minoRotateTime;
@@ -85,7 +89,7 @@ public class GameManager : MonoBehaviour {
 	public int RotateDirection => _rotateDirection;
 	public float BoardAnimationSpeed => Mathf.Min(_boardAnimationSpeed, MinMinoFallTime);
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
-	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - GameSettings.BoomBlockChance) + GameSettings.BoomBlockChance;
+	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - BoomBlockChance) + BoomBlockChance;
 	#endregion
 
 	public void UpdateDifficulty ( ) {
@@ -111,5 +115,10 @@ public class GameManager : MonoBehaviour {
 		float heightScaleFactor = heightMin - heightMax;
 		float heightSlope = -difficultyScaling * Breakthroughs;
 		WallHeight = Mathf.RoundToInt((heightScaleFactor * Mathf.Exp(heightSlope)) + heightMax);
+
+		// Calculate the boom block spawn chance for the specified settings
+		float chanceSlope = -difficultyScaling * Breakthroughs;
+		float chanceScaleFactor = GameSettings.BoomBlockChance - 1;
+		BoomBlockChance = (chanceScaleFactor * Mathf.Exp(chanceSlope)) + 1;
 	}
 }

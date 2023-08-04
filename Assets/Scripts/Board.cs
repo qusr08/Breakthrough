@@ -64,6 +64,7 @@ public class Board : MonoBehaviour {
 			switch (_boardState) {
 				case BoardState.PLACING_MINO:
 					needToUpdate = true;
+					Debug.Log(gameManager.BoomBlockSpawnChance);
 					UpdatePercentageCleared( );
 					GenerateMino( );
 					break;

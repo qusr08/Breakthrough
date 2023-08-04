@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using UnityEditor.Tilemaps;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class BlockGroup : MonoBehaviour {
 	[Header("Components - Block Group")]

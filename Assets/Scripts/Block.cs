@@ -60,7 +60,12 @@ public class Block : MonoBehaviour {
 		get => _blockColor;
 		set {
 			_blockColor = value;
-			spriteRenderer.color = themeManager.ActiveTheme.BlockColors[_blockColor];
+
+			if (BlockType == BlockType.WALL) {
+				spriteRenderer.color = themeManager.ActiveTheme.WallColors[_blockColor];
+			} else {
+				spriteRenderer.color = themeManager.ActiveTheme.BlockColors[_blockColor];
+			}
 		}
 	}
 	public BlockType BlockType {
@@ -132,7 +137,7 @@ public class Block : MonoBehaviour {
 
 		BlockGroup = GetComponentInParent<BlockGroup>( );
 		transform.localScale = new Vector3(Constants.BLOCK_SCALE, Constants.BLOCK_SCALE, 1f);
-		iconSpriteRenderer.color = Color.white;
+		iconSpriteRenderer.color = themeManager.ActiveTheme.TextColor;
 	}
 
 	protected void Awake ( ) {

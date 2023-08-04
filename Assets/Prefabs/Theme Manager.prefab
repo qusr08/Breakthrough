@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   themeSettingsList:
-    m_keys: 00000000
+    m_keys: 0000000001000000
     m_values:
     - {fileID: 11400000, guid: 1ec8e395a047cfc48ae3347316e8fac0, type: 2}
+    - {fileID: 11400000, guid: d517ab573c8eafe4190367bdf699e1bb, type: 2}
   _themeState: 0
