@@ -47,19 +47,9 @@ public static class Utils {
 	/// <param name="pivot">The position vector of the pivot to rotate around</param>
 	/// <param name="degAngle">The angle in degrees to rotate the position vector</param>
 	/// <returns>The rotated position vector</returns>
+	public static Vector2 RotatePositionAroundPivot (Vector2 position, Vector2 pivot, float degAngle) => RotatePositionAroundPivot(position, pivot, degAngle);
 	public static Vector3 RotatePositionAroundPivot (Vector3 position, Vector3 pivot, float degAngle) {
 		return (Quaternion.Euler(0, 0, degAngle) * (position - pivot) + pivot);
-	}
-
-	/// <summary>
-	/// Rotate a position vector around a pivot
-	/// </summary>
-	/// <param name="position">The position vector to rotate</param>
-	/// <param name="pivot">The position vector of the pivot to rotate around</param>
-	/// <param name="degAngle">The angle in degrees to rotate the position vector</param>
-	/// <returns>The rotated position vector</returns>
-	public static Vector2 RotatePositionAroundPivot (Vector2 position, Vector2 pivot, float degAngle) {
-		return (Quaternion.Euler(0, 0, degAngle) * (position - pivot) + (Vector3) pivot);
 	}
 
 	/// <summary>
@@ -81,7 +71,7 @@ public static class Utils {
 	/// <param name="vector1">The first rotation vector</param>
 	/// <param name="vector2">The second rotation vector</param>
 	/// <returns>Whether or not the two rotation vectors are equal</returns>
-	public static bool CompareDegreeAngleVectors (Vector3 vector1, Vector3 vector2) {
+	public static bool CompareEulerAngleVectors (Vector3 vector1, Vector3 vector2) {
 		vector1 = Vect3Round(Vect3Abs(vector1));
 		vector2 = Vect3Round(Vect3Abs(vector2));
 

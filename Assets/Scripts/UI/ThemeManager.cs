@@ -45,8 +45,13 @@ public class ThemeManager : MonoBehaviour {
 		return ActiveTheme.ButtonColors[excludedIndex];
 	}
 
-	public Color GetRandomBackgrounDetailColor ( ) {
+	public Color GetRandomBackgroundDetailColor ( ) {
 		int backgroundDetailColorCount = ActiveTheme.BackgroundDetailColors.Count;
 		return ActiveTheme.BackgroundDetailColors[Random.Range(0, backgroundDetailColorCount)];
+	}
+
+	public Color GetRandomMinoColor ( ) {
+		int minoColorCount = ActiveTheme.BlockColors.Count;
+		return ActiveTheme.BlockColors[(BlockColor) Random.Range(0, minoColorCount)];
 	}
 }

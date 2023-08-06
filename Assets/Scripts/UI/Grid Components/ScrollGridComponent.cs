@@ -12,7 +12,7 @@ public class ScrollGridComponent : GridComponent {
 	protected override void Awake ( ) {
 		base.Awake( );
 
-		scrollbarHandleImage.color = themeManager.GetRandomBackgrounDetailColor( );
+		scrollbarHandleImage.color = themeManager.GetRandomBackgroundDetailColor( );
 		scrollbarImage.color = Color.white;
 	}
 	#endregion

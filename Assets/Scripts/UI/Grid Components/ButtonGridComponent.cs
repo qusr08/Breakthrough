@@ -15,7 +15,7 @@ public class ButtonGridComponent : TextGridComponent {
 	public override void OnPointerEnter (PointerEventData eventData) {
 		LeanTween.scale(textRectTransform, new Vector3(Constants.UI_TEXT_SIZE, Constants.UI_TEXT_SIZE, 1f), Constants.UI_FADE_TIME);
 		LeanTween.value(textMeshProUGUI.gameObject, (Color color) => textMeshProUGUI.color = color, textMeshProUGUI.color, themeManager.GetRandomButtonColor( ), Constants.UI_FADE_TIME);
-		LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, themeManager.GetRandomBackgrounDetailColor( ), Constants.UI_FADE_TIME);
+		LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, themeManager.GetRandomBackgroundDetailColor( ), Constants.UI_FADE_TIME);
 	}
 
 	public override void OnPointerExit (PointerEventData eventData) {

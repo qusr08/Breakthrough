@@ -62,7 +62,7 @@ public class BlockGroup : MonoBehaviour {
 		// Smoothly transition the block group to a certain position no matter what
 		transform.position = Vector3.SmoothDamp(transform.position, toPosition, ref toPositionVelocity, gameManager.BoardAnimationSpeed);
 		transform.eulerAngles = Utils.SmoothDampEuler(transform.eulerAngles, toRotation, ref toRotationVelocity, gameManager.BoardAnimationSpeed);
-		_isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareDegreeAngleVectors(transform.eulerAngles, toRotation));
+		_isDoneTweening = (Utils.CompareVectors(transform.position, toPosition) && Utils.CompareEulerAngleVectors(transform.eulerAngles, toRotation));
 	}
 	#endregion
 
