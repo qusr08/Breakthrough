@@ -37,11 +37,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 120
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 120
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_LocalScale.x
@@ -85,11 +85,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 60
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -60
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990596, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -105,15 +105,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036079990597, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_Name
-      value: Box Grid Component Variant
+      value: Box Grid Component
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036148086836, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.95
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1797525036148086836, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.95
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1797525036079990593, guid: 25852e5f4fff2d14eb0fe7014b6a7eee, type: 3}
@@ -160,5 +160,5 @@ MonoBehaviour:
   rectTransform: {fileID: 7334179460726315957}
   backgroundRectTransform: {fileID: 7334179460794533061}
   backgroundImage: {fileID: 7334179460794533058}
-  gridPosition: {x: 0, y: 0}
-  gridDimensions: {x: 1, y: 1}
+  _gridPosition: {x: 0, y: 0}
+  _gridDimensions: {x: 0, y: 0}

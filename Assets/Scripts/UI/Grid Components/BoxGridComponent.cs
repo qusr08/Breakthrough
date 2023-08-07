@@ -5,44 +5,26 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class BoxGridComponent : GridComponent {
-	private Color hoverColor;
-	private Color idleColor;
-	private bool isHovered;
-
 	#region Unity Functions
 	protected override void Awake ( ) {
 		base.Awake( );
 
-		hoverColor = themeManager.GetRandomMinoColor( );
-		idleColor = themeManager.GetRandomBackgroundDetailColor( );
-		backgroundImage.color = idleColor;
-		isHovered = false;
+		backgroundImage.color = themeManager.GetRandomBackgroundDetailColor( );
 	}
 
-	private void Update ( ) {
-		// Get the world position of the mouse
-		Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue( ));
-
+	protected override void Update ( ) {
 		// If the mouse position is close to this grid component, fade the colors of the background
-		if (Vector2.Distance(mouseWorldPosition, transform.position) < 2f) {
+		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) < 3f) {
 			if (!isHovered) {
-				FadeBackgroundColor(hoverColor, Constants.UI_FADE_TIME);
+				FadeBackgroundColor(themeManager.GetRandomMinoColor( ), Constants.UI_FADE_TIME);
+				isHovered = true;
 			}
-
-			isHovered = true;
 		} else {
 			if (isHovered) {
-				FadeBackgroundColor(idleColor, Constants.UI_FADE_TIME * 3);
+				FadeBackgroundColor(themeManager.GetRandomBackgroundDetailColor( ), Constants.UI_FADE_TIME * 3);
+				isHovered = false;
 			}
-
-			isHovered = false;
 		}
 	}
 	#endregion
-
-	public override void OnPointerEnter (PointerEventData eventData) {
-	}
-
-	public override void OnPointerExit (PointerEventData eventData) {
-	}
 }

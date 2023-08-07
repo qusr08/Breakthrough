@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour {
 	[SerializeField] private GameObject gridBoxComponentPrefab;
@@ -20,7 +22,7 @@ public class MenuManager : MonoBehaviour {
 	public Vector2Int GridDimensions { get => _gridDimensions; set => _gridDimensions = value; }
 	public float[ , ] GridBoxNoise { get => _gridBoxNoise; private set => _gridBoxNoise = value; }
 
-	public int ActiveMenuLevel {
+	private int ActiveMenuLevel {
 		get => _activeMenuLevel;
 		set {
 			_activeMenuLevel = value;
@@ -62,14 +64,31 @@ public class MenuManager : MonoBehaviour {
 		yield return new WaitForEndOfFrame( );
 
 		GridDimensions = Utils.Vect2Round(rectTransform.rect.size / Constants.UI_GRID_SIZE);
-		GridBoxNoise = Utils.GenerateRandomNoiseGrid(GridDimensions.x, GridDimensions.y * menuLevels, 0, 3);
+		GridBoxNoise = Utils.GenerateRandomNoiseGrid(GridDimensions.x, GridDimensions.y * menuLevels, 0f, 1f);
 	}
 	#endregion
 
 	public void CreateGridBoxComponent (MenuScreen menuScreen, Vector2Int gridPosition) {
+		foreach (GridComponent gridComponent in menuScreen.GridComponents) {
+			int minX = gridComponent.GridPosition.x;
+			int maxX = gridComponent.GridPosition.x + gridComponent.GridDimensions.x;
+			int minY = gridComponent.GridPosition.y;
+			int maxY = gridComponent.GridPosition.y + gridComponent.GridDimensions.y;
+
+			// Check to see if the new grid position of the to-be-created box grid component is overlapping another grid component
+			bool isOverlappingX = (gridPosition.x >= minX && gridPosition.x < maxX);
+			bool isOverlappingY = (gridPosition.y >= minY && gridPosition.y < maxY);
+
+			// If there is an overlap, then return from this method and do not create a new box grid component
+			if (isOverlappingX && isOverlappingY) {
+				return;
+			}
+		}
+
 		BoxGridComponent boxGridComponent = Instantiate(gridBoxComponentPrefab, menuScreen.transform).GetComponent<BoxGridComponent>( );
 		boxGridComponent.GridPosition = gridPosition;
 		boxGridComponent.GridDimensions = Vector2Int.one;
+		boxGridComponent.transform.SetAsFirstSibling( );
 		boxGridComponent.RecalculateUI( );
 	}
 }

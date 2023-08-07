@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class Utils {
 	/// <summary>
@@ -231,5 +232,9 @@ public static class Utils {
 		}
 
 		return indices[UnityEngine.Random.Range(0, indices.Count)];
+	}
+
+	public static float DistanceSquared (Vector2 vector1, Vector2 vector2) {
+		return (float) Math.Pow(vector1.x - vector2.x, 2) + Mathf.Pow(vector1.y - vector2.y, 2);
 	}
 }

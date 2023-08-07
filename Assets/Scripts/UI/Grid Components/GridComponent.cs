@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
@@ -14,23 +15,43 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	[SerializeField] protected Vector2Int _gridPosition;
 	[SerializeField] protected Vector2Int _gridDimensions;
 
-	protected int backgroundColorIndex = -1;
+	protected bool isHovered;
+	private LTDescr backgroundColorLTID = null;
 
 	#region Properties
 	public Vector2Int GridPosition { get => _gridPosition; set => _gridPosition = value; }
 	public Vector2Int GridDimensions { get => _gridDimensions; set => _gridDimensions = value; }
+	protected Vector2 MouseWorldPosition => Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue( ));
 	#endregion
 
 	#region Unity Functions
 	private void OnValidate ( ) {
 		themeManager = FindObjectOfType<ThemeManager>( );
 		rectTransform = GetComponent<RectTransform>( );
+
+		RecalculateUI( );
 	}
 
 	protected virtual void Awake ( ) {
 		OnValidate( );
 
-		backgroundImage.color = themeManager.GetRandomButtonColor(ref backgroundColorIndex);
+		backgroundImage.color = themeManager.GetRandomButtonColor( );
+		isHovered = false;
+	}
+
+	protected virtual void Update ( ) {
+		// If the mouse position is close to this grid component, fade the colors of the background
+		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) <= Constants.UI_COLOR_AREA_SIZE) {
+			if (!isHovered) {
+				FadeBackgroundColor(themeManager.GetRandomMinoColor( ), Constants.UI_FADE_TIME);
+				isHovered = true;
+			}
+		} else {
+			if (isHovered) {
+				FadeBackgroundColor(themeManager.GetRandomButtonColor( ), Constants.UI_FADE_TIME * 3);
+				isHovered = false;
+			}
+		}
 	}
 	#endregion
 
@@ -51,20 +72,19 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		backgroundRectTransform.localScale = new Vector3(xScale, yScale, 1f);
 	}
 
+	public virtual void OnPointerEnter (PointerEventData eventData) { }
+
+	public virtual void OnPointerExit (PointerEventData eventData) { }
+
+	public virtual void OnPointerClick (PointerEventData eventData) { }
+
 	protected void FadeBackgroundColor (Color toColor, float fadeTime) {
-		LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, toColor, fadeTime);
-	}
+		// If there is currently a background tween happening, cancel it
+		if (backgroundColorLTID != null) {
+			LeanTween.cancel(backgroundImage.gameObject, backgroundColorLTID.id);
+		}
 
-	public virtual void OnPointerEnter (PointerEventData eventData) {
-		Color toColor = themeManager.GetRandomButtonColor(ref backgroundColorIndex);
-		LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, toColor, Constants.UI_FADE_TIME);
-	}
-
-	public virtual void OnPointerExit (PointerEventData eventData) {
-
-	}
-
-	public virtual void OnPointerClick (PointerEventData eventData) {
-
+		backgroundColorLTID = LeanTween.value(backgroundImage.gameObject, (Color color) => backgroundImage.color = color, backgroundImage.color, toColor, fadeTime)
+			.setOnComplete(( ) => backgroundColorLTID = null);
 	}
 }

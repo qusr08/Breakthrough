@@ -35,14 +35,8 @@ public class ThemeManager : MonoBehaviour {
 	#endregion
 
 	public Color GetRandomButtonColor ( ) {
-		int _ = -1;
-		return GetRandomButtonColor(ref _);
-	}
-
-	public Color GetRandomButtonColor (ref int excludedIndex) {
 		int buttonColorCount = ActiveTheme.ButtonColors.Count;
-		excludedIndex = Utils.GetRandomArrayIndexExcluded(buttonColorCount, excludedIndex);
-		return ActiveTheme.ButtonColors[excludedIndex];
+		return ActiveTheme.ButtonColors[Random.Range(0, buttonColorCount)];
 	}
 
 	public Color GetRandomBackgroundDetailColor ( ) {
