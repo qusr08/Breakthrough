@@ -11,7 +11,7 @@ public class GameSettings : ScriptableObject {
 	private const int MINO_SPEED_MULTIPLIER_RANGE = 12;
 	private const int HAZARD_SPEED_MULTIPLIER_RANGE = 12;
 	private const int WALL_STRENGTH_MULTIPLIER_RANGE = 8;
-	private const int BOOM_BLOCK_CHANCE_RANGE = 10;
+	private const int BOOM_BLOCK_CHANCE_RANGE = 7;
 	private const int GAME_LEVEL_RANGE = 6;
 	private const int ALLOWED_MINOS_RANGE = 511;
 
@@ -23,7 +23,7 @@ public class GameSettings : ScriptableObject {
 	[SerializeField, Range(0, MINO_SPEED_MULTIPLIER_RANGE - 1), Tooltip("0.25 - 3.0, steps of 0.25")] private int minoSpeedMultiplierValue;
 	[SerializeField, Range(0, HAZARD_SPEED_MULTIPLIER_RANGE - 1), Tooltip("0.25 - 3.0, steps of 0.25")] private int hazardSpeedMultiplierValue;
 	[SerializeField, Range(0, WALL_STRENGTH_MULTIPLIER_RANGE - 1), Tooltip("0.25 - 2.0, steps of 0.25")] private int wallStrengthMultiplierValue;
-	[SerializeField, Range(0, BOOM_BLOCK_CHANCE_RANGE - 1), Tooltip("0.1 - 1.0, steps of 0.1")] private int boomBlockChanceValue;
+	[SerializeField, Range(0, BOOM_BLOCK_CHANCE_RANGE - 1), Tooltip("0.1 - 0.7, steps of 0.1")] private int boomBlockChanceValue;
 	[SerializeField, Range(0, GAME_LEVEL_RANGE - 1), Tooltip("0 - 10, steps of 1")] private int gameLevelValue;
 	[SerializeField, Range(0, ALLOWED_MINOS_RANGE - 1), Tooltip("Binary representation of the allowed minos")] private int allowedMinosValue;
 	[Space]

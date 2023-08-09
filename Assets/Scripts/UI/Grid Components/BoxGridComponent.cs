@@ -14,7 +14,7 @@ public class BoxGridComponent : GridComponent {
 
 	protected override void Update ( ) {
 		// If the mouse position is close to this grid component, fade the colors of the background
-		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) < 3f) {
+		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) <= Constants.UI_COLOR_AREA_SIZE) {
 			if (!isHovered) {
 				FadeBackgroundColor(themeManager.GetRandomMinoColor( ), Constants.UI_FADE_TIME);
 				isHovered = true;

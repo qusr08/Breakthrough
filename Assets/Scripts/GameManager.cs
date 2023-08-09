@@ -30,11 +30,8 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f)] private float defaultHazardFallTime;
 	[SerializeField, Min(0f)] private float minHazardFallTime;
 	[Space]
-	[SerializeField, Min(1)] private int boomBlockGuarantee;
-	[Space]
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boardAnimationSpeed;
-	[SerializeField, Range(0f, 1f)] private float difficultyScaling;
 
 	private int _boomBlockDrought;
 	private float _minoFallTime;
@@ -89,23 +86,23 @@ public class GameManager : MonoBehaviour {
 	public int RotateDirection => _rotateDirection;
 	public float BoardAnimationSpeed => Mathf.Min(_boardAnimationSpeed, MinMinoFallTime);
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
-	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - BoomBlockChance) + BoomBlockChance;
+	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / Constants.BOOM_BLOCK_GUAR) * (1 - BoomBlockChance) + BoomBlockChance;
 	#endregion
 
 	public void UpdateDifficulty ( ) {
 		// Calculate the mino fall time for the specified settings
 		float minoScaleFactor = (defaultMinoFallTime / GameSettings.MinoSpeedMultiplier) - MinMinoFallTime;
-		float minoSlope = -GameSettings.MinoSpeedMultiplier * difficultyScaling * Breakthroughs;
+		float minoSlope = -GameSettings.MinoSpeedMultiplier * Constants.DIFF_VALUE * Breakthroughs;
 		MinoFallTime = (minoScaleFactor * Mathf.Exp(minoSlope)) + MinMinoFallTime;
 
 		// Calculate the hazard fall time for the specified settings
 		float hazardScaleFactor = (defaultHazardFallTime / GameSettings.HazardSpeedMultiplier) - minHazardFallTime;
-		float hazardSlope = -GameSettings.HazardSpeedMultiplier * difficultyScaling * Breakthroughs;
+		float hazardSlope = -GameSettings.HazardSpeedMultiplier * Constants.DIFF_VALUE * Breakthroughs;
 		HazardFallTime = (hazardScaleFactor * Mathf.Exp(hazardSlope)) + minHazardFallTime;
 
 		// Calculate the wall strength for the specified settings
 		// * This assumes that the wall health values are between 0 and 3
-		float strengthSlope = -GameSettings.WallStrengthMultiplier * difficultyScaling * Breakthroughs;
+		float strengthSlope = -GameSettings.WallStrengthMultiplier * Constants.DIFF_VALUE * Breakthroughs;
 		WallStrength = (-2f * Mathf.Exp(strengthSlope)) + 3f;
 
 		// Calculate the wall height for the specified settings
@@ -113,11 +110,11 @@ public class GameManager : MonoBehaviour {
 		float heightMax = availableBoardArea / 2f;
 		float heightMin = availableBoardArea / 8f;
 		float heightScaleFactor = heightMin - heightMax;
-		float heightSlope = -difficultyScaling * Breakthroughs;
+		float heightSlope = -Constants.DIFF_VALUE * Breakthroughs;
 		WallHeight = Mathf.RoundToInt((heightScaleFactor * Mathf.Exp(heightSlope)) + heightMax);
 
 		// Calculate the boom block spawn chance for the specified settings
-		float chanceSlope = -difficultyScaling * Breakthroughs;
+		float chanceSlope = -Constants.DIFF_VALUE * Breakthroughs;
 		float chanceScaleFactor = GameSettings.BoomBlockChance - 1;
 		BoomBlockChance = (chanceScaleFactor * Mathf.Exp(chanceSlope)) + 1;
 	}

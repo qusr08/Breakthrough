@@ -48,7 +48,7 @@ public static class Utils {
 	/// <param name="pivot">The position vector of the pivot to rotate around</param>
 	/// <param name="degAngle">The angle in degrees to rotate the position vector</param>
 	/// <returns>The rotated position vector</returns>
-	public static Vector2 RotatePositionAroundPivot (Vector2 position, Vector2 pivot, float degAngle) => RotatePositionAroundPivot(position, pivot, degAngle);
+	public static Vector2 RotatePositionAroundPivot (Vector2 position, Vector2 pivot, float degAngle) => RotatePositionAroundPivot((Vector3) position, (Vector3) pivot, degAngle);
 	public static Vector3 RotatePositionAroundPivot (Vector3 position, Vector3 pivot, float degAngle) {
 		return (Quaternion.Euler(0, 0, degAngle) * (position - pivot) + pivot);
 	}
@@ -236,5 +236,25 @@ public static class Utils {
 
 	public static float DistanceSquared (Vector2 vector1, Vector2 vector2) {
 		return (float) Math.Pow(vector1.x - vector2.x, 2) + Mathf.Pow(vector1.y - vector2.y, 2);
+	}
+
+	public static Vector2 CalculateRectTransformSize (RectTransform rectTransform, Canvas canvas) {
+		float width = (rectTransform.anchorMax.x - rectTransform.anchorMin.x) * Screen.width + (rectTransform.sizeDelta.x * canvas.scaleFactor);
+		float height = (rectTransform.anchorMax.y - rectTransform.anchorMin.y) * Screen.height + (rectTransform.sizeDelta.y * canvas.scaleFactor);
+		return new Vector2(width, height);
+	}
+
+	public static void PrintArray<T> (T[ ] array) {
+		string printString = "[";
+		for (int i = 0; i < array.Length; i++) {
+			printString += $"{array[i]}";
+
+			if (i < array.Length - 1) {
+				printString += ", ";
+			}
+		}
+		printString += "]";
+
+		Debug.Log(printString);
 	}
 }

@@ -38,6 +38,7 @@ public class Board : MonoBehaviour {
 	private float boomBlockFrameTimer;
 
 	private readonly List<List<Block>> minos = new List<List<Block>>( );
+	private WeightedList minoSpawnPercentages;
 	private Vector3 minoSpawnPosition;
 
 	private List<BlockGroup> blockGroups = new List<BlockGroup>( );
@@ -45,6 +46,7 @@ public class Board : MonoBehaviour {
 	private bool blockGroupsLocked = false;
 	private float blockGroupsLockedStartTime = 0f;
 	private bool needToUpdate = false;
+
 
 	#region Properties
 	public BoardArea BreakthroughBoardArea => breakthroughBoardArea;
@@ -64,7 +66,6 @@ public class Board : MonoBehaviour {
 			switch (_boardState) {
 				case BoardState.PLACING_MINO:
 					needToUpdate = true;
-					Debug.Log(gameManager.BoomBlockSpawnChance);
 					UpdatePercentageCleared( );
 					GenerateMino( );
 					break;
@@ -141,9 +142,12 @@ public class Board : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+
+		minoSpawnPercentages = new WeightedList(minoPrefabs.Count, gameManager.GameSettings.AllowedMinos);
 	}
 
 	private void Start ( ) {
+		// Set game difficulty and start the game
 		gameManager.Breakthroughs = gameManager.GameSettings.GameLevel * 6;
 		BoardState = BoardState.BREAKTHROUGH;
 	}
@@ -383,7 +387,10 @@ public class Board : MonoBehaviour {
 	/// Generate a random mino on the board
 	/// </summary>
 	private void GenerateMino ( ) {
-		GameObject randomMinoPrefab = minoPrefabs[Random.Range(0, minoPrefabs.Count)];
+		// Generate a random Mino from weighted percentages
+		GameObject randomMinoPrefab = minoPrefabs[minoSpawnPercentages.GetWeightedValue( )];
+
+		// Create the Mino gameobject
 		gameManager.ActiveMino = Instantiate(randomMinoPrefab, minoSpawnPosition, Quaternion.identity).GetComponent<PlayerControlledBlockGroup>( );
 		gameManager.ActiveMino.transform.SetParent(transform, true);
 		gameManager.ActiveMino.ID = blockGroupCount++;
@@ -534,7 +541,6 @@ public class Board : MonoBehaviour {
 	#region Sequences
 	private IEnumerator GenerateWall ( ) {
 		// Generate a random noise grid
-		Debug.Log(gameManager.WallStrength);
 		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(gameManager.GameSettings.BoardWidth, gameManager.WallHeight, gameManager.WallStrength - 1, gameManager.WallStrength + 1);
 		for (int j = 0; j < gameManager.WallHeight; j++) {
 			for (int i = 0; i < gameManager.GameSettings.BoardWidth; i++) {

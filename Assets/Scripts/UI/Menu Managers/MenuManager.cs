@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,14 +8,12 @@ using UnityEngine.UI;
 public class MenuManager : MonoBehaviour {
 	[SerializeField] private GameObject gridBoxComponentPrefab;
 	[SerializeField] private RectTransform rectTransform;
-	[SerializeField] private MenuScreen titleScreen;
-	[SerializeField] private MenuScreen menuScreen;
-	[SerializeField] private MenuScreen playScreen;
-	[SerializeField, Min(1)] private int menuLevels;
+	[SerializeField] private List<MenuScreen> menuScreens;
 
-	private int _activeMenuLevel = 0;
-	private Vector2Int _gridDimensions;
+	private int menuLevelCount;
 	private MenuScreen prevMenuScreen;
+
+	private Vector2Int _gridDimensions = Vector2Int.zero;
 	private MenuScreen _activeMenuScreen;
 	private float[ , ] _gridBoxNoise;
 
@@ -22,12 +21,15 @@ public class MenuManager : MonoBehaviour {
 	public Vector2Int GridDimensions { get => _gridDimensions; set => _gridDimensions = value; }
 	public float[ , ] GridBoxNoise { get => _gridBoxNoise; private set => _gridBoxNoise = value; }
 
-	private int ActiveMenuLevel {
-		get => _activeMenuLevel;
+	public MenuScreen ActiveMenuScreen {
+		get => _activeMenuScreen;
 		set {
-			_activeMenuLevel = value;
+			prevMenuScreen = _activeMenuScreen;
 
-			Vector2 toAnchoredPosition = new Vector2(0, _activeMenuLevel * rectTransform.rect.height);
+			_activeMenuScreen = value;
+			_activeMenuScreen.gameObject.SetActive(true);
+
+			Vector2 toAnchoredPosition = new Vector2(0, _activeMenuScreen.MenuLevel * rectTransform.rect.height);
 			LeanTween.value(gameObject, (Vector2 vector) => rectTransform.anchoredPosition = vector, rectTransform.anchoredPosition, toAnchoredPosition, Constants.UI_MENU_TRANS_TIME)
 				.setOnComplete(( ) => {
 					if (prevMenuScreen != null) {
@@ -36,37 +38,36 @@ public class MenuManager : MonoBehaviour {
 				});
 		}
 	}
-	public MenuScreen ActiveMenuScreen {
-		get => _activeMenuScreen;
-		set {
-			prevMenuScreen = _activeMenuScreen;
-
-			_activeMenuScreen = value;
-
-			_activeMenuScreen.gameObject.SetActive(true);
-			ActiveMenuLevel = _activeMenuScreen.MenuLevel;
-		}
-	}
 	#endregion
 
 	#region Unity Functions
 	private void OnValidate ( ) {
 		rectTransform = GetComponent<RectTransform>( );
+
+		RecalculateUI( );
 	}
 
 	private void Awake ( ) {
 		OnValidate( );
 
-		ActiveMenuScreen = titleScreen;
+		ActiveMenuScreen = menuScreens[0];
+		
 	}
 
-	private IEnumerator Start ( ) {
-		yield return new WaitForEndOfFrame( );
-
-		GridDimensions = Utils.Vect2Round(rectTransform.rect.size / Constants.UI_GRID_SIZE);
-		GridBoxNoise = Utils.GenerateRandomNoiseGrid(GridDimensions.x, GridDimensions.y * menuLevels, 0f, 1f);
-	}
 	#endregion
+
+	private void RecalculateUI ( ) {
+		// Calculate the grid dimensions of the screen
+		GridDimensions = Constants.SCREEN_RES / Constants.UI_GRID_SIZE;
+
+		// Find the highest menu level of this menu
+		foreach (MenuScreen menuScreen in menuScreens) {
+			menuLevelCount = Mathf.Max(menuLevelCount, menuScreen.MenuLevel + 1);
+		}
+
+		// Generate a noise grid for the grid box components
+		GridBoxNoise = Utils.GenerateRandomNoiseGrid(GridDimensions.x, GridDimensions.y * menuLevelCount, 0f, 1f);
+	}
 
 	public void CreateGridBoxComponent (MenuScreen menuScreen, Vector2Int gridPosition) {
 		foreach (GridComponent gridComponent in menuScreen.GridComponents) {
