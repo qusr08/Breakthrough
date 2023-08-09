@@ -14,6 +14,7 @@ public class Board : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private CameraController cameraController;
 	[SerializeField] private ParticleManager particleManager;
 	[SerializeField] private BoardArea breakthroughBoardArea;
 	[SerializeField] private BoardArea hazardBoardArea;
@@ -29,10 +30,6 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject blockPrefab;
 	[Header("Properties")]
 	[SerializeField] private BoardState _boardState;
-	[SerializeField, Min(0f)] private float cameraPadding;
-	[SerializeField, Min(0f)] private float _boardPadding;
-	[SerializeField, Min(0f)] private float _borderThickness;
-	[SerializeField, Min(0f)] private float _glowThickness;
 
 	private readonly List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
 	private float boomBlockFrameTimer;
@@ -47,14 +44,14 @@ public class Board : MonoBehaviour {
 	private float blockGroupsLockedStartTime = 0f;
 	private bool needToUpdate = false;
 
-
 	#region Properties
 	public BoardArea BreakthroughBoardArea => breakthroughBoardArea;
 	public BoardArea HazardBoardArea => hazardBoardArea;
 
-	public float BoardPadding => _boardPadding;
-	public float BorderThickness => _borderThickness;
-	public float GlowThickness => _glowThickness;
+	public float CameraPadding => Constants.BOARD_CAM_PADDNG * cameraController.SizeScaleFactor;
+	public float BoardPadding => Constants.BOARD_PADDNG * cameraController.SizeScaleFactor;
+	public float BorderThickness => Constants.BOARD_BRDR_WIDTH * cameraController.SizeScaleFactor;
+	public float GlowThickness => Constants.BOARD_GLOW_SIZE * cameraController.SizeScaleFactor;
 
 	public BoardState BoardState {
 		get => _boardState;
@@ -102,6 +99,7 @@ public class Board : MonoBehaviour {
 		}
 #endif
 
+		cameraController = FindObjectOfType<CameraController>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		particleManager = FindObjectOfType<ParticleManager>( );
@@ -131,9 +129,8 @@ public class Board : MonoBehaviour {
 		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
 		// Set the camera orthographic size and position so it fits the entire board
-		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + cameraPadding) / 2f;
+		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + CameraPadding) / 2f;
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
-		gameCamera.backgroundColor = themeManager.ActiveTheme.BackgroundColor;
 	}
 
 	private void Awake ( ) {

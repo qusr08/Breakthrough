@@ -63,8 +63,6 @@ public class WeightedList {
 			percentages[i] += percentageIncrease;
 		}
 
-		Utils.PrintArray(percentages);
-
 		return chosenIndex;
 	}
 

@@ -36,7 +36,7 @@ public class MenuScreen : MonoBehaviour {
 
 	private void RecalculateUI ( ) {
 		// Calculate the size of the rect transform
-		rectTransform.sizeDelta = Constants.SCREEN_RES * DimensionModifiers;
+		rectTransform.sizeDelta = Constants.SCRN_RES * DimensionModifiers;
 		gridDimensions = Utils.Vect2Round(rectTransform.sizeDelta / Constants.UI_GRID_SIZE);
 
 		// Calculate the anchored position of the rect transform

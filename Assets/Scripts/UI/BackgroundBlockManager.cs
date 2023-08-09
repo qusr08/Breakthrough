@@ -60,7 +60,9 @@ public class BackgroundBlockManager : MonoBehaviour {
 	public void CalculateValues (BackgroundBlock backgroundBlock, bool spawnInsideBounds = false) {
 		// Set the block to the theme color
 		// * This assumes there are only 2 detail colors being used
-		backgroundBlock.GetComponent<SpriteRenderer>( ).color = themeManager.GetRandomBackgroundDetailColor( );
+		Color color = themeManager.GetRandomBackgroundDetailColor( );
+		color.a = Constants.BACK_BLOCK_ALPHA;
+		backgroundBlock.GetComponent<SpriteRenderer>( ).color = color;
 
 		// Get a random position for the background block
 		Vector3 position;

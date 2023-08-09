@@ -7,6 +7,7 @@ public class HazardBar : MonoBehaviour {
 	[Header("Components - Hazard Bar")]
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private ThemeManager themeManager;
+	[SerializeField] private CameraController cameraController;
 	[SerializeField] private Board board;
 	[Space]
 	[SerializeField] private Transform backgroundTransform;
@@ -27,7 +28,9 @@ public class HazardBar : MonoBehaviour {
 			_progress = Mathf.Clamp01(value);
 
 			// Set the position and size of the fill bar
-			fillTransform.localPosition = new Vector3(0f, Mathf.Max(-backgroundSpriteRenderer.size.y * (1 - _progress) / 2f, (-backgroundSpriteRenderer.size.y * 0.5f) + 0.5f));
+			float fillBarBottom = (-backgroundSpriteRenderer.size.y * 0.5f) + 0.5f;
+			float fillBarCenter = -backgroundSpriteRenderer.size.y * (1 - _progress) / 2f;
+			fillTransform.localPosition = new Vector3(0f, Mathf.Max(fillBarCenter, fillBarBottom));
 			fillSpriteRenderer.size = new Vector2(1, Mathf.Max(1, _progress * backgroundSpriteRenderer.size.y));
 		}
 	}
@@ -44,6 +47,7 @@ public class HazardBar : MonoBehaviour {
 		}
 #endif
 
+		cameraController = FindObjectOfType<CameraController>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
@@ -55,7 +59,7 @@ public class HazardBar : MonoBehaviour {
 		// Set background position
 		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
-		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f));
+		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f) / cameraController.SizeScaleFactor);
 		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 
 		// Set glow size and color
@@ -83,13 +87,12 @@ public class HazardBar : MonoBehaviour {
 	}
 
 	private void Update ( ) {
-		if (gameManager.GameState == GameState.GAMEOVER || board.BoardState == BoardState.BREAKTHROUGH) {
+		if (gameManager.GameState != GameState.GAME || board.BoardState == BoardState.BREAKTHROUGH) {
 			return;
 		}
 
 		// Increase the progress of the bar based on the allotted time
-		// Progress += Time.deltaTime / gameManager.HazardTime;
-		toProgress += Time.deltaTime / 10f;
+		toProgress += Time.deltaTime / gameManager.HazardFallTime;
 		Progress = Mathf.SmoothDamp(Progress, toProgress, ref toProgressVelocity, gameManager.BoardAnimationSpeed);
 
 		// If the progress of the bar reaches the top, then drop the hazard area down

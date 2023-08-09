@@ -53,6 +53,10 @@ public class PlayerControlledBlockGroup : BlockGroup {
 	}
 
 	public override void UpdateBlockGroup ( ) {
+		if (gameManager.GameState != GameState.GAME) {
+			return;
+		}
+
 		// If the player controlled mino has been destroyed, then update the board areas
 		if (Count == 0) {
 			board.BreakthroughBoardArea.OnDestroyActiveMino( );

@@ -234,16 +234,21 @@ public static class Utils {
 		return indices[UnityEngine.Random.Range(0, indices.Count)];
 	}
 
+	/// <summary>
+	/// Get the distance squared between two points
+	/// </summary>
+	/// <param name="vector1"></param>
+	/// <param name="vector2"></param>
+	/// <returns>Returns a float value that represents the distance between the two points squared</returns>
 	public static float DistanceSquared (Vector2 vector1, Vector2 vector2) {
 		return (float) Math.Pow(vector1.x - vector2.x, 2) + Mathf.Pow(vector1.y - vector2.y, 2);
 	}
 
-	public static Vector2 CalculateRectTransformSize (RectTransform rectTransform, Canvas canvas) {
-		float width = (rectTransform.anchorMax.x - rectTransform.anchorMin.x) * Screen.width + (rectTransform.sizeDelta.x * canvas.scaleFactor);
-		float height = (rectTransform.anchorMax.y - rectTransform.anchorMin.y) * Screen.height + (rectTransform.sizeDelta.y * canvas.scaleFactor);
-		return new Vector2(width, height);
-	}
-
+	/// <summary>
+	/// Print an array to the console
+	/// </summary>
+	/// <typeparam name="T">The type of the array</typeparam>
+	/// <param name="array">The array to print out</param>
 	public static void PrintArray<T> (T[ ] array) {
 		string printString = "[";
 		for (int i = 0; i < array.Length; i++) {

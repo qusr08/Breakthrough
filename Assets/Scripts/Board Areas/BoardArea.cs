@@ -5,6 +5,7 @@ using UnityEngine;
 
 public abstract class BoardArea : MonoBehaviour {
 	[Header("Components - Board Area")]
+	[SerializeField] protected CameraController cameraController;
 	[SerializeField] protected ThemeManager themeManager;
 	[SerializeField] protected GameManager gameManager;
 	[SerializeField] protected Board board;
@@ -17,7 +18,6 @@ public abstract class BoardArea : MonoBehaviour {
 	[SerializeField] protected Sprite fillCircleTop;
 	[Header("Properties - Board Area")]
 	[SerializeField, Min(0)] protected int _defaultHeight;
-	[SerializeField, Range(0, 0.5f)] protected float lineThickness;
 	[SerializeField] protected bool _isAreaAbove;
 
 	private int _height;
@@ -42,6 +42,7 @@ public abstract class BoardArea : MonoBehaviour {
 		}
 #endif
 
+		cameraController = FindObjectOfType<CameraController>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
@@ -86,11 +87,15 @@ public abstract class BoardArea : MonoBehaviour {
 
 	private void Recalculate ( ) {
 		// Set the position of the board area
-		transform.position = new Vector3(-0.5f + (gameManager.GameSettings.BoardWidth / 2.0f), -0.5f + (IsAreaAbove ? gameManager.GameSettings.BoardHeight - fromHeight : fromHeight), 0);
+		float x = -0.5f + (gameManager.GameSettings.BoardWidth / 2.0f);
+		float y = -0.5f + (IsAreaAbove ? gameManager.GameSettings.BoardHeight - fromHeight : fromHeight);
+		transform.position = new Vector3(x, y, 0);
 
 		// Set the position and scale of the board area line
 		lineTransform.position = transform.position;
-		lineTransform.localScale = new Vector3(gameManager.GameSettings.BoardWidth, lineThickness, 1);
+		float xScale = gameManager.GameSettings.BoardWidth;
+		float yScale = Constants.BOARD_AREA_LINE_SIZE * cameraController.SizeScaleFactor;
+		lineTransform.localScale = new Vector3(xScale, yScale, 1);
 
 		// Set the position and size of the board area indicator
 		areaTransform.position = transform.position + Vector3.up * (fromHeight / (IsAreaAbove ? 2.0f : -2.0f));

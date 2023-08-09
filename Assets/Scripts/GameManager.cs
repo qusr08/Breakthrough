@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum GameState {
 	GAME, PAUSED, GAMEOVER
@@ -12,6 +14,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private BoardTextManager boardTextManager;
 	[SerializeField] private GameSettings _gameSettings;
 	[SerializeField] private Board board;
+	[SerializeField] private MenuManager menuManager;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
@@ -58,8 +61,10 @@ public class GameManager : MonoBehaviour {
 
 			switch (value) {
 				case GameState.GAME:
+					menuManager.IsDisabled = true;
 					break;
 				case GameState.PAUSED:
+					menuManager.IsDisabled = false;
 					break;
 				case GameState.GAMEOVER:
 					break;
@@ -87,6 +92,20 @@ public class GameManager : MonoBehaviour {
 	public float BoardAnimationSpeed => Mathf.Min(_boardAnimationSpeed, MinMinoFallTime);
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / Constants.BOOM_BLOCK_GUAR) * (1 - BoomBlockChance) + BoomBlockChance;
+	#endregion
+
+	#region Unity Functions
+	private void OnValidate ( ) {
+		board = FindObjectOfType<Board>( );
+		boardTextManager = FindObjectOfType<BoardTextManager>( );
+		menuManager = FindObjectOfType<MenuManager>( );
+	}
+
+	private void Awake ( ) {
+		OnValidate( );
+
+		GameState = GameState.GAME;
+	}
 	#endregion
 
 	public void UpdateDifficulty ( ) {
@@ -117,5 +136,13 @@ public class GameManager : MonoBehaviour {
 		float chanceSlope = -Constants.DIFF_VALUE * Breakthroughs;
 		float chanceScaleFactor = GameSettings.BoomBlockChance - 1;
 		BoomBlockChance = (chanceScaleFactor * Mathf.Exp(chanceSlope)) + 1;
+	}
+
+	public void OnPause (InputValue inputValue) {
+		if (GameState == GameState.PAUSED) {
+			GameState = GameState.GAME;
+		} else {
+			GameState = GameState.PAUSED;
+		}
 	}
 }

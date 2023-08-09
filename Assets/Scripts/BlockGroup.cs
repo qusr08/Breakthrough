@@ -36,7 +36,7 @@ public class BlockGroup : MonoBehaviour {
 	public bool IsDoneTweening => _isDoneTweening;
 	#endregion
 
-	#region Unity 
+	#region Unity Functions
 	protected virtual void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 		gameManager = FindObjectOfType<GameManager>( );

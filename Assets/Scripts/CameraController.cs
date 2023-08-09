@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 	[SerializeField] private ThemeManager themeManager;
-	[SerializeField] private Camera cam;
+	[SerializeField] private Camera _camera;
+
+	#region Properties
+	public Camera Camera => _camera;
+	public float SizeScaleFactor => _camera.orthographicSize / Constants.CAM_DEFLT_VALUE;
+	#endregion
 
 	#region Unity Functions
 	private void OnValidate ( ) {
 		themeManager = FindObjectOfType<ThemeManager>( );
-		cam = GetComponent<Camera>( );
+		_camera = GetComponent<Camera>( );
 	}
 
 	private void Awake ( ) {
 		OnValidate( );
 
-		cam.backgroundColor = themeManager.ActiveTheme.BackgroundColor;
+		Camera.backgroundColor = themeManager.ActiveTheme.BackgroundColor;
 	}
 	#endregion
 }

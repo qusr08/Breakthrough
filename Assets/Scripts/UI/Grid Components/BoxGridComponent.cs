@@ -9,22 +9,10 @@ public class BoxGridComponent : GridComponent {
 	protected override void Awake ( ) {
 		base.Awake( );
 
-		backgroundImage.color = themeManager.GetRandomBackgroundDetailColor( );
-	}
+		onHoverColorFunction = ( ) => themeManager.GetRandomMinoColor( );
+		onIdleColorFunction = ( ) => themeManager.GetRandomBackgroundDetailColor( );
 
-	protected override void Update ( ) {
-		// If the mouse position is close to this grid component, fade the colors of the background
-		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) <= Constants.UI_COLOR_AREA_SIZE) {
-			if (!isHovered) {
-				FadeBackgroundColor(themeManager.GetRandomMinoColor( ), Constants.UI_FADE_TIME);
-				isHovered = true;
-			}
-		} else {
-			if (isHovered) {
-				FadeBackgroundColor(themeManager.GetRandomBackgroundDetailColor( ), Constants.UI_FADE_TIME * 3);
-				isHovered = false;
-			}
-		}
+		backgroundImage.color = onIdleColorFunction( );
 	}
 	#endregion
 }

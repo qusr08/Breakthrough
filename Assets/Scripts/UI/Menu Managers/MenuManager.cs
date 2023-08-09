@@ -9,6 +9,7 @@ public class MenuManager : MonoBehaviour {
 	[SerializeField] private GameObject gridBoxComponentPrefab;
 	[SerializeField] private RectTransform rectTransform;
 	[SerializeField] private List<MenuScreen> menuScreens;
+	[SerializeField] private bool _isDisabled;
 
 	private int menuLevelCount;
 	private MenuScreen prevMenuScreen;
@@ -29,13 +30,22 @@ public class MenuManager : MonoBehaviour {
 			_activeMenuScreen = value;
 			_activeMenuScreen.gameObject.SetActive(true);
 
-			Vector2 toAnchoredPosition = new Vector2(0, _activeMenuScreen.MenuLevel * rectTransform.rect.height);
+			Vector2 toAnchoredPosition = new Vector2(rectTransform.anchoredPosition.x, _activeMenuScreen.MenuLevel * rectTransform.rect.height);
 			LeanTween.value(gameObject, (Vector2 vector) => rectTransform.anchoredPosition = vector, rectTransform.anchoredPosition, toAnchoredPosition, Constants.UI_MENU_TRANS_TIME)
 				.setOnComplete(( ) => {
 					if (prevMenuScreen != null) {
 						prevMenuScreen.gameObject.SetActive(false);
 					}
 				});
+		}
+	}
+
+	public bool IsDisabled {
+		get => _isDisabled;
+		set {
+			_isDisabled = value;
+
+			rectTransform.anchoredPosition = Constants.SCRN_RES * (_isDisabled ? Vector2.left : Vector2.zero);
 		}
 	}
 	#endregion
@@ -51,14 +61,13 @@ public class MenuManager : MonoBehaviour {
 		OnValidate( );
 
 		ActiveMenuScreen = menuScreens[0];
-		
 	}
 
 	#endregion
 
 	private void RecalculateUI ( ) {
 		// Calculate the grid dimensions of the screen
-		GridDimensions = Constants.SCREEN_RES / Constants.UI_GRID_SIZE;
+		GridDimensions = Constants.SCRN_RES / Constants.UI_GRID_SIZE;
 
 		// Find the highest menu level of this menu
 		foreach (MenuScreen menuScreen in menuScreens) {

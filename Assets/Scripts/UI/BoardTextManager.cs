@@ -47,7 +47,6 @@ public class BoardTextManager : MonoBehaviour {
 		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localPosition = new Vector3(width / 2f, -height / 2f);
 		backgroundSpriteRenderer.size = new Vector2(width, height);
-		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 
 		// Set the position of the text objects
 		TotalPointsBoardText.transform.localPosition = GetTextPositionFromIndex(0);
@@ -58,10 +57,6 @@ public class BoardTextManager : MonoBehaviour {
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
-		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
-
-		// Set misc. text positions
-		// versionBoardText.transform.localPosition = new Vector3(board.BorderThickness, -height - board.BoardPadding);
 	}
 
 	private void Awake ( ) {
@@ -70,6 +65,10 @@ public class BoardTextManager : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
+
+		// Set colors of the board text components
+		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
+		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
 		// Add the game settings code to the version number to show more information
 		versionBoardText.Label += $" | {gameManager.GameSettings.GameSettingsCode}";

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
 	[SerializeField] protected ThemeManager themeManager;
+	[SerializeField] protected CameraController cameraController;
 	[SerializeField] protected RectTransform rectTransform;
 	[SerializeField] protected RectTransform backgroundRectTransform;
 	[SerializeField] protected Image backgroundImage;
@@ -15,17 +16,24 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	[SerializeField] protected Vector2Int _gridPosition;
 	[SerializeField] protected Vector2Int _gridDimensions;
 
-	protected bool isHovered;
+	protected delegate Color OnHoverColorFunction ( );
+	protected delegate Color OnIdleColorFunction ( );
+
+	protected OnHoverColorFunction onHoverColorFunction;
+	protected OnIdleColorFunction onIdleColorFunction;
+
+	private bool isHovered;
 	private LTDescr backgroundColorLTID = null;
 
 	#region Properties
 	public Vector2Int GridPosition { get => _gridPosition; set => _gridPosition = value; }
 	public Vector2Int GridDimensions { get => _gridDimensions; set => _gridDimensions = value; }
-	protected Vector2 MouseWorldPosition => Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue( ));
+	protected Vector2 MouseWorldPosition => cameraController.Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue( ));
 	#endregion
 
 	#region Unity Functions
 	private void OnValidate ( ) {
+		cameraController = FindObjectOfType<CameraController>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		rectTransform = GetComponent<RectTransform>( );
 
@@ -35,20 +43,24 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	protected virtual void Awake ( ) {
 		OnValidate( );
 
-		backgroundImage.color = themeManager.GetRandomButtonColor( );
+		onHoverColorFunction = ( ) => themeManager.GetRandomMinoColor( );
+		onIdleColorFunction = ( ) => themeManager.GetRandomButtonColor( );
+
+		backgroundImage.color = onIdleColorFunction( );
 		isHovered = false;
 	}
 
 	protected virtual void Update ( ) {
 		// If the mouse position is close to this grid component, fade the colors of the background
-		if (Utils.DistanceSquared(MouseWorldPosition, transform.position) <= Constants.UI_COLOR_AREA_SIZE) {
+		float mouseDistance = Utils.DistanceSquared(MouseWorldPosition, transform.position);
+		if (mouseDistance <= Constants.UI_RANGE_SIZE * cameraController.SizeScaleFactor) {
 			if (!isHovered) {
-				FadeBackgroundColor(themeManager.GetRandomMinoColor( ), Constants.UI_FADE_TIME);
+				FadeBackgroundColor(onHoverColorFunction( ), Constants.UI_FADE_TIME);
 				isHovered = true;
 			}
 		} else {
 			if (isHovered) {
-				FadeBackgroundColor(themeManager.GetRandomButtonColor( ), Constants.UI_FADE_TIME * 3);
+				FadeBackgroundColor(onIdleColorFunction( ), Constants.UI_FADE_TIME * 3);
 				isHovered = false;
 			}
 		}
