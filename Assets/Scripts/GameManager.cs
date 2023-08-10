@@ -14,7 +14,8 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private BoardTextManager boardTextManager;
 	[SerializeField] private GameSettings _gameSettings;
 	[SerializeField] private Board board;
-	[SerializeField] private MenuManager menuManager;
+	[SerializeField] private MenuManager pauseMenuManager;
+	[SerializeField] private MenuManager gameOverMenuManager;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
@@ -61,12 +62,14 @@ public class GameManager : MonoBehaviour {
 
 			switch (value) {
 				case GameState.GAME:
-					menuManager.IsDisabled = true;
+					pauseMenuManager.IsDisabled = true;
+					gameOverMenuManager.IsDisabled = true;
 					break;
 				case GameState.PAUSED:
-					menuManager.IsDisabled = false;
+					pauseMenuManager.IsDisabled = false;
 					break;
 				case GameState.GAMEOVER:
+					gameOverMenuManager.IsDisabled = false;
 					break;
 			}
 		}
@@ -98,7 +101,6 @@ public class GameManager : MonoBehaviour {
 	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 		boardTextManager = FindObjectOfType<BoardTextManager>( );
-		menuManager = FindObjectOfType<MenuManager>( );
 	}
 
 	private void Awake ( ) {

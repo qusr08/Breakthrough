@@ -16,8 +16,8 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private CameraController cameraController;
 	[SerializeField] private ParticleManager particleManager;
-	[SerializeField] private BoardArea breakthroughBoardArea;
-	[SerializeField] private BoardArea hazardBoardArea;
+	[SerializeField] private BreakthroughBoardArea breakthroughBoardArea;
+	[SerializeField] private HazardBoardArea hazardBoardArea;
 	[SerializeField] private HazardBar hazardBar;
 	[SerializeField] private Camera gameCamera;
 	[Space]
@@ -45,8 +45,8 @@ public class Board : MonoBehaviour {
 	private bool needToUpdate = false;
 
 	#region Properties
-	public BoardArea BreakthroughBoardArea => breakthroughBoardArea;
-	public BoardArea HazardBoardArea => hazardBoardArea;
+	public BreakthroughBoardArea BreakthroughBoardArea => breakthroughBoardArea;
+	public HazardBoardArea HazardBoardArea => hazardBoardArea;
 
 	public float CameraPadding => Constants.BOARD_CAM_PADDNG * cameraController.SizeScaleFactor;
 	public float BoardPadding => Constants.BOARD_PADDNG * cameraController.SizeScaleFactor;
@@ -63,6 +63,13 @@ public class Board : MonoBehaviour {
 			switch (_boardState) {
 				case BoardState.PLACING_MINO:
 					needToUpdate = true;
+					
+					// Check to see if the game is over
+					HazardBoardArea.CheckForGameOver( );
+					if (gameManager.GameState == GameState.GAMEOVER) {
+						break;
+					}
+
 					UpdatePercentageCleared( );
 					GenerateMino( );
 					break;

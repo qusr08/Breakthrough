@@ -39,13 +39,14 @@ public class MenuManager : MonoBehaviour {
 				});
 		}
 	}
-
+	
 	public bool IsDisabled {
 		get => _isDisabled;
 		set {
 			_isDisabled = value;
 
-			rectTransform.anchoredPosition = Constants.SCRN_RES * (_isDisabled ? Vector2.left : Vector2.zero);
+			Vector2 directionOffset = _isDisabled ? Vector2.left : Vector2.zero;
+			rectTransform.anchoredPosition = Constants.SCRN_RES * directionOffset;
 		}
 	}
 	#endregion

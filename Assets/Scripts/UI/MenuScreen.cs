@@ -42,7 +42,7 @@ public class MenuScreen : MonoBehaviour {
 		// Calculate the anchored position of the rect transform
 		float anchoredX = rectTransform.sizeDelta.x / 2f;
 		float anchoredY = (-rectTransform.sizeDelta.y / 2f) + (-MenuLevel * rectTransform.rect.height);
-		rectTransform.anchorMin = rectTransform.anchorMax = Vector2.up;
+		// rectTransform.anchorMin = rectTransform.anchorMax = Vector2.up;
 		rectTransform.anchoredPosition = new Vector2(anchoredX, anchoredY);
 	}
 
