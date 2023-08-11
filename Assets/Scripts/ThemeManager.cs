@@ -24,7 +24,7 @@ public class ThemeManager : MonoBehaviour {
 	private void Awake ( ) {
 		// Make sure only one instance of the theme manager is in the game at one time
 		if (Instance != null && Instance != this) {
-			Destroy(this);
+			Destroy(gameObject);
 		} else {
 			Instance = this;
 		}

@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
+public class CameraManager : MonoBehaviour {
 	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private Camera _camera;
 
 	#region Properties
 	public Camera Camera => _camera;
-	public float SizeScaleFactor => _camera.orthographicSize / Constants.CAM_DEFLT_VALUE;
+	// public float SizeScaleFactor => _camera.orthographicSize / Constants.CAM_DEFLT_VALUE;
+	public float SizeScaleFactor => 15.5f / Constants.CAM_DEFLT_VALUE;
 	#endregion
 
 	#region Unity Functions

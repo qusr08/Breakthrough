@@ -14,7 +14,7 @@ public class Board : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
-	[SerializeField] private CameraController cameraController;
+	[SerializeField] private CameraManager cameraController;
 	[SerializeField] private ParticleManager particleManager;
 	[SerializeField] private BreakthroughBoardArea breakthroughBoardArea;
 	[SerializeField] private HazardBoardArea hazardBoardArea;
@@ -106,7 +106,7 @@ public class Board : MonoBehaviour {
 		}
 #endif
 
-		cameraController = FindObjectOfType<CameraController>( );
+		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		particleManager = FindObjectOfType<ParticleManager>( );

@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public enum GameState {
 	GAME, PAUSED, GAMEOVER
@@ -14,8 +16,11 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private BoardTextManager boardTextManager;
 	[SerializeField] private GameSettings _gameSettings;
 	[SerializeField] private Board board;
+	[SerializeField] private CameraManager cameraManager;
 	[SerializeField] private MenuManager pauseMenuManager;
 	[SerializeField] private MenuManager gameOverMenuManager;
+	[SerializeField] private HazardBar hazardBar;
+	[SerializeField] private TextMeshProUGUI totalPointsUIText;
 	[Header("Properties")]
 	[SerializeField, Min(0f)] private int _boardPoints;
 	[SerializeField, Min(0f)] private int _totalPoints;
@@ -60,16 +65,28 @@ public class GameManager : MonoBehaviour {
 
 			Debug.Log("Set Game State: " + value.ToString( ));
 
+			Vector3 cameraTransform = cameraManager.Camera.transform.position;
+
 			switch (value) {
 				case GameState.GAME:
+					hazardBar.gameObject.SetActive(true);
+					boardTextManager.gameObject.SetActive(true);
+					cameraManager.Camera.transform.position = new Vector3(7.5f, cameraTransform.y, cameraTransform.z);
 					pauseMenuManager.IsDisabled = true;
 					gameOverMenuManager.IsDisabled = true;
 					break;
 				case GameState.PAUSED:
+					hazardBar.gameObject.SetActive(false);
+					boardTextManager.gameObject.SetActive(false);
+					cameraManager.Camera.transform.position = new Vector3(-7.5f, cameraTransform.y, cameraTransform.z);
 					pauseMenuManager.IsDisabled = false;
 					break;
 				case GameState.GAMEOVER:
+					hazardBar.gameObject.SetActive(false);
+					boardTextManager.gameObject.SetActive(false);
+					cameraManager.Camera.transform.position = new Vector3(-7.5f, cameraTransform.y, cameraTransform.z);
 					gameOverMenuManager.IsDisabled = false;
+					totalPointsUIText.text = $"Total Points:\n{TotalPoints:n0}";
 					break;
 			}
 		}
@@ -101,6 +118,7 @@ public class GameManager : MonoBehaviour {
 	private void OnValidate ( ) {
 		board = FindObjectOfType<Board>( );
 		boardTextManager = FindObjectOfType<BoardTextManager>( );
+		cameraManager = FindObjectOfType<CameraManager>( );
 	}
 
 	private void Awake ( ) {
@@ -146,5 +164,13 @@ public class GameManager : MonoBehaviour {
 		} else {
 			GameState = GameState.PAUSED;
 		}
+	}
+
+	public void ReloadScene ( ) {
+		SceneManager.LoadScene(SceneManager.GetActiveScene( ).buildIndex);
+	}
+
+	public void Unpause ( ) {
+		GameState = GameState.GAME;
 	}
 }

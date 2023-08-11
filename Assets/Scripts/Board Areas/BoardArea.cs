@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class BoardArea : MonoBehaviour {
 	[Header("Components - Board Area")]
-	[SerializeField] protected CameraController cameraController;
+	[SerializeField] protected CameraManager cameraController;
 	[SerializeField] protected ThemeManager themeManager;
 	[SerializeField] protected GameManager gameManager;
 	[SerializeField] protected Board board;
@@ -42,7 +42,7 @@ public abstract class BoardArea : MonoBehaviour {
 		}
 #endif
 
-		cameraController = FindObjectOfType<CameraController>( );
+		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );

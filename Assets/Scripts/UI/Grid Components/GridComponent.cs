@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
 	[SerializeField] protected ThemeManager themeManager;
-	[SerializeField] protected CameraController cameraController;
+	[SerializeField] protected CameraManager cameraController;
 	[SerializeField] protected RectTransform rectTransform;
 	[SerializeField] protected RectTransform backgroundRectTransform;
 	[SerializeField] protected Image backgroundImage;
@@ -33,7 +33,7 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	#region Unity Functions
 	private void OnValidate ( ) {
-		cameraController = FindObjectOfType<CameraController>( );
+		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		rectTransform = GetComponent<RectTransform>( );
 

@@ -8,7 +8,7 @@ public class BoardText : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
-	[SerializeField] private CameraController cameraController;
+	[SerializeField] private CameraManager cameraController;
 	[SerializeField] private TextMeshPro labelText;
 	[SerializeField] private TextMeshPro valueText;
 	[SerializeField] private RectTransform labelRectTransform;
@@ -24,9 +24,9 @@ public class BoardText : MonoBehaviour {
 		set => valueText.text = (isPercentange ? $"{value:0.##}%" : $"{value:n0}");
 	}
 
-	public float LabelHeight => Constants.BOARD_TEXT_LABEL_HGHT * cameraController.SizeScaleFactor;
-	public float ValueHeight => disableValueText ? 0f : Constants.BOARD_TEXT_VALUE_HGHT * cameraController.SizeScaleFactor;
-	public float Width => Constants.BOARD_TEXT_WIDTH * cameraController.SizeScaleFactor;
+	public float LabelHeight => Constants.BOARD_TEXT_LABEL_HGHT * (15.5f / 15f);
+	public float ValueHeight => disableValueText ? 0f : Constants.BOARD_TEXT_VALUE_HGHT * (15.5f / 15f);
+	public float Width => Constants.BOARD_TEXT_WIDTH * (15.5f / 15f);
 	public float Height => ValueHeight + LabelHeight;
 	#endregion
 
@@ -41,7 +41,7 @@ public class BoardText : MonoBehaviour {
 		}
 #endif
 
-		cameraController = FindObjectOfType<CameraController>( );
+		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
@@ -50,6 +50,10 @@ public class BoardText : MonoBehaviour {
 		labelRectTransform.sizeDelta = new Vector2(Width, LabelHeight);
 		valueRectTransform.localPosition = new Vector3(Width / 2f, -LabelHeight - (ValueHeight / 2f));
 		valueRectTransform.sizeDelta = new Vector2(Width, ValueHeight);
+
+		// Set the color of the text
+		labelText.color = themeManager.ActiveTheme.TextColor;
+		valueText.color = themeManager.ActiveTheme.TextColor;
 	}
 
 	private void Awake ( ) {
@@ -58,9 +62,5 @@ public class BoardText : MonoBehaviour {
 #else
 		_OnValidate( );
 #endif
-
-		// Set the color of the text
-		labelText.color = themeManager.ActiveTheme.TextColor;
-		valueText.color = themeManager.ActiveTheme.TextColor;
 	}
 }

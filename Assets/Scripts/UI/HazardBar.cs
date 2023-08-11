@@ -7,7 +7,7 @@ public class HazardBar : MonoBehaviour {
 	[Header("Components - Hazard Bar")]
 	[SerializeField] private GameManager gameManager;
 	[SerializeField] private ThemeManager themeManager;
-	[SerializeField] private CameraController cameraController;
+	[SerializeField] private CameraManager cameraController;
 	[SerializeField] private Board board;
 	[Space]
 	[SerializeField] private Transform backgroundTransform;
@@ -47,7 +47,7 @@ public class HazardBar : MonoBehaviour {
 		}
 #endif
 
-		cameraController = FindObjectOfType<CameraController>( );
+		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 		board = FindObjectOfType<Board>( );
