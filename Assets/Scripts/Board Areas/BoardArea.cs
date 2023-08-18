@@ -19,6 +19,7 @@ public abstract class BoardArea : MonoBehaviour {
 	[Header("Properties - Board Area")]
 	[SerializeField, Min(0)] protected int _defaultHeight;
 	[SerializeField] protected bool _isAreaAbove;
+	[SerializeField] private float lineThickness;
 
 	private int _height;
 	private float fromHeight;
@@ -94,7 +95,7 @@ public abstract class BoardArea : MonoBehaviour {
 		// Set the position and scale of the board area line
 		lineTransform.position = transform.position;
 		float xScale = gameManager.GameSettings.BoardWidth;
-		float yScale = Constants.BOARD_AREA_LINE_SIZE * cameraController.SizeScaleFactor;
+		float yScale = lineThickness;
 		lineTransform.localScale = new Vector3(xScale, yScale, 1);
 
 		// Set the position and size of the board area indicator

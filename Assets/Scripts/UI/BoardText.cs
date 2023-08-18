@@ -8,7 +8,6 @@ public class BoardText : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private ThemeManager themeManager;
 	[SerializeField] private GameManager gameManager;
-	[SerializeField] private CameraManager cameraController;
 	[SerializeField] private TextMeshPro labelText;
 	[SerializeField] private TextMeshPro valueText;
 	[SerializeField] private RectTransform labelRectTransform;
@@ -16,6 +15,9 @@ public class BoardText : MonoBehaviour {
 	[Header("Properties")]
 	[SerializeField] private bool isPercentange;
 	[SerializeField] private bool disableValueText;
+	[SerializeField] private float _labelHeight;
+	[SerializeField] private float _valueHeight;
+	[SerializeField] private float _width;
 
 	#region Properties
 	public string Label { get => labelText.text; set => labelText.text = value; }
@@ -24,9 +26,9 @@ public class BoardText : MonoBehaviour {
 		set => valueText.text = (isPercentange ? $"{value:0.##}%" : $"{value:n0}");
 	}
 
-	public float LabelHeight => Constants.BOARD_TEXT_LABEL_HGHT * (15.5f / 15f);
-	public float ValueHeight => disableValueText ? 0f : Constants.BOARD_TEXT_VALUE_HGHT * (15.5f / 15f);
-	public float Width => Constants.BOARD_TEXT_WIDTH * (15.5f / 15f);
+	public float LabelHeight => _labelHeight;
+	public float ValueHeight => disableValueText ? 0f : _valueHeight;
+	public float Width => _width;
 	public float Height => ValueHeight + LabelHeight;
 	#endregion
 
@@ -41,7 +43,6 @@ public class BoardText : MonoBehaviour {
 		}
 #endif
 
-		cameraController = FindObjectOfType<CameraManager>( );
 		themeManager = FindObjectOfType<ThemeManager>( );
 		gameManager = FindObjectOfType<GameManager>( );
 

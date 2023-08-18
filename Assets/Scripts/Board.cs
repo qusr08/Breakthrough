@@ -19,7 +19,6 @@ public class Board : MonoBehaviour {
 	[SerializeField] private BreakthroughBoardArea breakthroughBoardArea;
 	[SerializeField] private HazardBoardArea hazardBoardArea;
 	[SerializeField] private HazardBar hazardBar;
-	[SerializeField] private Camera gameCamera;
 	[Space]
 	[SerializeField] private SpriteRenderer spriteRenderer;
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
@@ -30,6 +29,10 @@ public class Board : MonoBehaviour {
 	[SerializeField] private GameObject blockPrefab;
 	[Header("Properties")]
 	[SerializeField] private BoardState _boardState;
+	[SerializeField] private float _cameraPadding;
+	[SerializeField] private float _boardPadding;
+	[SerializeField] private float _borderThickness;
+	[SerializeField] private float _glowThickness;
 
 	private readonly List<BoomBlockFrames> boomBlockFrames = new List<BoomBlockFrames>( );
 	private float boomBlockFrameTimer;
@@ -48,10 +51,10 @@ public class Board : MonoBehaviour {
 	public BreakthroughBoardArea BreakthroughBoardArea => breakthroughBoardArea;
 	public HazardBoardArea HazardBoardArea => hazardBoardArea;
 
-	public float CameraPadding => Constants.BOARD_CAM_PADDNG * cameraController.SizeScaleFactor;
-	public float BoardPadding => Constants.BOARD_PADDNG * cameraController.SizeScaleFactor;
-	public float BorderThickness => Constants.BOARD_BRDR_WIDTH * cameraController.SizeScaleFactor;
-	public float GlowThickness => Constants.BOARD_GLOW_SIZE * cameraController.SizeScaleFactor;
+	public float CameraPadding => _cameraPadding;
+	public float BoardPadding => _boardPadding;
+	public float BorderThickness => _borderThickness;
+	public float GlowThickness => _glowThickness;
 
 	public BoardState BoardState {
 		get => _boardState;
@@ -135,9 +138,9 @@ public class Board : MonoBehaviour {
 		glowSpriteRenderer.size = new Vector2(glowWidth, glowHeight);
 		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
 
-		// Set the camera orthographic size and position so it fits the entire board
-		gameCamera.orthographicSize = (gameManager.GameSettings.BoardHeight + CameraPadding) / 2f;
-		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
+		// Set the camera position
+		cameraController.Camera.orthographicSize = (gameManager.GameSettings.BoardHeight + CameraPadding) / 2f;
+		cameraController.transform.position = new Vector3(positionX, positionY, cameraController.transform.position.z);
 	}
 
 	private void Awake ( ) {

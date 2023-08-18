@@ -57,6 +57,9 @@ public class BoardTextManager : MonoBehaviour {
 
 		// Set glow size
 		glowSpriteRenderer.size = new Vector2(width, height) + (Vector2.one * (board.GlowThickness * 2));
+
+		// Show version number and game settings code
+		versionBoardText.Label = $"V{Application.version} | {gameManager.GameSettings.GameSettingsCode}";
 	}
 
 	private void Awake ( ) {
@@ -69,9 +72,6 @@ public class BoardTextManager : MonoBehaviour {
 		// Set colors of the board text components
 		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 		glowSpriteRenderer.color = themeManager.ActiveTheme.GlowColor;
-
-		// Add the game settings code to the version number to show more information
-		versionBoardText.Label += $" | {gameManager.GameSettings.GameSettingsCode}";
 	}
 
 	/// <summary>

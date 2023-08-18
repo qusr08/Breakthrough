@@ -53,7 +53,7 @@ public class GridComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	protected virtual void Update ( ) {
 		// If the mouse position is close to this grid component, fade the colors of the background
 		float mouseDistance = Utils.DistanceSquared(MouseWorldPosition, transform.position);
-		if (mouseDistance <= Constants.UI_RANGE_SIZE * cameraController.SizeScaleFactor) {
+		if (mouseDistance <= GameManager.UI_GRID_SIZE) {
 			if (!isHovered) {
 				FadeBackgroundColor(onHoverColorFunction( ), Constants.UI_FADE_TIME);
 				isHovered = true;

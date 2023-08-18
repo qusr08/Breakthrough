@@ -12,13 +12,13 @@ public enum GameState {
 }
 
 public class GameManager : MonoBehaviour {
+	public const int UI_GRID_SIZE = 120;
+
 	[Header("Components")]
 	[SerializeField] private BoardTextManager boardTextManager;
 	[SerializeField] private GameSettings _gameSettings;
 	[SerializeField] private Board board;
 	[SerializeField] private CameraManager cameraManager;
-	[SerializeField] private MenuManager pauseMenuManager;
-	[SerializeField] private MenuManager gameOverMenuManager;
 	[SerializeField] private HazardBar hazardBar;
 	[SerializeField] private TextMeshProUGUI totalPointsUIText;
 	[Header("Properties")]
@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour {
 	[Space]
 	[SerializeField, Range(-1, 1)] private int _rotateDirection;
 	[SerializeField, Min(0f)] private float _boardAnimationSpeed;
+	[Header("Temporary")]
+	[SerializeField] private GameObject pausedText;
 
 	private int _boomBlockDrought;
 	private float _minoFallTime;
@@ -65,28 +67,14 @@ public class GameManager : MonoBehaviour {
 
 			Debug.Log("Set Game State: " + value.ToString( ));
 
-			Vector3 cameraTransform = cameraManager.Camera.transform.position;
-
 			switch (value) {
 				case GameState.GAME:
-					hazardBar.gameObject.SetActive(true);
-					boardTextManager.gameObject.SetActive(true);
-					cameraManager.Camera.transform.position = new Vector3(7.5f, cameraTransform.y, cameraTransform.z);
-					pauseMenuManager.IsDisabled = true;
-					gameOverMenuManager.IsDisabled = true;
+					pausedText.SetActive(false);
 					break;
 				case GameState.PAUSED:
-					hazardBar.gameObject.SetActive(false);
-					boardTextManager.gameObject.SetActive(false);
-					cameraManager.Camera.transform.position = new Vector3(-7.5f, cameraTransform.y, cameraTransform.z);
-					pauseMenuManager.IsDisabled = false;
+					pausedText.SetActive(true);
 					break;
 				case GameState.GAMEOVER:
-					hazardBar.gameObject.SetActive(false);
-					boardTextManager.gameObject.SetActive(false);
-					cameraManager.Camera.transform.position = new Vector3(-7.5f, cameraTransform.y, cameraTransform.z);
-					gameOverMenuManager.IsDisabled = false;
-					totalPointsUIText.text = $"Total Points:\n{TotalPoints:n0}";
 					break;
 			}
 		}
@@ -164,13 +152,5 @@ public class GameManager : MonoBehaviour {
 		} else {
 			GameState = GameState.PAUSED;
 		}
-	}
-
-	public void ReloadScene ( ) {
-		SceneManager.LoadScene(SceneManager.GetActiveScene( ).buildIndex);
-	}
-
-	public void Unpause ( ) {
-		GameState = GameState.GAME;
 	}
 }

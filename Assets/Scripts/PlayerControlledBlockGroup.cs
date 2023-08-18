@@ -50,6 +50,8 @@ public class PlayerControlledBlockGroup : BlockGroup {
 		} else {
 			gameManager.BoomBlockDrought++;
 		}
+
+		fallTimer = gameManager.MinoFallTime;
 	}
 
 	public override void UpdateBlockGroup ( ) {
@@ -70,14 +72,12 @@ public class PlayerControlledBlockGroup : BlockGroup {
 			return;
 		}
 
-		placeTimer -= Time.deltaTime;
-
 		// Fall down based on the fall time of the minos
-		if (Time.time - previousFallTime > (verticalValue > 0 ? gameManager.MinMinoFallTime : gameManager.MinoFallTime)) {
+		if (fallTimer <= (verticalValue > 0 ? gameManager.MinoFallTime - gameManager.MinMinoFallTime : 0f)) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {
-				previousFallTime = Time.time;
+				fallTimer = gameManager.MinoFallTime;
 
 				if (verticalValue > 0) {
 					gameManager.BoardPoints += Constants.POINT_FAST_DROP;
@@ -123,6 +123,9 @@ public class PlayerControlledBlockGroup : BlockGroup {
 				placeTimer = gameManager.MinoPlaceTime;
 			}
 		}
+
+		placeTimer -= Time.deltaTime;
+		fallTimer -= Time.deltaTime;
 	}
 	#endregion
 

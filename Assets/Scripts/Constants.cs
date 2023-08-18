@@ -33,15 +33,6 @@ public static class Constants {
 
 	public static Vector2Int SCRN_RES = new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height); // The resolution of the screen
 	public const float CAM_DEFLT_VALUE = 15f;
-
-	public const float BOARD_AREA_LINE_SIZE = 0.1f; // Size of the board area boundary lines on the board
-	public const float BOARD_TEXT_WIDTH = 7.5f; // The width of the board text components
-	public const float BOARD_TEXT_LABEL_HGHT = 0.75f; // The size of the label text on board text components
-	public const float BOARD_TEXT_VALUE_HGHT = 1.5f; // The size of the value text on board text components
-	public const float BOARD_CAM_PADDNG = 3f; // The padding around the border of the screen
-	public const float BOARD_PADDNG = 0.25f; // The padding between the board and the board UI elements
-	public const float BOARD_BRDR_WIDTH = 0.75f; // The width of the board border
-	public const float BOARD_GLOW_SIZE = 3f; // The size of the glow around board UI elements
 	#endregion
 
 	public const float CLOSE_ENOUGH = 0.01f;

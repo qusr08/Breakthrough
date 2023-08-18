@@ -9,7 +9,7 @@ public class CameraManager : MonoBehaviour {
 	#region Properties
 	public Camera Camera => _camera;
 	// public float SizeScaleFactor => _camera.orthographicSize / Constants.CAM_DEFLT_VALUE;
-	public float SizeScaleFactor => 15.5f / Constants.CAM_DEFLT_VALUE;
+	// public float SizeScaleFactor => 15.5f / Constants.CAM_DEFLT_VALUE;
 	#endregion
 
 	#region Unity Functions

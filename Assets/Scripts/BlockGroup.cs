@@ -22,7 +22,7 @@ public class BlockGroup : MonoBehaviour {
 	private Vector3 toRotationVelocity;
 	protected bool _isDoneTweening;
 
-	protected float previousFallTime;
+	protected float fallTimer;
 	protected float previousMoveTime;
 	protected float previousRotateTime;
 
@@ -49,9 +49,7 @@ public class BlockGroup : MonoBehaviour {
 		toRotation = transform.eulerAngles;
 		_isDoneTweening = true;
 
-		previousFallTime = Time.time;
-		previousMoveTime = Time.time;
-		previousRotateTime = Time.time;
+		fallTimer = gameManager.MinMinoFallTime;
 	}
 
 	protected virtual void Start ( ) {
@@ -67,13 +65,15 @@ public class BlockGroup : MonoBehaviour {
 	#endregion
 
 	public virtual void UpdateBlockGroup ( ) {
-		if (Time.time - previousFallTime > gameManager.MinMinoFallTime) {
+		if (fallTimer <= 0f) {
 			CanFall = TryMove(Vector2Int.down);
 
 			if (CanFall) {
-				previousFallTime = Time.time;
+				fallTimer = gameManager.MinMinoFallTime;
 			}
 		}
+
+		fallTimer -= Time.deltaTime;
 	}
 
 	/// <summary>

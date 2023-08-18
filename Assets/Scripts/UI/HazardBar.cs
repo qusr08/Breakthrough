@@ -59,7 +59,7 @@ public class HazardBar : MonoBehaviour {
 		// Set background position
 		transform.position = board.transform.position + new Vector3(x, y);
 		backgroundTransform.localScale = new Vector3(board.BorderThickness, board.BorderThickness, 1);
-		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f) / cameraController.SizeScaleFactor);
+		backgroundSpriteRenderer.size = new Vector2(1, gameManager.GameSettings.BoardHeight * (4f / 3f));
 		backgroundSpriteRenderer.color = themeManager.GetRandomButtonColor( );
 
 		// Set glow size and color
