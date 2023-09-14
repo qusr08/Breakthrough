@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4fa81364cd458c499a6376b1686d03d, type: 3}
+  m_Name: Light Theme
+  m_EditorClassIdentifier: 
+  _backgroundColor: {r: 0.9372549, g: 0.9372549, b: 0.9372549, a: 1}
+  _detailColor: {r: 0.654902, g: 0.7647059, b: 0.8, a: 1}
+  _textColor: {r: 0.9372549, g: 0.9372549, b: 0.9372549, a: 1}
+  _glowColor: {r: 0.654902, g: 0.7647059, b: 0.8, a: 1}
+  _hazardColor: {r: 0.78039217, g: 0.25882354, b: 0.41568628, a: 1}
+  _breakthroughColor: {r: 0.59607846, g: 0.8, b: 0.32941177, a: 1}
+  _backgroundDetailColors: []
+  _minoBlockColors:
+    m_keys: 000000000100000002000000030000000400000005000000060000000700000008000000
+    m_values:
+    - {r: 0.72156864, g: 0.9411765, b: 0.43529412, a: 1}
+    - {r: 1, g: 0.61960787, b: 0.38431373, a: 1}
+    - {r: 0.09803922, g: 0.627451, b: 0.6039216, a: 1}
+    - {r: 0.6627451, g: 0.59607846, b: 1, a: 1}
+    - {r: 0.3764706, g: 0.3647059, b: 1, a: 1}
+    - {r: 0.9607843, g: 0.5254902, b: 0.654902, a: 1}
+    - {r: 0.78039217, g: 0.25882354, b: 0.41568628, a: 1}
+    - {r: 0.5921569, g: 0.8980392, b: 0.93333334, a: 1}
+    - {r: 0.3372549, g: 0.64705884, b: 1, a: 1}
+  _wallBlockColors:
+    m_keys: 00000000010000000200000003000000
+    m_values:
+    - {r: 0.54509807, g: 0.61960787, b: 0.64705884, a: 1}
+    - {r: 0.54509807, g: 0.61960787, b: 0.64705884, a: 1}
+    - {r: 0.3529412, g: 0.45882353, b: 0.49411765, a: 1}
+    - {r: 0.16078432, g: 0.23529412, b: 0.2627451, a: 1}

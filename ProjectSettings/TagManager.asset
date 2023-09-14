@@ -41,24 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Background
-    uniqueID: 1017343173
-    locked: 0
   - name: Board
-    uniqueID: 205540463
+    uniqueID: 649119475
     locked: 0
-  - name: Board UI
-    uniqueID: 350089539
+  - name: Board Areas
+    uniqueID: 1177486679
     locked: 0
   - name: Blocks
-    uniqueID: 999272537
-    locked: 0
-  - name: Particles
-    uniqueID: 4282495665
-    locked: 0
-  - name: Gameplay UI
-    uniqueID: 3079897967
-    locked: 0
-  - name: UI
-    uniqueID: 1227106041
+    uniqueID: 2082880423
     locked: 0

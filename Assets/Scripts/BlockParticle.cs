@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockParticle : MonoBehaviour {
-	[Header("Components")]
 	[SerializeField] private Rigidbody2D rigidBody2D;
-	[Header("Properties")]
-	[SerializeField, Min(0f), Tooltip("The maximum velocity that can be applied to this particle when it is created.")] private float maxVelocity;
-	[SerializeField, Min(0f), Tooltip("The minimum velocity that can be applied to this particle when it is created.")] private float minVelocity;
-	[SerializeField, Min(0f), Tooltip("The maximum angular velocity that can be applied to this particle when it is created.")] private float maxAngularVelocity;
-	[SerializeField, Min(0f), Tooltip("The minimum angular velocity that can be applied to this particle when it is created.")] private float minAngularVelocity;
+	[SerializeField, Range(0f, 180f)] private float coneSizeDegrees;
+	[SerializeField] private float minVelocity;
+	[SerializeField] private float maxVelocity;
+	[SerializeField, Range(0f, 180f)] private float angularVelocity;
 
+	#region Unity Functions
 	private void Start ( ) {
-		rigidBody2D.velocity = Random.insideUnitCircle.normalized * Random.Range(minVelocity, maxVelocity);
-		rigidBody2D.angularVelocity = Random.Range(minAngularVelocity, maxAngularVelocity);
+		// Generate a random velocity vector within the range of the cone spawn area
+		float randomRadians = (Random.Range(-coneSizeDegrees, coneSizeDegrees) * Mathf.Deg2Rad) + (Mathf.PI / 2f);
+		Vector2 velocityVector = new Vector2(Mathf.Cos(randomRadians), Mathf.Sin(randomRadians));
+		rigidBody2D.velocity = velocityVector * Random.Range(minVelocity, maxVelocity);
+
+		// Generate a random angular velocity speed
+		rigidBody2D.angularVelocity = Random.Range(-angularVelocity, angularVelocity);
 	}
 
 	private void Update ( ) {
+		// If the board particle falls below the bottom of the camera view, then destroy it
 		if (transform.position.y < Camera.main.transform.position.y - (Camera.main.orthographicSize * 2f)) {
 			Destroy(gameObject);
 		}
 	}
+	#endregion
 }
