@@ -12,6 +12,9 @@ public class BoomBlock : MinoBlock {
 	[SerializeField, Tooltip("A dictionary that converts BoomBlockType to an icon sprite.")] private BoomBlockIconDictionary boomBlockIconDictionary;
 
 	#region Properties
+	/// <summary>
+	///		The type of pattern this boom block has when it explodes
+	/// </summary>
 	public BoomBlockType BoomBlockType {
 		get => _boomBlockType;
 		set {
@@ -20,6 +23,4 @@ public class BoomBlock : MinoBlock {
 		}
 	}
 	#endregion
-
-
 }

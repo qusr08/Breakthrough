@@ -12,7 +12,14 @@ public abstract class BoardArea : MonoBehaviour {
 	private int _height;
 
 	#region Properties
+	/// <summary>
+	///		The default height of this board area
+	/// </summary>
 	public int DefaultHeight => _defaultHeight;
+
+	/// <summary>
+	///		The current height of this board area
+	/// </summary>
 	public int Height {
 		get => _height;
 		set {
@@ -20,6 +27,10 @@ public abstract class BoardArea : MonoBehaviour {
 			_height = value;
 		}
 	}
+
+	/// <summary>
+	///		Whether or not this board area uses the top or bottom of the board as a baseline when calculating its position and size
+	/// </summary>
 	public bool IsFlipped => _isFlipped;
 	#endregion
 

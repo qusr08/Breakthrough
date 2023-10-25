@@ -23,6 +23,10 @@ public class BoardAreaSizer : MonoBehaviour {
 	}
 	#endregion
 
+	/// <summary>
+	///		Calculate the position and size of the board area
+	/// </summary>
+	/// <param name="height">The height value to use when calculating the position and size</param>
 	public void Recalculate (float height) {
 		// Set the position of the board area
 		float x = -0.5f + (GameSettingsManager.Instance.BoardWidth / 2.0f);
@@ -36,6 +40,10 @@ public class BoardAreaSizer : MonoBehaviour {
 		lineSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.BoardWidth, lineThickness);
 	}
 
+	/// <summary>
+	///		Change the color of the board area
+	/// </summary>
+	/// <param name="color">The color to set</param>
 	public void Recolor (Color color) {
 		lineSpriteRenderer.color = color;
 		areaSpriteRenderer.color = Utils.ColorWithAlpha(color, areaOpacity);

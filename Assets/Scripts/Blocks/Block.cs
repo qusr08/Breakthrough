@@ -16,7 +16,20 @@ public class Block : MonoBehaviour {
 	[SerializeField, Range(0f, 1f), Tooltip("The new scale of this block object to add a gap between other blocks next to it on the game board.")] private float blockScale;
 
 	#region Properties
-	public BlockGroup BlockGroup { get => _blockGroup; set => value.TransferBlock(this); }
+	/// <summary>
+	///		The current block group this block is a part of
+	/// </summary>
+	public BlockGroup BlockGroup {
+		get => _blockGroup;
+		set {
+			_blockGroup = value;
+			value.TransferBlock(this);
+		}
+	}
+
+	/// <summary>
+	///		The amount of health the block has before it is destroyed
+	/// </summary>
 	public int Health {
 		get => _health;
 		set {
@@ -24,7 +37,15 @@ public class Block : MonoBehaviour {
 			OnHealthChange( );
 		}
 	}
+	
+	/// <summary>
+	///		The position of the block on the board
+	/// </summary>
 	public Vector2Int Position { get => _position; set => _position = value; }
+
+	/// <summary>
+	///		The direction that the block is facing
+	/// </summary>
 	public BlockDirection BlockDirection { get => _blockDirection; set => _blockDirection = value; }
 	#endregion
 
@@ -40,6 +61,9 @@ public class Block : MonoBehaviour {
 	}
 	#endregion
 
+	/// <summary>
+	///		Update called when the health of this block changes
+	/// </summary>
 	protected virtual void OnHealthChange ( ) {
 		// If the block has 
 		if (Health <= 0) {
@@ -47,19 +71,30 @@ public class Block : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	///		Set the color of the spriterenderer attached to this block
+	/// </summary>
+	/// <param name="color">The color to set this block to</param>
 	protected void SetColor (Color color) {
 		spriteRenderer.color = color;
 	}
 
+	/// <summary>
+	///		Set the physical location of this block in Unity coordinates
+	/// </summary>
+	/// <param name="x">The x coordinate to set this block to</param>
+	/// <param name="y">The y coordinate to set this block to</param>
 	public void SetLocation (int x, int y) => SetLocation(new Vector2Int(x, y));
+
+	/// <summary>
+	///		Set the physical location of this block in Unity coordinates
+	/// </summary>
+	/// <param name="location">The location to set this block to</param>
 	public void SetLocation (Vector2Int location) {
-		// Set the position temporarily to be off the board
-		// Needed to properly set the position of this block in the grid array
-		Position = -Vector2Int.one;
 		board.MoveBlockTo(this, location);
 
 		// Set the transform position of this block its grid position
-		if (board.IsPositionValid(Position)) {
+		if (board.IsPositionOnBoard(Position)) {
 			transform.position = (Vector3Int) Position;
 		}
 	}

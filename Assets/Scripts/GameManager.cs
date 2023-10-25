@@ -34,9 +34,24 @@ public class GameManager : MonoBehaviour {
 	private float boomBlockChance;
 
 	#region Properties
+	/// <summary>
+	///		The number of board points the player currently has
+	/// </summary>
 	public int BoardPoints { get => _boardPoints; set => _boardPoints = value; }
+
+	/// <summary>
+	///		The number of total points the player currently has
+	/// </summary>
 	public int TotalPoints { get => _totalPoints; set => _totalPoints = value; }
+
+	/// <summary>
+	///		The percentage of the board that is currently empty
+	/// </summary>
 	public float PercentageCleared { get => _percentageCleared; set => _percentageCleared = value; }
+
+	/// <summary>
+	///		The number of breakthroughs the player currently has
+	/// </summary>
 	public int Breakthroughs { get => _breakthroughs; set => _breakthroughs = value; }
 
 	public float HazardFallTime { get => _hazardFallTime; private set => _hazardFallTime = value; }
@@ -62,6 +77,9 @@ public class GameManager : MonoBehaviour {
 
 	#endregion
 
+	/// <summary>
+	///		Update all variables that effect game difficulty based on the amount of breakthroughs that have been achieved
+	/// </summary>
 	public void UpdateDifficulty ( ) {
 		// Calculate the mino fall time for the specified settings
 		float minoScaleFactor = (defaultMinoFallTime / GameSettingsManager.Instance.MinoSpeedMultiplier) - FastMinoFallTime;
