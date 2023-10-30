@@ -57,11 +57,9 @@ public class Board : MonoBehaviour {
 
 			switch (_boardState) {
 				case BoardState.UPDATING_MINO:
-					needToUpdateBlockGroups = true;
 					gameManager.ActiveMino = SpawnRandomMino( );
 					break;
 				case BoardState.MERGING_BLOCKGROUPS:
-					needToUpdateBlockGroups = true;
 					MergeBlockGroups( );
 					break;
 				case BoardState.UPDATING_BLOCKGROUPS:
@@ -368,6 +366,8 @@ public class Board : MonoBehaviour {
 		return minoBlockGroup;
 	}
 
+
+
 	/// <summary>
 	///		Create a new block group
 	/// </summary>
@@ -415,12 +415,14 @@ public class Board : MonoBehaviour {
 
 					// While there are still block groups to merge, merge them together
 					while (surroundingBlockGroups.Count > 0) {
-						// mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, surroundingBlockGroups[0]);
+						mergedBlockGroup = mergedBlockGroup.MergeBlockGroup(surroundingBlockGroups[0]);
 						surroundingBlockGroups.RemoveAt(0);
 					}
 
+					// Transfer the block to the final merged block group
 					block.BlockGroup = mergedBlockGroup;
 				} else {
+					// Create a new block group and transfer the block to it
 					block.BlockGroup = CreateBlockGroup( );
 				}
 			}

@@ -24,6 +24,11 @@ public class BlockGroup : MonoBehaviour {
 	///		Whether or not the block group has been modified
 	/// </summary>
 	public bool IsModified { get => _isModified; set => _isModified = value; }
+
+	/// <summary>
+	///		Whether or not this block group has no blocks that are a part of it
+	/// </summary>
+	public bool IsEmpty => Blocks.Count == 0;
 	#endregion
 
 	#region Unity Functions
@@ -51,11 +56,6 @@ public class BlockGroup : MonoBehaviour {
 		BlockGroup previousBlockGroup = block.BlockGroup;
 		if (previousBlockGroup != null) {
 			previousBlockGroup.Blocks.Remove(block);
-
-			// If the other block group now has no more blocks, then destroy it
-			/*if (previousBlockGroup.Blocks.Count == 0) {
-				Destroy(previousBlockGroup);
-			}*/
 		}
 
 		// Set the blocks transform parent to this block group
@@ -72,63 +72,46 @@ public class BlockGroup : MonoBehaviour {
 	///		<strong>BlockGroup</strong> that is the block group this block group was merged into
 	/// </returns>
 	public BlockGroup MergeToBlockGroup (BlockGroup blockGroup) {
+		// Transfer all of the blocks to the input block group
 		for (int i = Blocks.Count - 1; i >= 0; i--) {
 			Blocks[i].BlockGroup = blockGroup;
 		}
+
+		// Since the block group is now empty, destroy it
+		board.BlockGroups.Remove(this);
+		Destroy(gameObject);
 
 		return blockGroup;
 	}
 
 	/// <summary>
-	///		Merge two block groups together
+	///		Merge the input block group with this one
 	/// </summary>
-	/// <param name="blockGroup1">The first block group to merge</param>
-	/// <param name="blockGroup2">The second block group to merge</param>
+	/// <param name="blockGroup">The block group to merge with this block group</param>
 	/// <returns>
-	///		<strong>BlockGroup</strong> that has all of the blocks that were a part of both block groups
+	///		<strong>BlockGroup</strong> that is the two block groups merged together
 	/// </returns>
-	public static BlockGroup MergeBlockGroups (BlockGroup blockGroup1, BlockGroup blockGroup2) {
+	public BlockGroup MergeBlockGroup (BlockGroup blockGroup) {
 		// If the block groups are the same, then just return
-		if (blockGroup1 == blockGroup2) {
-			return blockGroup1;
+		if (blockGroup == this) {
+			return blockGroup;
 		}
 
 		// If one of the block groups are a player controlled block group, make sure that one is always destroyed
 		// This prevents the player from being able to control block groups from minos that have already been placed
-		if (blockGroup1.IsPlayerControlled) {
-			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		if (blockGroup.IsPlayerControlled) {
+			return MergeToBlockGroup(blockGroup);
 		}
-		if (blockGroup2.IsPlayerControlled) {
-			return blockGroup1.MergeToBlockGroup(blockGroup2);
+		if (IsPlayerControlled) {
+			return blockGroup.MergeToBlockGroup(this);
 		}
 
 		// Merge the smaller block group into the larger block group
 		// This saves processing time
-		if (blockGroup1.Blocks.Count >= blockGroup2.Blocks.Count) {
-			return blockGroup2.MergeToBlockGroup(blockGroup1);
+		if (blockGroup.Blocks.Count >= Blocks.Count) {
+			return MergeToBlockGroup(blockGroup);
 		} else {
-			return blockGroup1.MergeToBlockGroup(blockGroup2);
+			return blockGroup.MergeToBlockGroup(this);
 		}
 	}
-
-	/// <summary>
-	///		Merge all block groups in a list together
-	/// </summary>
-	/// <param name="blockGroups">The list of block groups to merge</param>
-	/// <returns>
-	///		<strong>BlockGroup</strong> that has all of the blocks that were a part of the list of block groups
-	/// </returns>
-	/*public static BlockGroup MergeAllBlockGroups (List<BlockGroup> blockGroups) {
-		// Make the first block group in the merge list the block group that all blocks will merge into
-		BlockGroup mergedBlockGroup = blockGroups[0];
-		blockGroups.RemoveAt(0);
-
-		// While there are still block groups to merge, merge them together
-		while (blockGroups.Count > 0) {
-			mergedBlockGroup = MergeBlockGroups(mergedBlockGroup, blockGroups[0]);
-			blockGroups.RemoveAt(0);
-		}
-
-		return mergedBlockGroup;
-	}*/
 }
