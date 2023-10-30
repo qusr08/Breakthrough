@@ -10,6 +10,9 @@ public class WallBlock : Block {
 	[SerializeField] private WallBlockColor _wallBlockColor;
 
 	#region Properties
+	/// <summary>
+	///		The color of the wall block
+	/// </summary>
 	public WallBlockColor WallBlockColor {
 		get => _wallBlockColor;
 		set {

@@ -37,7 +37,7 @@ public class Block : MonoBehaviour {
 			OnHealthChange( );
 		}
 	}
-	
+
 	/// <summary>
 	///		The position of the block on the board
 	/// </summary>
@@ -65,8 +65,13 @@ public class Block : MonoBehaviour {
 	///		Update called when the health of this block changes
 	/// </summary>
 	protected virtual void OnHealthChange ( ) {
-		// If the block has 
+		// If the block has been destroyed, update various parts of the game
 		if (Health <= 0) {
+			// Set this block's block group to be modified because this block was destroyed
+			BlockGroup.IsModified = true;
+
+			// Remove the block from the board
+			board.Blocks.Remove(this);
 			Destroy(gameObject);
 		}
 	}

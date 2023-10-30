@@ -10,6 +10,9 @@ public class MinoBlock : Block {
 	[SerializeField] protected MinoType _minoType;
 
 	#region Properties
+	/// <summary>
+	///		The type of mino (or color) that this block is
+	/// </summary>
 	public MinoType MinoType {
 		get => _minoType;
 		set {

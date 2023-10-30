@@ -8,6 +8,7 @@ public class BlockGroup : MonoBehaviour {
 	[SerializeField, Tooltip("A list of all the blocks that are a part of this block group.")] private List<Block> _blocks;
 	[SerializeField, Tooltip("Whether or not this block group can be controlled by the player.")] private bool _isPlayerControlled;
 	[SerializeField, Tooltip("Set to true if any block that is part of this block group is destroyed.")] private bool _isModified;
+	[SerializeField, Tooltip("A queue containing the positions that this block group will move to.")] private Queue<Vector2Int> _positionQueue;
 
 	#region Properties
 	/// <summary>
@@ -29,6 +30,11 @@ public class BlockGroup : MonoBehaviour {
 	///		Whether or not this block group has no blocks that are a part of it
 	/// </summary>
 	public bool IsEmpty => Blocks.Count == 0;
+
+	/// <summary>
+	///		A queue containing the positions that this block group will move to
+	/// </summary>
+	public Queue<Vector2Int> PositionQueue { get => _positionQueue; set => _positionQueue = value; }
 	#endregion
 
 	#region Unity Functions

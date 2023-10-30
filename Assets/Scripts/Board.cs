@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,6 +20,7 @@ public class Board : MonoBehaviour {
 	[SerializeField, Tooltip("A reference to the hazard board area.")] private HazardBoardArea _hazardBoardArea;
 	[SerializeField, Tooltip("The current state of the board.")] private BoardState _boardState;
 	[SerializeField, Tooltip("A list of all the block groups on the board.")] private List<BlockGroup> _blockGroups;
+	[SerializeField, Tooltip("A list of all the blocks on the board.")] private List<Block> _blocks;
 
 	private Block[ , ] grid;
 
@@ -44,6 +44,11 @@ public class Board : MonoBehaviour {
 	///		A list of all the block groups that are currently on the board
 	/// </summary>
 	public List<BlockGroup> BlockGroups { get => _blockGroups; private set => _blockGroups = value; }
+
+	/// <summary>
+	///		A list of all the blocks that are currently on the board
+	/// </summary>
+	public List<Block> Blocks { get => _blocks; set => _blocks = value; }
 
 	/// <summary>
 	///		The current state of the board processes
@@ -117,9 +122,8 @@ public class Board : MonoBehaviour {
 		switch (BoardState) {
 			case BoardState.UPDATING_MINO:
 				break;
-			case BoardState.MERGING_BLOCKGROUPS:
-				break;
 			case BoardState.UPDATING_BLOCKGROUPS:
+				UpdateBlockGroups( );
 				break;
 			case BoardState.UPDATING_BOOMBLOCKS:
 				break;
@@ -312,6 +316,7 @@ public class Board : MonoBehaviour {
 		// Initialize all general block variables
 		block.SetLocation(position);
 		block.Health = health;
+		Blocks.Add(block);
 
 		// Add the block to the block group
 		if (blockGroup == null) {
@@ -366,8 +371,6 @@ public class Board : MonoBehaviour {
 		return minoBlockGroup;
 	}
 
-
-
 	/// <summary>
 	///		Create a new block group
 	/// </summary>
@@ -393,40 +396,48 @@ public class Board : MonoBehaviour {
 	///		Merge all block groups currently on the board together
 	/// </summary>
 	private void MergeBlockGroups ( ) {
-		// Loop through every board position on the board
-		for (int y = 0; y < GameSettingsManager.Instance.BoardHeight; y++) {
-			for (int x = 0; x < GameSettingsManager.Instance.BoardWidth; x++) {
-				// Get a reference to the block at the current position
-				Vector2Int position = new Vector2Int(x, y);
-				Block block = GetBlockAt(position);
+		// Loop through all of the blocks on the board
+		foreach (Block block in Blocks) {
+			// Get the surrounding block groups to the current block
+			List<BlockGroup> surroundingBlockGroups = GetSurroundingBlockGroups(block);
 
-				// If there is no block at the position, move to the next position
-				if (block == null) {
-					continue;
-				}
+			if (surroundingBlockGroups.Count > 0) {
+				// Make the first block group in the merge list the block group that all blocks will merge into
+				BlockGroup mergedBlockGroup = surroundingBlockGroups[0];
+				surroundingBlockGroups.RemoveAt(0);
 
-				// Get the surrounding block groups to the current block
-				List<BlockGroup> surroundingBlockGroups = GetSurroundingBlockGroups(block);
-
-				if (surroundingBlockGroups.Count > 0) {
-					// Make the first block group in the merge list the block group that all blocks will merge into
-					BlockGroup mergedBlockGroup = surroundingBlockGroups[0];
+				// While there are still block groups to merge, merge them together
+				while (surroundingBlockGroups.Count > 0) {
+					mergedBlockGroup = mergedBlockGroup.MergeBlockGroup(surroundingBlockGroups[0]);
 					surroundingBlockGroups.RemoveAt(0);
-
-					// While there are still block groups to merge, merge them together
-					while (surroundingBlockGroups.Count > 0) {
-						mergedBlockGroup = mergedBlockGroup.MergeBlockGroup(surroundingBlockGroups[0]);
-						surroundingBlockGroups.RemoveAt(0);
-					}
-
-					// Transfer the block to the final merged block group
-					block.BlockGroup = mergedBlockGroup;
-				} else {
-					// Create a new block group and transfer the block to it
-					block.BlockGroup = CreateBlockGroup( );
 				}
+
+				// Transfer the block to the final merged block group
+				block.BlockGroup = mergedBlockGroup;
+			} else {
+				// Create a new block group and transfer the block to it
+				block.BlockGroup = CreateBlockGroup( );
 			}
 		}
+
+		// If the block groups need to update, switch the board state to update all of the block groups
+		// If the block groups do not need to update, then begin placing a new mino
+		if (needToUpdateBlockGroups) {
+			BoardState = BoardState.UPDATING_BLOCKGROUPS;
+		} else {
+			BoardState = BoardState.UPDATING_MINO;
+		}
+	}
+
+	/// <summary>
+	///		Update the positions of all the block groups on the board
+	/// </summary>
+	public void UpdateBlockGroups ( ) {
+		// Loop through all block groups on the board
+		// Update the position queue of each block group
+		// Check to see if any of the block groups can fall (as in they have a position queue that is larger than 0)
+		// If there are block groups that can move, have them all fall downwards, then loop back to updating the position queues again
+		// If there are no block groups that can move, switch the board state to merge the block groups together
 	}
 
 	/// <summary>
