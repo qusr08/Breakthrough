@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField, Min(0f), Tooltip("The percentage of the board that is cleared during gameplay.")] private float _percentageCleared;
 	[SerializeField, Min(0), Tooltip("The number of Breakthroughs that the player has gotten.")] private int _breakthroughs;
 	[SerializeField, Tooltip("The current active Mino that the player is controlling on the board.")] private BlockGroup _activeMino;
-	[SerializeField, Tooltip("A reference to the game board.")] private Board board;
+	[SerializeField, Tooltip("A reference to the game board.")] private Board _board;
 	[SerializeField, Tooltip("The current game state of the game.")] private GameState _gameState;
 	[SerializeField, Range(0f, 1f), Tooltip("The current difficulty scaling value. The lower this value is, the slower the game scales in difficulty.")] private float difficultyValue;
 
@@ -34,6 +34,11 @@ public class GameManager : MonoBehaviour {
 	private float boomBlockChance;
 
 	#region Properties
+	/// <summary>
+	///		A reference to the board
+	/// </summary>
+	public Board Board { get => _board; private set => _board = value; }
+
 	/// <summary>
 	///		The number of board points the player currently has
 	/// </summary>
@@ -54,27 +59,90 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public int Breakthroughs { get => _breakthroughs; set => _breakthroughs = value; }
 
+	/// <summary>
+	///		The time that it takes for the hazard board area to fall one block
+	/// </summary>
 	public float HazardFallTime { get => _hazardFallTime; private set => _hazardFallTime = value; }
+
+	/// <summary>
+	///		The strength of the wall blocks when they are generated at the start of a board
+	/// </summary>
 	public float WallStrength { get => _wallStrength; private set => _wallStrength = value; }
+
+	/// <summary>
+	///		The height of the wall when it is generated at the start of a board
+	/// </summary>
 	public int WallHeight { get => _wallHeight; private set => _wallHeight = value; }
 
+	/// <summary>
+	///		The number of seconds it takes for a mino to fall down one block
+	/// </summary>
 	public float MinoFallTime { get => _minoFallTime; private set => _minoFallTime = value; }
-	public float FastMinoFallTime => _minMinoFallTime;
+
+	/// <summary>
+	///		The minimum time it takes for the mino to fall down one block. As MinoFallTime scales, this acts as a limit to make sure minos do not fall too fast. This value is also used for the speed at which block groups fall when they are being updated
+	/// </summary>
+	public float MinMinoFallTime => _minMinoFallTime;
+
+	/// <summary>
+	///		The number of seconds it takes for a mino to move left or right by one block
+	/// </summary>
 	public float MinoMoveTime => _minoMoveTime;
+
+	/// <summary>
+	///		When the player holds down the input buttons to move a mino left or right, the mino will move faster than normal and uses this value rather than MinoMoveTime
+	/// </summary>
 	public float FastMinoMoveTime => MinoMoveTime / 2f;
+
+	/// <summary>
+	///		The number of seconds it takes for a mino to rotate left or right by 90 degrees
+	/// </summary>
 	public float MinoRotateTime => _minoRotateTime;
+
+	/// <summary>
+	///		When the player holds down the input buttons to rotate a mino left or right, the mino will rotate faster than normal and use this value rather than MinoRotateTime
+	/// </summary>
 	public float FastMinoRotateTime => MinoRotateTime / 2f;
+
+	/// <summary>
+	///		The number of seconds it takes a mino to be placed once it lands on the wall
+	/// </summary>
 	public float MinoPlaceTime => _minoPlaceTime;
 
+	/// <summary>
+	///		The current active mino on the board that is being controlled by player input
+	/// </summary>
 	public BlockGroup ActiveMino { get => _activeMino; set => _activeMino = value; }
+
+	/// <summary>
+	///		The percentage of a Mino's weighted percentage value that is redistributed to the rest of the percentages. The higher this number, the less likely it is to have multiple Minos appear in a row
+	/// </summary>
 	public float MinoWeightPercentage => minoWeightPercentage;
+
+	/// <summary>
+	///		The direction that minos will rotate
+	/// </summary>
 	public int RotateDirection => _rotateDirection;
+
+	/// <summary>
+	///		The number of minos that have spawned in a row without a boom block on them
+	/// </summary>
 	public int BoomBlockDrought { get => _boomBlockDrought; set => _boomBlockDrought = value; }
+
+	/// <summary>
+	///		The chance that a boom block will spawn on the current mino
+	/// </summary>
 	public float BoomBlockSpawnChance => ((float) BoomBlockDrought / boomBlockGuarantee) * (1 - boomBlockChance) + boomBlockChance;
 	#endregion
 
 	#region Unity Functions
+	private void OnValidate ( ) {
+		Board = FindObjectOfType<Board>( );
+	}
 
+	private void Awake ( ) {
+		OnValidate( );
+	}
 	#endregion
 
 	/// <summary>
@@ -82,22 +150,22 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void UpdateDifficulty ( ) {
 		// Calculate the mino fall time for the specified settings
-		float minoScaleFactor = (defaultMinoFallTime / GameSettingsManager.Instance.MinoSpeedMultiplier) - FastMinoFallTime;
-		float minoSlope = -GameSettingsManager.Instance.MinoSpeedMultiplier * difficultyValue * Breakthroughs;
-		MinoFallTime = (minoScaleFactor * Mathf.Exp(minoSlope)) + FastMinoFallTime;
+		float minoScaleFactor = (defaultMinoFallTime / GameSettingsManager.MinoSpeedMultiplier) - MinMinoFallTime;
+		float minoSlope = -GameSettingsManager.MinoSpeedMultiplier * difficultyValue * Breakthroughs;
+		MinoFallTime = (minoScaleFactor * Mathf.Exp(minoSlope)) + MinMinoFallTime;
 
 		// Calculate the hazard fall time for the specified settings
-		float hazardScaleFactor = (defaultHazardFallTime / GameSettingsManager.Instance.HazardSpeedMultiplier) - minHazardFallTime;
-		float hazardSlope = -GameSettingsManager.Instance.HazardSpeedMultiplier * difficultyValue * Breakthroughs;
+		float hazardScaleFactor = (defaultHazardFallTime / GameSettingsManager.HazardSpeedMultiplier) - minHazardFallTime;
+		float hazardSlope = -GameSettingsManager.HazardSpeedMultiplier * difficultyValue * Breakthroughs;
 		HazardFallTime = (hazardScaleFactor * Mathf.Exp(hazardSlope)) + minHazardFallTime;
 
 		// Calculate the wall strength for the specified settings
 		// * This assumes that the wall health values are between 0 and 3
-		float strengthSlope = -GameSettingsManager.Instance.WallStrengthMultiplier * difficultyValue * Breakthroughs;
+		float strengthSlope = -GameSettingsManager.WallStrengthMultiplier * difficultyValue * Breakthroughs;
 		WallStrength = (-2f * Mathf.Exp(strengthSlope)) + 3f;
 
 		// Calculate the wall height for the specified settings
-		float availableBoardArea = GameSettingsManager.Instance.BoardHeight - board.BreakthroughBoardArea.Height - board.HazardBoardArea.Height;
+		float availableBoardArea = GameSettingsManager.BoardHeight - Board.BreakthroughBoardArea.Height - Board.HazardBoardArea.Height;
 		float heightMax = availableBoardArea / 2f;
 		float heightMin = availableBoardArea / 8f;
 		float heightScaleFactor = heightMin - heightMax;
@@ -106,7 +174,7 @@ public class GameManager : MonoBehaviour {
 
 		// Calculate the boom block spawn chance for the specified settings
 		float chanceSlope = -difficultyValue * Breakthroughs;
-		float chanceScaleFactor = GameSettingsManager.Instance.BoomBlockChance - 1;
+		float chanceScaleFactor = GameSettingsManager.BoomBlockChance - 1;
 		boomBlockChance = (chanceScaleFactor * Mathf.Exp(chanceSlope)) + 1;
 	}
 }

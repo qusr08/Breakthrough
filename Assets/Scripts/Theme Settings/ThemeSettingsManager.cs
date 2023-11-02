@@ -14,15 +14,15 @@ public class ThemeSettingsManager : Singleton<ThemeSettingsManager> {
 	public ThemeSettingsState ThemeSettingsState => _themeSettingsState;
 	public ThemeSettings ActiveThemeSettings => themeSettingsStateDictionary[ThemeSettingsState];
 
-	public Color BackgroundColor => ActiveThemeSettings.BackgroundColor;
-	public Color DetailColor => ActiveThemeSettings.DetailColor;
-	public Color TextColor => ActiveThemeSettings.TextColor;
-	public Color GlowColor => ActiveThemeSettings.GlowColor;
-	public Color HazardColor => ActiveThemeSettings.HazardColor;
-	public Color BreakthroughColor => ActiveThemeSettings.BreakthroughColor;
-	public List<Color> BackgroundDetailColors => ActiveThemeSettings.BackgroundDetailColors;
-	public MinoBlockColorDictionary MinoBlockColors => ActiveThemeSettings.MinoBlockColors;
-	public WallBlockColorDictionary WallBlockColors => ActiveThemeSettings.WallBlockColors;
+	public static Color BackgroundColor => Instance.ActiveThemeSettings.BackgroundColor;
+	public static Color DetailColor => Instance.ActiveThemeSettings.DetailColor;
+	public static Color TextColor => Instance.ActiveThemeSettings.TextColor;
+	public static Color GlowColor => Instance.ActiveThemeSettings.GlowColor;
+	public static Color HazardColor => Instance.ActiveThemeSettings.HazardColor;
+	public static Color BreakthroughColor => Instance.ActiveThemeSettings.BreakthroughColor;
+	public static List<Color> BackgroundDetailColors => Instance.ActiveThemeSettings.BackgroundDetailColors;
+	public static MinoBlockColorDictionary MinoBlockColors => Instance.ActiveThemeSettings.MinoBlockColors;
+	public static WallBlockColorDictionary WallBlockColors => Instance.ActiveThemeSettings.WallBlockColors;
 	#endregion
 
 	#region Unity Functions

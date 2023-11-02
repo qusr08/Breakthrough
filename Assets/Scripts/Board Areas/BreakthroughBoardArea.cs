@@ -7,7 +7,7 @@ public class BreakthroughBoardArea : BoardArea {
 	protected override void OnValidate ( ) {
 		base.OnValidate( );
 
-		boardAreaSizer.Recolor(ThemeSettingsManager.Instance.BreakthroughColor);
+		boardAreaSizer.Recolor(ThemeSettingsManager.BreakthroughColor);
 	}
 	#endregion
 

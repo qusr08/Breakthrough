@@ -17,22 +17,22 @@ public class BoardSizer : MonoBehaviour {
 	#region Unity Functions
 	private void OnValidate ( ) {
 		// Set the size and position of the board
-		float positionX = (GameSettingsManager.Instance.BoardWidth / 2) - (GameSettingsManager.Instance.BoardWidth % 2 == 0 ? 0.5f : 0f);
-		float positionY = (GameSettingsManager.Instance.BoardHeight / 2) - (GameSettingsManager.Instance.BoardHeight % 2 == 0 ? 0.5f : 0f);
+		float positionX = (GameSettingsManager.BoardWidth / 2) - (GameSettingsManager.BoardWidth % 2 == 0 ? 0.5f : 0f);
+		float positionY = (GameSettingsManager.BoardHeight / 2) - (GameSettingsManager.BoardHeight % 2 == 0 ? 0.5f : 0f);
 		transform.position = new Vector3(positionX, positionY);
-		boardSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.BoardWidth, GameSettingsManager.Instance.BoardHeight);
-		boardSpriteRenderer.color = ThemeSettingsManager.Instance.BackgroundColor;
+		boardSpriteRenderer.size = new Vector2(GameSettingsManager.BoardWidth, GameSettingsManager.BoardHeight);
+		boardSpriteRenderer.color = ThemeSettingsManager.BackgroundColor;
 
 		// Set the size and position of the border
-		float borderWidth = GameSettingsManager.Instance.BoardWidth + (borderThickness * 2f);
-		float borderHeight = GameSettingsManager.Instance.BoardHeight + (borderThickness * 2f);
+		float borderWidth = GameSettingsManager.BoardWidth + (borderThickness * 2f);
+		float borderHeight = GameSettingsManager.BoardHeight + (borderThickness * 2f);
 		borderSpriteRenderer.size = new Vector2(borderWidth, borderHeight);
-		borderSpriteRenderer.color = ThemeSettingsManager.Instance.DetailColor;
+		borderSpriteRenderer.color = ThemeSettingsManager.DetailColor;
 
 		// Set the size and position of the camera
-		gameCamera.orthographicSize = (GameSettingsManager.Instance.BoardHeight + boardPadding) / 2f;
+		gameCamera.orthographicSize = (GameSettingsManager.BoardHeight + boardPadding) / 2f;
 		gameCamera.transform.position = new Vector3(positionX, positionY, gameCamera.transform.position.z);
-		gameCamera.backgroundColor = ThemeSettingsManager.Instance.BackgroundColor;
+		gameCamera.backgroundColor = ThemeSettingsManager.BackgroundColor;
 	}
 
 	private void Awake ( ) {

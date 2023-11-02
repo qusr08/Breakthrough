@@ -17,7 +17,7 @@ public class WallBlock : Block {
 		get => _wallBlockColor;
 		set {
 			_wallBlockColor = value;
-			SetColor(ThemeSettingsManager.Instance.WallBlockColors[_wallBlockColor]);
+			SetColor(ThemeSettingsManager.WallBlockColors[_wallBlockColor]);
 		}
 	}
 	#endregion

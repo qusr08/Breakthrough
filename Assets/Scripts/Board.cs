@@ -14,7 +14,8 @@ public class Board : MonoBehaviour {
 	[SerializeField, Tooltip("The prefab object for wall blocks.")] private GameObject wallBlockPrefab;
 	[SerializeField, Tooltip("The prefab object for mino blocks.")] private GameObject minoBlockPrefab;
 	[SerializeField, Tooltip("The prefab object for boom blocks.")] private GameObject boomBlockPrefab;
-	[SerializeField, Tooltip("The prefab object for block groups.")] private GameObject blockGroupPrefab;
+	[SerializeField, Tooltip("The prefab object for block groups.")] private GameObject wallBlockGroupPrefab;
+	[SerializeField, Tooltip("The prefab object for player controlled block groups.")] private GameObject minoBlockGroupPrefab;
 	[SerializeField, Tooltip("A reference to the game manager.")] private GameManager gameManager;
 	[SerializeField, Tooltip("A reference to the breakthrough board area.")] private BreakthroughBoardArea _breakthroughBoardArea;
 	[SerializeField, Tooltip("A reference to the hazard board area.")] private HazardBoardArea _hazardBoardArea;
@@ -23,10 +24,8 @@ public class Board : MonoBehaviour {
 	[SerializeField, Tooltip("A list of all the blocks on the board.")] private List<Block> _blocks;
 
 	private Block[ , ] grid;
-
 	private Vector2 minoSpawnPosition;
 	private WeightedList<MinoType> weightedMinoList;
-
 	private bool needToUpdateBlockGroups;
 
 	#region Properties
@@ -62,23 +61,38 @@ public class Board : MonoBehaviour {
 
 			switch (_boardState) {
 				case BoardState.UPDATING_MINO:
+					// Spawn a new mino on the board and set it as the active mino
 					gameManager.ActiveMino = SpawnRandomMino( );
+
 					break;
 				case BoardState.MERGING_BLOCKGROUPS:
+					// Merge all of the block groups on the board
 					MergeBlockGroups( );
+
 					break;
 				case BoardState.UPDATING_BLOCKGROUPS:
+					// Since this is the board state that updates the block groups, this boolean can be set to false
 					needToUpdateBlockGroups = false;
+
 					break;
 				case BoardState.UPDATING_BOOMBLOCKS:
+					// Since boom blocks explode parts of the board, block groups may be separated or destroyed
+					// This requires an update of block group positions on the board
 					needToUpdateBlockGroups = true;
+
 					break;
 				case BoardState.BREAKTHROUGH:
-					StartCoroutine(BreakthroughProcess( ));
+					// Start the sequence of breakthrough animation
+					StartCoroutine(BreakthroughSequence( ));
+
 					break;
 				case BoardState.GENERATING_WALL:
+					// Since new blocks were added to the board that may be floating in the air, the board needs to be updated
 					needToUpdateBlockGroups = true;
-					StartCoroutine(GenerateWallProcess( ));
+
+					// Generate the wall blocks
+					StartCoroutine(GenerateWallSequence( ));
+
 					break;
 			}
 		}
@@ -94,11 +108,11 @@ public class Board : MonoBehaviour {
 		OnValidate( );
 
 		// Calculate the spawn position of Minos
-		float offsetX = GameSettingsManager.Instance.BoardWidth % 2 == 0 ? 0.5f : 0.0f;
-		minoSpawnPosition = new Vector2((GameSettingsManager.Instance.BoardWidth / 2f) - offsetX, GameSettingsManager.Instance.BoardHeight - 2.5f);
+		float offsetX = GameSettingsManager.BoardWidth % 2 == 0 ? 0.5f : 0.0f;
+		minoSpawnPosition = new Vector2((GameSettingsManager.BoardWidth / 2f) - offsetX, GameSettingsManager.BoardHeight - 2.5f);
 
 		// Initialize the arrays
-		grid = new Block[GameSettingsManager.Instance.BoardWidth, GameSettingsManager.Instance.BoardHeight];
+		grid = new Block[GameSettingsManager.BoardWidth, GameSettingsManager.BoardHeight];
 		BlockGroups = new List<BlockGroup>( );
 
 		// Convert the enum types to a list
@@ -107,7 +121,7 @@ public class Board : MonoBehaviour {
 		// Convert the allowed minos integer to a list of booleans
 		List<bool> enabledMinoTypes = new List<bool>( );
 		for (int i = 0; i < minoTypeList.Count; i++) {
-			enabledMinoTypes.Add(((GameSettingsManager.Instance.AllowedMinos >> i) & 1) == 1);
+			enabledMinoTypes.Add(((GameSettingsManager.AllowedMinos >> i) & 1) == 1);
 		}
 
 		// Initialize the mino weighted list array
@@ -121,11 +135,13 @@ public class Board : MonoBehaviour {
 	private void Update ( ) {
 		switch (BoardState) {
 			case BoardState.UPDATING_MINO:
+
 				break;
 			case BoardState.UPDATING_BLOCKGROUPS:
-				UpdateBlockGroups( );
+				
 				break;
 			case BoardState.UPDATING_BOOMBLOCKS:
+
 				break;
 		}
 	}
@@ -141,12 +157,12 @@ public class Board : MonoBehaviour {
 	/// </returns>
 	public bool IsPositionOnBoard (Vector2Int position) {
 		// See if the position is outside of the x axis bounds
-		if (position.x < 0 || position.x >= GameSettingsManager.Instance.BoardWidth) {
+		if (position.x < 0 || position.x >= GameSettingsManager.BoardWidth) {
 			return false;
 		}
 
 		// See if the position is outside of the y axis bounds
-		if (position.y < 0 || position.y >= GameSettingsManager.Instance.BoardHeight) {
+		if (position.y < 0 || position.y >= GameSettingsManager.BoardHeight) {
 			return false;
 		}
 
@@ -233,14 +249,14 @@ public class Board : MonoBehaviour {
 
 		// Set the current location of the block in the grid array to null
 		// Only do this if the block has a valid position
-		if (IsPositionOnBoard(block.Position)) {
-			grid[block.Position.x, block.Position.y] = null;
+		if (IsPositionOnBoard(block.BoardPosition)) {
+			grid[block.BoardPosition.x, block.BoardPosition.y] = null;
 		}
 
 		// Set the new position of the block
 		// Only do this if the inputted position is valid
 		if (IsPositionOnBoard(position)) {
-			block.Position = position;
+			block.BoardPosition = position;
 			grid[position.x, position.y] = block;
 		}
 	}
@@ -311,7 +327,7 @@ public class Board : MonoBehaviour {
 	private Block InitializeBlock (Block block, Vector2Int position, int health = 1, BlockGroup blockGroup = null) {
 		// Set the position temporarily to be off the board
 		// Needed to properly set the position of this block in the grid array
-		block.Position = -Vector2Int.one;
+		block.BoardPosition = -Vector2Int.one;
 
 		// Initialize all general block variables
 		block.SetLocation(position);
@@ -335,7 +351,7 @@ public class Board : MonoBehaviour {
 	/// </returns>
 	public BlockGroup SpawnRandomMino ( ) {
 		// Create a Mino block group
-		BlockGroup minoBlockGroup = CreateBlockGroup(position: minoSpawnPosition, isPlayerControlled: true);
+		BlockGroup minoBlockGroup = CreateBlockGroup(position: minoSpawnPosition, isMino: true);
 
 		// Get a random weighted Mino type from the weighted array
 		// The array will internally update its percentage values
@@ -374,19 +390,19 @@ public class Board : MonoBehaviour {
 	/// <summary>
 	///		Create a new block group
 	/// </summary>
-	/// <param name="position">
-	///		The position of the block group on the board<br/>
-	///		This should only be used if the block group will be player controlled and needs a rotational pivot point
-	///	</param>
-	/// <param name="isPlayerControlled">Whether or not the block group can be controlled by player inputs</param>
+	/// <param name="position">The position of the block group on the board. This should only be used if the block group will be player controlled and needs a rotational pivot point</param>
+	/// <param name="isMino">Whether or not the block group can be controlled by player inputs. If set to false or left as the default value, a wall block group will be created instead</param>
 	/// <returns>
 	///		<strong>BlockGroup</strong> that is the created block group
 	///	</returns>
-	public BlockGroup CreateBlockGroup (Vector2 position = default, bool isPlayerControlled = false) {
-		BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
+	public BlockGroup CreateBlockGroup (Vector2 position = default, bool isMino = false) {
+		// Create the block group differently depending on if it should be player controlled or not
+		BlockGroup blockGroup = Instantiate(isMino ? minoBlockGroupPrefab : wallBlockGroupPrefab, transform).GetComponent<BlockGroup>( );
+
+		// Set variables for the block group
 		blockGroup.transform.position = position;
-		blockGroup.IsPlayerControlled = isPlayerControlled;
-		blockGroup.IsModified = false;
+
+		// Add the block group to the array of block groups
 		BlockGroups.Add(blockGroup);
 
 		return blockGroup;
@@ -430,17 +446,6 @@ public class Board : MonoBehaviour {
 	}
 
 	/// <summary>
-	///		Update the positions of all the block groups on the board
-	/// </summary>
-	public void UpdateBlockGroups ( ) {
-		// Loop through all block groups on the board
-		// Update the position queue of each block group
-		// Check to see if any of the block groups can fall (as in they have a position queue that is larger than 0)
-		// If there are block groups that can move, have them all fall downwards, then loop back to updating the position queues again
-		// If there are no block groups that can move, switch the board state to merge the block groups together
-	}
-
-	/// <summary>
 	///		Get a list of the surround block groups to the specified block
 	/// </summary>
 	/// <param name="block">The block to check the surrounding block groups of</param>
@@ -458,11 +463,11 @@ public class Board : MonoBehaviour {
 		}
 
 		// Get all of the block groups that surround the inputted block
-		List<Vector2Int> cardinalPositions = Utils.GetCardinalPositions(block.Position);
+		List<Vector2Int> cardinalPositions = Utils.GetCardinalPositions(block.BoardPosition);
 
 		// Include the block's current block group if it is specified
 		if (countCurrentBlockGroup) {
-			cardinalPositions.Add(block.Position);
+			cardinalPositions.Add(block.BoardPosition);
 		}
 
 		foreach (Vector2Int cardinalPosition in cardinalPositions) {
@@ -492,11 +497,11 @@ public class Board : MonoBehaviour {
 	///		Generate the wall on the board
 	/// </summary>
 	/// <returns></returns>
-	public IEnumerator GenerateWallProcess ( ) {
+	public IEnumerator GenerateWallSequence ( ) {
 		// Generate a random noise grid
-		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(GameSettingsManager.Instance.BoardWidth, gameManager.WallHeight, gameManager.WallStrength - 1, gameManager.WallStrength + 1);
+		float[ , ] wallValues = Utils.GenerateRandomNoiseGrid(GameSettingsManager.BoardWidth, gameManager.WallHeight, gameManager.WallStrength - 1, gameManager.WallStrength + 1);
 		for (int j = 0; j < gameManager.WallHeight; j++) {
-			for (int i = 0; i < GameSettingsManager.Instance.BoardWidth; i++) {
+			for (int i = 0; i < GameSettingsManager.BoardWidth; i++) {
 				// Round the random noise grid value to an integer
 				int randomValue = Mathf.RoundToInt(wallValues[i, j]);
 
@@ -531,7 +536,7 @@ public class Board : MonoBehaviour {
 	///		Reset the board once the player gets a breakthrough
 	/// </summary>
 	/// <returns></returns>
-	public IEnumerator BreakthroughProcess ( ) {
+	public IEnumerator BreakthroughSequence ( ) {
 		// Clear the board
 		yield return new WaitForEndOfFrame( );
 

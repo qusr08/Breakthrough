@@ -504,11 +504,14 @@ MonoBehaviour:
   wallBlockPrefab: {fileID: 5433447853322664001, guid: f7ab35c56d6a26646a3e1264d8788b70, type: 3}
   minoBlockPrefab: {fileID: 3202303038754262879, guid: 36df4c7803b2ded4d837e3c039620e65, type: 3}
   boomBlockPrefab: {fileID: 4960708640293160772, guid: 1d71af3c2c4898f47b9831a465ac704b, type: 3}
-  blockGroupPrefab: {fileID: 5135286572906305462, guid: dcd40aaa1a0b4b94885f3ca8e2971599, type: 3}
-  gameManager: {fileID: 1452216626}
+  wallBlockGroupPrefab: {fileID: 5135286572906305462, guid: dcd40aaa1a0b4b94885f3ca8e2971599, type: 3}
+  minoBlockGroupPrefab: {fileID: 0}
+  _gameManager: {fileID: 1452216626}
   _breakthroughBoardArea: {fileID: 1105869371}
   _hazardBoardArea: {fileID: 1809262060}
   _boardState: 0
+  _blockGroups: []
+  _blocks: []
 --- !u!1 &1452216624
 GameObject:
   m_ObjectHideFlags: 0

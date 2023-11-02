@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum BlockDirection {
-	UP, RIGHT, DOWN, LEFT
+	RIGHT, DOWN, LEFT, UP
 }
 
 public class Block : MonoBehaviour {
-	[SerializeField, Tooltip("A reference to the game board.")] protected Board board;
+	[SerializeField, Tooltip("A reference to the game board.")] protected GameManager gameManager;
 	[SerializeField, Tooltip("A reference to this blocks sprite renderer.")] protected SpriteRenderer spriteRenderer;
-	[SerializeField, Tooltip("The current position of this block on the game board.")] private Vector2Int _position;
+	[SerializeField, Tooltip("The current position of this block on the game board.")] private Vector2Int _boardPosition;
 	[SerializeField, Tooltip("The current direction that this block is facing.")] private BlockDirection _blockDirection;
 	[SerializeField, Tooltip("The current block group that moves this block.")] private BlockGroup _blockGroup;
 	[SerializeField, Tooltip("The current health of this block.")] private int _health;
@@ -41,7 +42,7 @@ public class Block : MonoBehaviour {
 	/// <summary>
 	///		The position of the block on the board
 	/// </summary>
-	public Vector2Int Position { get => _position; set => _position = value; }
+	public Vector2Int BoardPosition { get => _boardPosition; set => _boardPosition = value; }
 
 	/// <summary>
 	///		The direction that the block is facing
@@ -51,7 +52,7 @@ public class Block : MonoBehaviour {
 
 	#region Unity Functions
 	protected virtual void OnValidate ( ) {
-		board = FindObjectOfType<Board>( );
+		gameManager = FindObjectOfType<GameManager>( );
 
 		transform.localScale = new Vector3(blockScale, blockScale, 1f);
 	}
@@ -71,7 +72,7 @@ public class Block : MonoBehaviour {
 			BlockGroup.IsModified = true;
 
 			// Remove the block from the board
-			board.Blocks.Remove(this);
+			gameManager.Board.Blocks.Remove(this);
 			Destroy(gameObject);
 		}
 	}
@@ -87,20 +88,13 @@ public class Block : MonoBehaviour {
 	/// <summary>
 	///		Set the physical location of this block in Unity coordinates
 	/// </summary>
-	/// <param name="x">The x coordinate to set this block to</param>
-	/// <param name="y">The y coordinate to set this block to</param>
-	public void SetLocation (int x, int y) => SetLocation(new Vector2Int(x, y));
-
-	/// <summary>
-	///		Set the physical location of this block in Unity coordinates
-	/// </summary>
 	/// <param name="location">The location to set this block to</param>
 	public void SetLocation (Vector2Int location) {
-		board.MoveBlockTo(this, location);
+		gameManager.Board.MoveBlockTo(this, location);
 
 		// Set the transform position of this block its grid position
-		if (board.IsPositionOnBoard(Position)) {
-			transform.position = (Vector3Int) Position;
+		if (gameManager.Board.IsPositionOnBoard(BoardPosition)) {
+			transform.position = (Vector3Int) BoardPosition;
 		}
 	}
 }

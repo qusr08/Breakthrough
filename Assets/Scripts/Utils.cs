@@ -29,6 +29,17 @@ public static class Utils {
 	}
 
 	/// <summary>
+	///		Round all elements of a 3D vector to the nearest integer
+	/// </summary>
+	/// <param name="vector">The 3D vector to round</param>
+	/// <returns>
+	///		<strong>Vector3Int</strong> that is the rounded 3D vector
+	/// </returns>
+	public static Vector3Int Vect3Round (Vector3 vector) {
+		return new Vector3Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
+	}
+
+	/// <summary>
 	///		Get the specified color with a specified alpha value applied to it
 	/// </summary>
 	/// <param name="color">The color to alter</param>
@@ -77,5 +88,20 @@ public static class Utils {
 			position + Vector2Int.down,
 			position + Vector2Int.left
 		};
+	}
+
+	/// <summary>
+	///		Rotate a 2D position around a pivot point by a certain number of degrees
+	/// </summary>
+	/// <param name="position">The position to rotate around the pivot point</param>
+	/// <param name="pivot">The pivot point to rotate around</param>
+	/// <param name="angle">The angle in degrees to rotate the position around the pivot point by</param>
+	/// <returns>
+	///		<strong>Vector2Int</strong> that is the 2D position after it has been rotated by the specified number of degrees around the pivot point
+	///	</returns>
+	public static Vector2Int RotatePositionAroundPivot2D (Vector2 position, Vector2 pivot, float angle) {
+		Vector3 distance = position - pivot;
+		Vector3 rotatedPosition = Quaternion.Euler(0, 0, angle) * distance + (Vector3) pivot;
+		return (Vector2Int) Vect3Round(rotatedPosition);
 	}
 }

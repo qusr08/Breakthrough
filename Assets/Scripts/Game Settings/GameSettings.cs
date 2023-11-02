@@ -30,13 +30,44 @@ public class GameSettings : ScriptableObject {
 	[SerializeField] private long gameSettingsLong;
 
 	#region Properties
+	/// <summary>
+	///		The width of the game board
+	/// </summary>
 	public int BoardWidth => boardWidthValue + 9;
+
+	/// <summary>
+	///		The height of the game board
+	/// </summary>
 	public int BoardHeight => boardHeightValue + 21;
+
+	/// <summary>
+	///		The default speed that mino block groups fall
+	/// </summary>
 	public float MinoSpeedMultiplier => (minoSpeedMultiplierValue * 0.25f) + 0.25f;
+
+	/// <summary>
+	///		The default speed that the hazard board area falls
+	/// </summary>
 	public float HazardSpeedMultiplier => (hazardSpeedMultiplierValue * 0.25f) + 0.25f;
+
+	/// <summary>
+	///		The default strength of the overall wall on the board when it is generated
+	/// </summary>
 	public float WallStrengthMultiplier => (wallStrengthMultiplierValue * 0.25f) + 0.25f;
+
+	/// <summary>
+	///		The default chance for boom blocks to spawn on a generated mino
+	/// </summary>
 	public float BoomBlockChance => (boomBlockChanceValue * 0.1f) + 0.1f;
+
+	/// <summary>
+	///		The initial game level when starting a new playthrough
+	/// </summary>
 	public int GameLevel => gameLevelValue;
+
+	/// <summary>
+	///		An integer representation of the allowed minos during the game. Each bit represents a different mino type
+	/// </summary>
 	public int AllowedMinos => allowedMinosValue + 1;
 
 	public string GameSettingsCode {

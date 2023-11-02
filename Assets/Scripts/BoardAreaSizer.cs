@@ -29,15 +29,15 @@ public class BoardAreaSizer : MonoBehaviour {
 	/// <param name="height">The height value to use when calculating the position and size</param>
 	public void Recalculate (float height) {
 		// Set the position of the board area
-		float x = -0.5f + (GameSettingsManager.Instance.BoardWidth / 2.0f);
-		float y = -0.5f + (boardArea.IsFlipped ? GameSettingsManager.Instance.BoardHeight - height : height);
+		float x = -0.5f + (GameSettingsManager.BoardWidth / 2.0f);
+		float y = -0.5f + (boardArea.IsFlipped ? GameSettingsManager.BoardHeight - height : height);
 		transform.position = new Vector3(x, y, 0);
 		transform.eulerAngles = new Vector3(0f, 0f, boardArea.IsFlipped ? 180f : 0f);
 
 		// Set the position and size of the sprite renderers
 		areaSpriteRenderer.transform.position = transform.position + Vector3.up * (height / (boardArea.IsFlipped ? 2.0f : -2.0f));
-		areaSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.BoardWidth, height);
-		lineSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.BoardWidth, lineThickness);
+		areaSpriteRenderer.size = new Vector2(GameSettingsManager.BoardWidth, height);
+		lineSpriteRenderer.size = new Vector2(GameSettingsManager.BoardWidth, lineThickness);
 	}
 
 	/// <summary>

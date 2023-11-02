@@ -17,7 +17,7 @@ public class MinoBlock : Block {
 		get => _minoType;
 		set {
 			_minoType = value;
-			SetColor(ThemeSettingsManager.Instance.MinoBlockColors[_minoType]);
+			SetColor(ThemeSettingsManager.MinoBlockColors[_minoType]);
 		}
 	}
 	#endregion

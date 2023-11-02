@@ -7,7 +7,7 @@ public class HazardBoardArea : BoardArea {
 	protected override void OnValidate ( ) {
 		base.OnValidate( );
 
-		boardAreaSizer.Recolor(ThemeSettingsManager.Instance.HazardColor);
+		boardAreaSizer.Recolor(ThemeSettingsManager.HazardColor);
 	}
 	#endregion
 

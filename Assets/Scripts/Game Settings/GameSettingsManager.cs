@@ -14,14 +14,14 @@ public class GameSettingsManager : Singleton<GameSettingsManager> {
 	public GameSettingsState GameSettingsState => _gameSettingsState;
 	public GameSettings ActiveGameSettings => gameSettingsStateDictionary[GameSettingsState];
 
-	public int BoardWidth => ActiveGameSettings.BoardWidth;
-	public int BoardHeight => ActiveGameSettings.BoardHeight;
-	public float MinoSpeedMultiplier => ActiveGameSettings.MinoSpeedMultiplier;
-	public float HazardSpeedMultiplier => ActiveGameSettings.HazardSpeedMultiplier;
-	public float WallStrengthMultiplier => ActiveGameSettings.WallStrengthMultiplier;
-	public float BoomBlockChance => ActiveGameSettings.BoomBlockChance;
-	public int GameLevel => ActiveGameSettings.GameLevel;
-	public int AllowedMinos => ActiveGameSettings.AllowedMinos;
+	public static int BoardWidth => Instance.ActiveGameSettings.BoardWidth;
+	public static int BoardHeight => Instance.ActiveGameSettings.BoardHeight;
+	public static float MinoSpeedMultiplier => Instance.ActiveGameSettings.MinoSpeedMultiplier;
+	public static float HazardSpeedMultiplier => Instance.ActiveGameSettings.HazardSpeedMultiplier;
+	public static float WallStrengthMultiplier => Instance.ActiveGameSettings.WallStrengthMultiplier;
+	public static float BoomBlockChance => Instance.ActiveGameSettings.BoomBlockChance;
+	public static int GameLevel => Instance.ActiveGameSettings.GameLevel;
+	public static int AllowedMinos => Instance.ActiveGameSettings.AllowedMinos;
 	#endregion
 
 	#region Unity Functions

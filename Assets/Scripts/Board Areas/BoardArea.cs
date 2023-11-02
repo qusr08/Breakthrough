@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public abstract class BoardArea : MonoBehaviour {
+	[SerializeField, Tooltip("A reference to the game manager.")] protected GameManager gameManager;
 	[SerializeField, Min(0), Tooltip("The default height of the board area.")] private int _defaultHeight;
 	[SerializeField, Tooltip("Whether or not the board area comes from the top or bottom of the board. This orientation effects the height value as well.")] private bool _isFlipped;
 	[SerializeField, Tooltip("A reference to this board area's sizer script.")] protected BoardAreaSizer boardAreaSizer;
-	[SerializeField, Tooltip("A reference to the game manager.")] protected GameManager gameManager;
 
 	private int _height;
 
