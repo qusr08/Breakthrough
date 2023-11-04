@@ -14,8 +14,7 @@ public class Board : MonoBehaviour {
 	[SerializeField, Tooltip("The prefab object for wall blocks.")] private GameObject wallBlockPrefab;
 	[SerializeField, Tooltip("The prefab object for mino blocks.")] private GameObject minoBlockPrefab;
 	[SerializeField, Tooltip("The prefab object for boom blocks.")] private GameObject boomBlockPrefab;
-	[SerializeField, Tooltip("The prefab object for block groups.")] private GameObject wallBlockGroupPrefab;
-	[SerializeField, Tooltip("The prefab object for player controlled block groups.")] private GameObject minoBlockGroupPrefab;
+	[SerializeField, Tooltip("The prefab object for block groups.")] private GameObject blockGroupPrefab;
 	[SerializeField, Tooltip("A reference to the game manager.")] private GameManager gameManager;
 	[SerializeField, Tooltip("A reference to the breakthrough board area.")] private BreakthroughBoardArea _breakthroughBoardArea;
 	[SerializeField, Tooltip("A reference to the hazard board area.")] private HazardBoardArea _hazardBoardArea;
@@ -23,12 +22,18 @@ public class Board : MonoBehaviour {
 	[SerializeField, Tooltip("A list of all the block groups on the board.")] private List<BlockGroup> _blockGroups;
 	[SerializeField, Tooltip("A list of all the blocks on the board.")] private List<Block> _blocks;
 
-	private Block[ , ] grid;
+	private Block[ , ] _grid;
 	private Vector2 minoSpawnPosition;
 	private WeightedList<MinoType> weightedMinoList;
 	private bool needToUpdateBlockGroups;
+	private float blockGroupFallTimer;
 
 	#region Properties
+	/// <summary>
+	///		A 2D block array that represents the board space
+	/// </summary>
+	public Block[ , ] Grid { get => _grid; set => _grid = value; }
+
 	/// <summary>
 	///		A reference to the breakthrough board area
 	/// </summary>
@@ -56,6 +61,7 @@ public class Board : MonoBehaviour {
 		get => _boardState;
 		set {
 			_boardState = value;
+			blockGroupFallTimer = 0f;
 
 			Debug.Log($"BOARD STATE = {value}");
 
@@ -112,7 +118,7 @@ public class Board : MonoBehaviour {
 		minoSpawnPosition = new Vector2((GameSettingsManager.BoardWidth / 2f) - offsetX, GameSettingsManager.BoardHeight - 2.5f);
 
 		// Initialize the arrays
-		grid = new Block[GameSettingsManager.BoardWidth, GameSettingsManager.BoardHeight];
+		Grid = new Block[GameSettingsManager.BoardWidth, GameSettingsManager.BoardHeight];
 		BlockGroups = new List<BlockGroup>( );
 
 		// Convert the enum types to a list
@@ -133,12 +139,41 @@ public class Board : MonoBehaviour {
 	}
 
 	private void Update ( ) {
+		// Update the fall timer
+		blockGroupFallTimer += Time.deltaTime;
+
 		switch (BoardState) {
 			case BoardState.UPDATING_MINO:
+				if (blockGroupFallTimer >= gameManager.MinoFallTime) {
+					blockGroupFallTimer -= gameManager.MinoFallTime;
+
+					if (!gameManager.ActiveMino.TryMove(Vector2Int.down)) { // TEMPORARY
+						BoardState = BoardState.MERGING_BLOCKGROUPS;
+					}
+				}
 
 				break;
 			case BoardState.UPDATING_BLOCKGROUPS:
-				
+				// Once the block groups can fall
+				if (blockGroupFallTimer >= gameManager.MinMinoFallTime) {
+					blockGroupFallTimer -= gameManager.MinMinoFallTime;
+
+					bool blockGroupsCanMove = false;
+
+					// Loop through all of the block groups entered in the list
+					foreach (BlockGroup blockGroup in BlockGroups) {
+						// If at least one block group can move then continue to update the block groups
+						if (blockGroup.TryMove(Vector2Int.down)) {
+							blockGroupsCanMove = true;
+						}
+					}
+
+					// If all of the block groups have been looped through and all of them cannot move, then stop updating them and merge the block groups
+					if (!blockGroupsCanMove) {
+						BoardState = BoardState.MERGING_BLOCKGROUPS;
+					}
+				}
+
 				break;
 			case BoardState.UPDATING_BOOMBLOCKS:
 
@@ -184,7 +219,7 @@ public class Board : MonoBehaviour {
 			return null;
 		}
 
-		return grid[position.x, position.y];
+		return Grid[position.x, position.y];
 	}
 
 	/// <summary>
@@ -206,59 +241,6 @@ public class Board : MonoBehaviour {
 		}
 
 		return block.BlockGroup;
-	}
-
-	/// <summary>
-	///		Damage a block by a specified amount
-	/// </summary>
-	/// <param name="block">The block to damage</param>
-	/// <param name="damage">The amount of damage to inflict</param>
-	public void DamageBlock (Block block, int damage) {
-		// If the block is null, then do not try to damage it
-		if (block == null) {
-			return;
-		}
-
-		// Remove health from the block
-		block.Health -= damage;
-	}
-
-	/// <summary>
-	///		Damage a block at the specified position by a specified amount
-	/// </summary>
-	/// <param name="position">The position of the block to damage</param>
-	/// <param name="damage">The amount of damage to inflict</param>
-	public void DamageBlockAt (Vector2Int position, int damage) => DamageBlock(GetBlockAt(position), damage);
-
-	/// <summary>
-	///		Destroy a block at a specified position
-	/// </summary>
-	/// <param name="position">The position of the block to destroy</param>
-	public void DestroyBlockAt (Vector2Int position) => DamageBlock(GetBlockAt(position), 999);
-
-	/// <summary>
-	///		Move a block from the position it is currently in to the specified position
-	/// </summary>
-	/// <param name="block">The block to move</param>
-	/// <param name="position">The position to move the block to</param>
-	public void MoveBlockTo (Block block, Vector2Int position) {
-		// If the block is equal to null, then do not try and change its position
-		if (block == null) {
-			return;
-		}
-
-		// Set the current location of the block in the grid array to null
-		// Only do this if the block has a valid position
-		if (IsPositionOnBoard(block.BoardPosition)) {
-			grid[block.BoardPosition.x, block.BoardPosition.y] = null;
-		}
-
-		// Set the new position of the block
-		// Only do this if the inputted position is valid
-		if (IsPositionOnBoard(position)) {
-			block.BoardPosition = position;
-			grid[position.x, position.y] = block;
-		}
 	}
 
 	/// <summary>
@@ -325,20 +307,16 @@ public class Board : MonoBehaviour {
 	///		<strong>Block</strong> that is the initialize block
 	/// </returns>
 	private Block InitializeBlock (Block block, Vector2Int position, int health = 1, BlockGroup blockGroup = null) {
-		// Set the position temporarily to be off the board
-		// Needed to properly set the position of this block in the grid array
-		block.BoardPosition = -Vector2Int.one;
-
-		// Initialize all general block variables
-		block.SetLocation(position);
-		block.Health = health;
-		Blocks.Add(block);
-
 		// Add the block to the block group
 		if (blockGroup == null) {
 			blockGroup = CreateBlockGroup( );
 		}
 		block.BlockGroup = blockGroup;
+
+		// Initialize all general block variables
+		block.SetLocation(position);
+		block.Health = health;
+		Blocks.Add(block);
 
 		return block;
 	}
@@ -351,7 +329,7 @@ public class Board : MonoBehaviour {
 	/// </returns>
 	public BlockGroup SpawnRandomMino ( ) {
 		// Create a Mino block group
-		BlockGroup minoBlockGroup = CreateBlockGroup(position: minoSpawnPosition, isMino: true);
+		BlockGroup minoBlockGroup = CreateBlockGroup(position: minoSpawnPosition);
 
 		// Get a random weighted Mino type from the weighted array
 		// The array will internally update its percentage values
@@ -391,18 +369,16 @@ public class Board : MonoBehaviour {
 	///		Create a new block group
 	/// </summary>
 	/// <param name="position">The position of the block group on the board. This should only be used if the block group will be player controlled and needs a rotational pivot point</param>
-	/// <param name="isMino">Whether or not the block group can be controlled by player inputs. If set to false or left as the default value, a wall block group will be created instead</param>
 	/// <returns>
 	///		<strong>BlockGroup</strong> that is the created block group
 	///	</returns>
-	public BlockGroup CreateBlockGroup (Vector2 position = default, bool isMino = false) {
+	public BlockGroup CreateBlockGroup (Vector2 position = default) {
 		// Create the block group differently depending on if it should be player controlled or not
-		BlockGroup blockGroup = Instantiate(isMino ? minoBlockGroupPrefab : wallBlockGroupPrefab, transform).GetComponent<BlockGroup>( );
+		BlockGroup blockGroup = Instantiate(blockGroupPrefab, transform).GetComponent<BlockGroup>( );
 
 		// Set variables for the block group
 		blockGroup.transform.position = position;
-
-		// Add the block group to the array of block groups
+		blockGroup.CanFallBelow = false;
 		BlockGroups.Add(blockGroup);
 
 		return blockGroup;
@@ -434,6 +410,11 @@ public class Board : MonoBehaviour {
 				// Create a new block group and transfer the block to it
 				block.BlockGroup = CreateBlockGroup( );
 			}
+		}
+
+		// Loop through all of the block groups on the board and reset their variables
+		foreach (BlockGroup blockGroup in BlockGroups) {
+			blockGroup.CanFallBelow = false;
 		}
 
 		// If the block groups need to update, switch the board state to update all of the block groups

@@ -379,10 +379,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42887779344ae7346b472168277812ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 1452216626}
   _defaultHeight: 2
   _isFlipped: 0
   boardAreaSizer: {fileID: 1105869370}
-  gameManager: {fileID: 1452216626}
 --- !u!1 &1396273329
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,9 +504,8 @@ MonoBehaviour:
   wallBlockPrefab: {fileID: 5433447853322664001, guid: f7ab35c56d6a26646a3e1264d8788b70, type: 3}
   minoBlockPrefab: {fileID: 3202303038754262879, guid: 36df4c7803b2ded4d837e3c039620e65, type: 3}
   boomBlockPrefab: {fileID: 4960708640293160772, guid: 1d71af3c2c4898f47b9831a465ac704b, type: 3}
-  wallBlockGroupPrefab: {fileID: 5135286572906305462, guid: dcd40aaa1a0b4b94885f3ca8e2971599, type: 3}
-  minoBlockGroupPrefab: {fileID: 0}
-  _gameManager: {fileID: 1452216626}
+  blockGroupPrefab: {fileID: 5135286572906305462, guid: dcd40aaa1a0b4b94885f3ca8e2971599, type: 3}
+  gameManager: {fileID: 1452216626}
   _breakthroughBoardArea: {fileID: 1105869371}
   _hazardBoardArea: {fileID: 1809262060}
   _boardState: 0
@@ -571,7 +570,7 @@ MonoBehaviour:
   _percentageCleared: 0
   _breakthroughs: 0
   _activeMino: {fileID: 0}
-  board: {fileID: 1396273333}
+  _board: {fileID: 1396273333}
   _gameState: 0
   difficultyValue: 0.07
 --- !u!1001 &1809262056
@@ -736,10 +735,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5dfd14fe03c9654e8d1e1534e629022, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 1452216626}
   _defaultHeight: 4
   _isFlipped: 1
   boardAreaSizer: {fileID: 1809262059}
-  gameManager: {fileID: 1452216626}
 --- !u!1001 &566156742335000021
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
 public enum BlockDirection {
 	RIGHT, DOWN, LEFT, UP
@@ -23,8 +24,20 @@ public class Block : MonoBehaviour {
 	public BlockGroup BlockGroup {
 		get => _blockGroup;
 		set {
+			// Do nothing if the block is already a part of this block group
+			if (value.Blocks.Contains(this)) {
+				return;
+			}
+
+			// Remove the block from the other block group
+			if (_blockGroup != null) {
+				_blockGroup.Blocks.Remove(this);
+			}
+
+			// Set the blocks transform parent to this block group
+			transform.SetParent(value.transform, true);
+			value.Blocks.Add(this);
 			_blockGroup = value;
-			value.TransferBlock(this);
 		}
 	}
 
@@ -42,7 +55,25 @@ public class Block : MonoBehaviour {
 	/// <summary>
 	///		The position of the block on the board
 	/// </summary>
-	public Vector2Int BoardPosition { get => _boardPosition; set => _boardPosition = value; }
+	public Vector2Int BoardPosition {
+		get => _boardPosition;
+		set {
+			// Only set the new position of this block if the inputted position is valid
+			if (gameManager.Board.IsPositionOnBoard(value)) {
+				gameManager.Board.Grid[_boardPosition.x, _boardPosition.y] = null;
+				_boardPosition = value;
+				gameManager.Board.Grid[value.x, value.y] = this;
+
+				return;
+			}
+
+			// If the block has been set to a y position that is below the bottom of the board, then destroy this block
+			if (value.y < 0) {
+				gameManager.Board.Grid[_boardPosition.x, _boardPosition.y] = null;
+				Health = 0;
+			}
+		}
+	}
 
 	/// <summary>
 	///		The direction that the block is facing
@@ -90,7 +121,7 @@ public class Block : MonoBehaviour {
 	/// </summary>
 	/// <param name="location">The location to set this block to</param>
 	public void SetLocation (Vector2Int location) {
-		gameManager.Board.MoveBlockTo(this, location);
+		BoardPosition = location;
 
 		// Set the transform position of this block its grid position
 		if (gameManager.Board.IsPositionOnBoard(BoardPosition)) {

@@ -3,21 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public abstract class BlockGroup : MonoBehaviour {
-	[SerializeField, Tooltip("A reference to the game manager.")] protected GameManager gameManager;
+public class BlockGroup : MonoBehaviour {
+	[SerializeField, Tooltip("A reference to the game manager.")] private GameManager gameManager;
 	[SerializeField, Tooltip("A list of all the blocks that are a part of this block group.")] private List<Block> _blocks;
 	[SerializeField, Tooltip("Set to true if any block that is part of this block group is destroyed.")] private bool _isModified;
+	[SerializeField, Tooltip("Whether or not this block group can fall into the breakthrough board area.")] private bool _canFallBelow;
 
 	private Vector2 _toPosition;
 	private Vector3 _toRotation;
 
-	protected float fallTimer;
-
 	#region Properties
+	/// <summary>
+	///		Whether or not this block group can fall into the breakthrough board area
+	/// </summary>
+	public bool CanFallBelow { get => _canFallBelow; set => _canFallBelow = value; }
+
 	/// <summary>
 	///		A list of all the blocks that are a part of this block group
 	/// </summary>
-	public List<Block> Blocks { get => _blocks; protected set => _blocks = value; }
+	public List<Block> Blocks { get => _blocks; private set => _blocks = value; }
 
 	/// <summary>
 	///		Whether or not the block group has been modified. When this is true, this block group will be destroyed during the next merge
@@ -32,38 +36,28 @@ public abstract class BlockGroup : MonoBehaviour {
 	/// <summary>
 	///		The position that this block group is going to move to
 	/// </summary>
-	public Vector2 ToPosition { get => _toPosition; protected set => _toPosition = value; }
+	public Vector2 ToPosition { get => _toPosition; private set => _toPosition = value; }
 
 	/// <summary>
 	///		The rotation that this block group is going to rotate to
 	/// </summary>
-	public Vector3 ToRotation { get => _toRotation; protected set => _toRotation = value; }
+	public Vector3 ToRotation { get => _toRotation; private set => _toRotation = value; }
 	#endregion
 
 	#region Unity Functions
-	protected virtual void OnValidate ( ) {
+	private void OnValidate ( ) {
 		gameManager = FindObjectOfType<GameManager>( );
 		Blocks = GetComponentsInChildren<Block>( ).ToList( );
 	}
 
-	protected virtual void Awake ( ) {
+	private void Awake ( ) {
 		OnValidate( );
-
-		fallTimer = 0f;
 	}
 
-	protected virtual void Update ( ) {
+	private void Update ( ) {
 		// Update the smoothing position of this block group
-
-		// Update this block group using specific logic to each type of block group
-		UpdateBlockGroup( );
 	}
 	#endregion
-
-	/// <summary>
-	///		Update this block group using specific 
-	/// </summary>
-	public abstract void UpdateBlockGroup ( );
 
 	/// <summary>
 	///		Check to see if this block group can move in the specified direction
@@ -80,10 +74,16 @@ public abstract class BlockGroup : MonoBehaviour {
 			Vector2Int blockMovePosition = block.BoardPosition + direction;
 			Block checkBlock = gameManager.Board.GetBlockAt(blockMovePosition);
 
+			// If this block group cannot fall below the breakthrough board area but the current block is trying to, then this movement is not valid
+			if (!CanFallBelow && blockMovePosition.y < gameManager.Board.BreakthroughBoardArea.Height) {
+				return false;
+			}
+
 			// If there is no block in the direction that the current block will move, then continue to the next block
 			if (checkBlock == null) {
 				continue;
 			}
+
 
 			// If the check block and the current block are a part of the same block group, then move on to the next block
 			if (checkBlock.BlockGroup == this) {
@@ -106,7 +106,7 @@ public abstract class BlockGroup : MonoBehaviour {
 	///		<strong>true</strong> if this block group was able to move in the specified direction<br/>
 	///		<strong>false</strong> if this block group was not able to move in the specified direction
 	/// </returns>
-	public bool TryMove (Vector2Int direction, bool moveInstantly = false) {
+	public bool TryMove (Vector2Int direction, bool moveInstantly = true) {
 		// If this block group cannot move in the specified direction, then exit out of this function
 		if (!CheckMove(direction)) {
 			return false;
@@ -193,28 +193,6 @@ public abstract class BlockGroup : MonoBehaviour {
 	}
 
 	/// <summary>
-	///		Transfer the specified block from another block group to this block group
-	/// </summary>
-	/// <param name="block">The block to transfer</param>
-	public void TransferBlock (Block block) {
-		// Do nothing if the block is already a part of this block group
-		if (Blocks.Contains(block)) {
-			return;
-		}
-
-		// Remove the block from the other block group
-		BlockGroup previousBlockGroup = block.BlockGroup;
-		if (previousBlockGroup != null) {
-			previousBlockGroup.Blocks.Remove(block);
-		}
-
-		// Set the blocks transform parent to this block group
-		block.transform.SetParent(transform, true);
-		Blocks.Add(block);
-		block.BlockGroup = this;
-	}
-
-	/// <summary>
 	///		Merge this block group to another block group
 	/// </summary>
 	/// <param name="blockGroup">The block group to merge all blocks to</param>
@@ -245,15 +223,6 @@ public abstract class BlockGroup : MonoBehaviour {
 		// If the block groups are the same, then just return
 		if (blockGroup == this) {
 			return blockGroup;
-		}
-
-		// If one of the block groups are a player controlled block group, make sure that one is always destroyed
-		// This prevents the player from being able to control block groups from minos that have already been placed
-		if (this is MinoBlockGroup) {
-			return MergeToBlockGroup(blockGroup);
-		}
-		if (blockGroup is MinoBlockGroup) {
-			return blockGroup.MergeToBlockGroup(this);
 		}
 
 		// Merge the smaller block group into the larger block group
