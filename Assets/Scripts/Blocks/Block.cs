@@ -29,6 +29,11 @@ public class Block : MonoBehaviour {
 				return;
 			}
 
+			// If the block group is already equal to the new block group, do not do any of the code below
+			if (_blockGroup == value) {
+				return;
+			}
+
 			// Remove the block from the other block group
 			if (_blockGroup != null) {
 				_blockGroup.Blocks.Remove(this);
@@ -63,14 +68,6 @@ public class Block : MonoBehaviour {
 				gameManager.Board.Grid[_boardPosition.x, _boardPosition.y] = null;
 				_boardPosition = value;
 				gameManager.Board.Grid[value.x, value.y] = this;
-
-				return;
-			}
-
-			// If the block has been set to a y position that is below the bottom of the board, then destroy this block
-			if (value.y < 0) {
-				gameManager.Board.Grid[_boardPosition.x, _boardPosition.y] = null;
-				Health = 0;
 			}
 		}
 	}

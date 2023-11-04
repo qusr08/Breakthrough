@@ -147,7 +147,7 @@ public class Board : MonoBehaviour {
 				if (blockGroupFallTimer >= gameManager.MinoFallTime) {
 					blockGroupFallTimer -= gameManager.MinoFallTime;
 
-					if (!gameManager.ActiveMino.TryMove(Vector2Int.down)) { // TEMPORARY
+					if (!gameManager.ActiveMino.TryTranslate(Vector2Int.down)) {
 						BoardState = BoardState.MERGING_BLOCKGROUPS;
 					}
 				}
@@ -163,7 +163,7 @@ public class Board : MonoBehaviour {
 					// Loop through all of the block groups entered in the list
 					foreach (BlockGroup blockGroup in BlockGroups) {
 						// If at least one block group can move then continue to update the block groups
-						if (blockGroup.TryMove(Vector2Int.down)) {
+						if (blockGroup.TryTranslate(Vector2Int.down)) {
 							blockGroupsCanMove = true;
 						}
 					}

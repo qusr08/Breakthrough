@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
 public class BlockGroup : MonoBehaviour {
 	[SerializeField, Tooltip("A reference to the game manager.")] private GameManager gameManager;
@@ -59,39 +60,83 @@ public class BlockGroup : MonoBehaviour {
 	}
 	#endregion
 
+	private bool IsBlockMovementValid (Block block, Vector2Int blockPosition) {
+		// If the position that the block is going to move to is off the board in the x direction, do not move to that position
+		// Since blocks can fall off the bottom of the board on the y axis
+		if (blockPosition.x < 0 || blockPosition.x >= GameSettingsManager.BoardWidth) {
+			return false;
+		}
+
+		// If the block has been set to a y position that is below the bottom of the board, then destroy this block and remove it from the grid
+		if (blockPosition.y < 0) {
+			gameManager.Board.Grid[block.BoardPosition.x, block.BoardPosition.y] = null;
+			block.Health = 0;
+			return true;
+		}
+
+		// If this block group cannot fall below the breakthrough board area but the current block is trying to, then this movement is not valid
+		if (!CanFallBelow && blockPosition.y < gameManager.Board.BreakthroughBoardArea.Height) {
+			return false;
+		}
+
+		// Get a reference to the block at the position
+		Block checkBlock = gameManager.Board.GetBlockAt(blockPosition);
+
+		// If there is no block in the direction that the current block will move, then continue to the next block
+		if (checkBlock == null) {
+			return true;
+		}
+
+		// If the check block and the current block are a part of the same block group, then move on to the next block
+		if (checkBlock.BlockGroup == this) {
+			return true;
+		}
+
+		// If the check block and the current block are part of a different block groups, then this block group cannot move
+		return false;
+	}
+
 	/// <summary>
-	///		Check to see if this block group can move in the specified direction
+	///		Check to see if this block group can move on the board based on the specified translation
 	/// </summary>
-	/// <param name="direction">The direction to check</param>
+	/// <param name="translation">The direction to check</param>
 	/// <returns>
 	///		<strong>true</strong> if this block group can move in the specified direction<br/>
 	///		<strong>false</strong> if this block group cannot move in the specified direction
 	/// </returns>
-	public bool CheckMove (Vector2Int direction) {
+	public bool CheckTranslation (Vector2Int translation) {
 		// Check to see if the block group can move by looping through every block in the block group
 		foreach (Block block in Blocks) {
-			// Get the block that is directly next to the current block
-			Vector2Int blockMovePosition = block.BoardPosition + direction;
-			Block checkBlock = gameManager.Board.GetBlockAt(blockMovePosition);
+			// Get the board position that this block will moved to based on the input movement variables
+			Vector2Int newBlockPosition = block.BoardPosition + translation;
 
-			// If this block group cannot fall below the breakthrough board area but the current block is trying to, then this movement is not valid
-			if (!CanFallBelow && blockMovePosition.y < gameManager.Board.BreakthroughBoardArea.Height) {
+			// If this block's movement is not valid for this block group, then the specified translation cannot be completed
+			if (!IsBlockMovementValid(block, newBlockPosition)) {
 				return false;
 			}
+		}
 
-			// If there is no block in the direction that the current block will move, then continue to the next block
-			if (checkBlock == null) {
-				continue;
+		return true;
+	}
+
+	/// <summary>
+	///		Check to see if this block group can move on the board based on the specified rotation
+	/// </summary>
+	/// <param name="rotation">The angle in degrees to rotate this block group</param>
+	/// <returns>
+	///		<strong>true</strong> if this block group can rotate in the specified direction<br/>
+	///		<strong>false</strong> if this block group cannot rotate in the specified direction
+	/// </returns>
+	public bool CheckRotation (float rotation) {
+		// Check to see if the block group can move by looping through every block in the block group
+		foreach (Block block in Blocks) {
+			// Get the board position that this block will moved to based on the input movement variables
+			Vector2Int newBlockPosition = Utils.RotatePositionAroundPivot2D(block.BoardPosition, ToPosition, rotation);
+
+			// If this block's movement is not valid for this block group, then the specified translation cannot be completed
+			if (!IsBlockMovementValid(block, newBlockPosition)) {
+				return false;
 			}
-
-
-			// If the check block and the current block are a part of the same block group, then move on to the next block
-			if (checkBlock.BlockGroup == this) {
-				continue;
-			}
-
-			// If the check block and the current block are part of a different block groups, then this block group cannot move
-			return false;
 		}
 
 		return true;
@@ -100,61 +145,29 @@ public class BlockGroup : MonoBehaviour {
 	/// <summary>
 	///		Try to move this block group in the specified direction
 	/// </summary>
-	/// <param name="direction">The cardinal direction to move this block group</param>
+	/// <param name="translation">The cardinal direction to move this block group</param>
 	/// <param name="moveInstantly">Whether or not to move this block group instantly or smoothly</param>
 	/// <returns>
 	///		<strong>true</strong> if this block group was able to move in the specified direction<br/>
 	///		<strong>false</strong> if this block group was not able to move in the specified direction
 	/// </returns>
-	public bool TryMove (Vector2Int direction, bool moveInstantly = true) {
+	public bool TryTranslate (Vector2Int translation, bool moveInstantly = true) {
 		// If this block group cannot move in the specified direction, then exit out of this function
-		if (!CheckMove(direction)) {
+		if (!CheckTranslation(translation)) {
 			return false;
 		}
 
 		// Alter the position that this block group will move to
-		ToPosition += direction;
+		ToPosition += translation;
 
 		// Alter the board positions of all the blocks in this block group
 		foreach (Block block in Blocks) {
-			block.BoardPosition += direction;
+			block.BoardPosition += translation;
 		}
 
 		// If it has been specified to move the block group instantly, then set the transform position
 		if (moveInstantly) {
-			transform.position += (Vector3Int) direction;
-		}
-
-		return true;
-	}
-
-	/// <summary>
-	///		Check to see if this block group can rotate in the specified direction
-	/// </summary>
-	/// <param name="angle">The angle in degrees to rotate this block group</param>
-	/// <returns>
-	///		<strong>true</strong> if this block group can rotate in the specified direction<br/>
-	///		<strong>false</strong> if this block group cannot rotate in the specified direction
-	/// </returns>
-	public bool CheckRotate (float angle) {
-		// Check to see if the block group can rotate by looping through every block in the block group
-		foreach (Block block in Blocks) {
-			// Calculate the position that the current block will be in when it rotates 
-			Vector2Int blockRotatePosition = Utils.RotatePositionAroundPivot2D(block.BoardPosition, ToPosition, angle);
-			Block checkBlock = gameManager.Board.GetBlockAt(blockRotatePosition);
-
-			// If the check block is null, then continue to the next block in this block group
-			if (checkBlock == null) {
-				continue;
-			}
-
-			// If the check block and the current block have the same block group, then continue to the next block
-			if (checkBlock.BlockGroup == this) {
-				continue;
-			}
-
-			// If the check block and the current block have different block groups, then the block cannot move and therefore the entire block group cannot rotate
-			return false;
+			transform.position += (Vector3Int) translation;
 		}
 
 		return true;
@@ -163,24 +176,24 @@ public class BlockGroup : MonoBehaviour {
 	/// <summary>
 	///		Rotate this block group by one block in the specified direction. This function does not check to see if this block group can rotate in the specified direction, that must be checked beforehand
 	/// </summary>
-	/// <param name="angle">The angle in degrees to rotate this block group</param>
+	/// <param name="rotation">The angle in degrees to rotate this block group</param>
 	/// <param name="rotateInstantly">Whether or not to rotate this block group instantly or smoothly</param>
 	/// <returns>
 	///		<strong>true</strong> if this block group was able to rotate in the specified direction<br/>
 	///		<strong>false</strong> if this block group was not able to rotate in the specified direction
 	/// </returns>
-	public bool TryRotate (float angle, bool rotateInstantly = false) {
-		if (!CheckRotate(angle)) {
+	public bool TryRotate (float rotation, bool rotateInstantly = false) {
+		if (!CheckRotation(rotation)) {
 			return false;
 		}
 
 		// Alter the rotation that this block group will rotate to
-		Vector3Int rotationVector = Utils.Vect3Round(Quaternion.Euler(0, 0, angle) * Vector3.one);
+		Vector3Int rotationVector = Utils.Vect3Round(Quaternion.Euler(0, 0, rotation) * Vector3.one);
 		ToRotation += rotationVector;
 
 		// Alter the board positions and directions of all the blocks in this block group
 		foreach (Block block in Blocks) {
-			block.BoardPosition = Utils.RotatePositionAroundPivot2D(block.BoardPosition, ToPosition, angle);
+			block.BoardPosition = Utils.RotatePositionAroundPivot2D(block.BoardPosition, ToPosition, rotation);
 			block.BlockDirection = (BlockDirection) (((int) block.BlockDirection - gameManager.RotateDirection) % 4);
 		}
 
