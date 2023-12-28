@@ -335,7 +335,7 @@ SpriteRenderer:
   m_SortingLayerID: 649119475
   m_SortingLayer: 1
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: ea4a4f92a02adc0419f27059ffd1de8c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8148d363fa9adcc4c9aac833387cd562, type: 3}
   m_Color: {r: 0.654902, g: 0.7647059, b: 0.8, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -443,7 +443,7 @@ SpriteRenderer:
   m_SortingLayerID: 649119475
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8148d363fa9adcc4c9aac833387cd562, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a976bac6e01f8a744808d405ef0c9370, type: 3}
   m_Color: {r: 0.9372549, g: 0.9372549, b: 0.9372549, a: 1}
   m_FlipX: 0
   m_FlipY: 0
