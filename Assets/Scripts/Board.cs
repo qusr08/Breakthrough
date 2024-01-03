@@ -405,8 +405,9 @@ public class Board : MonoBehaviour {
 				}
 
 				// Transfer the block to the final merged block group
-				block.BlockGroup = mergedBlockGroup;
+				// block.BlockGroup = mergedBlockGroup;
 			} else {
+				Debug.Log("create new block group");
 				// Create a new block group and transfer the block to it
 				block.BlockGroup = CreateBlockGroup( );
 			}

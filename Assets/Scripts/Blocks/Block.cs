@@ -24,11 +24,6 @@ public class Block : MonoBehaviour {
 	public BlockGroup BlockGroup {
 		get => _blockGroup;
 		set {
-			// Do nothing if the block is already a part of this block group
-			if (value.Blocks.Contains(this)) {
-				return;
-			}
-
 			// If the block group is already equal to the new block group, do not do any of the code below
 			if (_blockGroup == value) {
 				return;
