@@ -1,32 +1,18 @@
+using MyBox;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WallBlockColor {
-	WALL_0, WALL_1, WALL_2, WALL_3
-}
-
-public class WallBlock : Block {
-	[SerializeField] private WallBlockColor _wallBlockColor;
-
-	#region Properties
-	/// <summary>
-	///		The color of the wall block
-	/// </summary>
-	public WallBlockColor WallBlockColor {
-		get => _wallBlockColor;
-		set {
-			_wallBlockColor = value;
-			SetColor(ThemeSettingsManager.WallBlockColors[_wallBlockColor]);
-		}
-	}
-	#endregion
-
+public class WallBlock : Block, IThemeElement {
 	protected override void OnHealthChange ( ) {
 		base.OnHealthChange( );
 
 		if (Health > 0) {
-			WallBlockColor = (WallBlockColor) Health;
+			BlockColor = ThemeSettingsManager.Instance.ActiveThemeSettings.WallBlockColors[Health];
 		}
+	}
+
+	public void UpdateThemeElements ( ) {
+		BlockColor = ThemeSettingsManager.Instance.ActiveThemeSettings.WallBlockColors[Health];
 	}
 }

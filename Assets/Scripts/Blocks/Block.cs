@@ -1,48 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
 
-public enum BlockDirection {
-	RIGHT, DOWN, LEFT, UP
-}
+public abstract class Block : MonoBehaviour {
+	[Header("References")]
+	[SerializeField] protected SpriteRenderer spriteRenderer;
+	[Header("Properties")]
+	[SerializeField] private Vector2Int _boardPosition;
+	[SerializeField] private BlockGroup _blockGroup;
+	[SerializeField] private int _health;
+	[SerializeField] private Color _blockColor;
 
-public class Block : MonoBehaviour {
-	[SerializeField, Tooltip("A reference to the game board.")] protected GameManager gameManager;
-	[SerializeField, Tooltip("A reference to this blocks sprite renderer.")] protected SpriteRenderer spriteRenderer;
-	[SerializeField, Tooltip("The current position of this block on the game board.")] private Vector2Int _boardPosition;
-	[SerializeField, Tooltip("The current direction that this block is facing.")] private BlockDirection _blockDirection;
-	[SerializeField, Tooltip("The current block group that moves this block.")] private BlockGroup _blockGroup;
-	[SerializeField, Tooltip("The current health of this block.")] private int _health;
-	[SerializeField, Range(0f, 1f), Tooltip("The new scale of this block object to add a gap between other blocks next to it on the game board.")] private float blockScale;
+	private bool hasBoardPositionBeenSet = false;
 
-	#region Properties
 	/// <summary>
-	///		The current block group this block is a part of
+	///		The current position of this block on the board
 	/// </summary>
-	public BlockGroup BlockGroup {
-		get => _blockGroup;
+	public Vector2Int BoardPosition {
+		get => _boardPosition;
 		set {
-			// If the block group is already equal to the new block group, do not do any of the code below
-			if (_blockGroup == value) {
+			// If this block is already at the same position, then return
+			if (_boardPosition == value) {
 				return;
 			}
 
-			// Remove the block from the other block group
-			if (_blockGroup != null) {
-				_blockGroup.Blocks.Remove(this);
+			// If the old block position is on the board, set that position to null
+			if (hasBoardPositionBeenSet && BoardManager.Instance.IsPositionOnBoard(_boardPosition)) {
+				BoardManager.Instance.SetBlock(_boardPosition, null);
 			}
 
-			// Set the blocks transform parent to this block group
-			transform.SetParent(value.transform, true);
-			value.Blocks.Add(this);
-			_blockGroup = value;
+			_boardPosition = value;
+
+			// If the new block position is on the board, set that position to be a reference to this block
+			if (BoardManager.Instance.IsPositionOnBoard(_boardPosition)) {
+				BoardManager.Instance.SetBlock(_boardPosition, this);
+				hasBoardPositionBeenSet = true;
+			}
 		}
 	}
 
 	/// <summary>
-	///		The amount of health the block has before it is destroyed
+	///		The current block group that this block is a part of
+	/// </summary>
+	public BlockGroup BlockGroup {
+		get => _blockGroup;
+		set {
+			// If this block is already part of the new block group, then return
+			if (_blockGroup == value) {
+				return;
+			}
+
+			// Remove this block from the old block group if it is not equal to null
+			if (_blockGroup != null) {
+				_blockGroup.RemoveBlock(this);
+			}
+
+			_blockGroup = value;
+
+			// Add this block to the new block group if it is not equal to null
+			if (_blockGroup != null) {
+				_blockGroup.AddBlock(this);
+			}
+		}
+	}
+
+	/// <summary>
+	///		The current health of this block
 	/// </summary>
 	public int Health {
 		get => _health;
@@ -53,71 +76,22 @@ public class Block : MonoBehaviour {
 	}
 
 	/// <summary>
-	///		The position of the block on the board
+	///		The color of this block
 	/// </summary>
-	public Vector2Int BoardPosition {
-		get => _boardPosition;
-		set {
-			// Only set the new position of this block if the inputted position is valid
-			if (gameManager.Board.IsPositionOnBoard(value)) {
-				gameManager.Board.Grid[_boardPosition.x, _boardPosition.y] = null;
-				_boardPosition = value;
-				gameManager.Board.Grid[value.x, value.y] = this;
-			}
-		}
+	public Color BlockColor {
+		get => _blockColor;
+		set => _blockColor = spriteRenderer.color = value;
 	}
 
-	/// <summary>
-	///		The direction that the block is facing
-	/// </summary>
-	public BlockDirection BlockDirection { get => _blockDirection; set => _blockDirection = value; }
-	#endregion
+	protected virtual void OnHealthChange ( ) {
 
-	#region Unity Functions
+	}
+
 	protected virtual void OnValidate ( ) {
-		gameManager = FindObjectOfType<GameManager>( );
-
-		transform.localScale = new Vector3(blockScale, blockScale, 1f);
+		spriteRenderer = GetComponent<SpriteRenderer>( );
 	}
 
 	protected virtual void Awake ( ) {
 		OnValidate( );
-	}
-	#endregion
-
-	/// <summary>
-	///		Update called when the health of this block changes
-	/// </summary>
-	protected virtual void OnHealthChange ( ) {
-		// If the block has been destroyed, update various parts of the game
-		if (Health <= 0) {
-			// Set this block's block group to be modified because this block was destroyed
-			BlockGroup.IsModified = true;
-
-			// Remove the block from the board
-			gameManager.Board.Blocks.Remove(this);
-			Destroy(gameObject);
-		}
-	}
-
-	/// <summary>
-	///		Set the color of the spriterenderer attached to this block
-	/// </summary>
-	/// <param name="color">The color to set this block to</param>
-	protected void SetColor (Color color) {
-		spriteRenderer.color = color;
-	}
-
-	/// <summary>
-	///		Set the physical location of this block in Unity coordinates
-	/// </summary>
-	/// <param name="location">The location to set this block to</param>
-	public void SetLocation (Vector2Int location) {
-		BoardPosition = location;
-
-		// Set the transform position of this block its grid position
-		if (gameManager.Board.IsPositionOnBoard(BoardPosition)) {
-			transform.position = (Vector3Int) BoardPosition;
-		}
 	}
 }

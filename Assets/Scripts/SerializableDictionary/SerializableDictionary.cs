@@ -10,7 +10,8 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 	[SerializeField]
 	TValueStorage[ ] m_values;
 
-	public SerializableDictionaryBase ( ) { }
+	public SerializableDictionaryBase ( ) {
+	}
 
 	public SerializableDictionaryBase (IDictionary<TKey, TValue> dict) : base(dict.Count) {
 		foreach (var kvp in dict) {
@@ -59,9 +60,11 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 }
 
 public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase<TKey, TValue, TValue> {
-	public SerializableDictionary ( ) { }
+	public SerializableDictionary ( ) {
+	}
 
-	public SerializableDictionary (IDictionary<TKey, TValue> dict) : base(dict) { }
+	public SerializableDictionary (IDictionary<TKey, TValue> dict) : base(dict) {
+	}
 
 	protected SerializableDictionary (SerializationInfo info, StreamingContext context) : base(info, context) { }
 
@@ -81,9 +84,11 @@ public static class SerializableDictionary {
 }
 
 public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableDictionaryBase<TKey, TValue, TValueStorage> where TValueStorage : SerializableDictionary.Storage<TValue>, new() {
-	public SerializableDictionary ( ) { }
+	public SerializableDictionary ( ) {
+	}
 
-	public SerializableDictionary (IDictionary<TKey, TValue> dict) : base(dict) { }
+	public SerializableDictionary (IDictionary<TKey, TValue> dict) : base(dict) {
+	}
 
 	protected SerializableDictionary (SerializationInfo info, StreamingContext context) : base(info, context) { }
 
@@ -101,11 +106,9 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 [Serializable]
 public class ThemeSettingsStateDictionary : SerializableDictionary<ThemeSettingsState, ThemeSettings> { }
 [Serializable]
-public class GameSettingsStateDictionary : SerializableDictionary<GameSettingsState, GameSettings> { }
-[Serializable]
 public class MinoBlockColorDictionary : SerializableDictionary<MinoType, Color> { }
 [Serializable]
-public class WallBlockColorDictionary : SerializableDictionary<WallBlockColor, Color> { }
+public class WallBlockColorDictionary : SerializableDictionary<int, Color> { }
 [Serializable]
 public class BoomBlockIconDictionary : SerializableDictionary<BoomBlockType, Sprite> { }
 [Serializable]

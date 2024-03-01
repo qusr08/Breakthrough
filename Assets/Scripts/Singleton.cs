@@ -5,7 +5,6 @@ using UnityEngine;
 public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 	private static T _instance;
 
-	#region Properties
 	public static T Instance {
 		get {
 			if (_instance == null) {
@@ -16,9 +15,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 		}
 		set => _instance = value;
 	}
-	#endregion
 
-	#region Unity Functions
 	protected virtual void Awake ( ) {
 		// Make sure only one instance of the theme manager is in the game at one time
 		if (Instance != null && Instance != this) {
@@ -28,7 +25,6 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 		}
 
 		// Have the singleton persist between scenes
-		DontDestroyOnLoad(gameObject);
+		// DontDestroyOnLoad(gameObject);
 	}
-	#endregion
 }

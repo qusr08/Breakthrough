@@ -18,6 +18,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer {
 	static GUIStyle s_buttonStyle = GUIStyle.none;
 	static GUIContent s_tempContent = new GUIContent( );
 
+
 	class ConflictState {
 		public object conflictKey = null;
 		public object conflictValue = null;
@@ -489,7 +490,6 @@ public class SerializableDictionaryStoragePropertyDrawer : PropertyDrawer {
 
 #region Custom Dictionaries
 [CustomPropertyDrawer(typeof(ThemeSettingsStateDictionary))]
-[CustomPropertyDrawer(typeof(GameSettingsStateDictionary))]
 [CustomPropertyDrawer(typeof(MinoBlockColorDictionary))]
 [CustomPropertyDrawer(typeof(WallBlockColorDictionary))]
 [CustomPropertyDrawer(typeof(BoomBlockIconDictionary))]
