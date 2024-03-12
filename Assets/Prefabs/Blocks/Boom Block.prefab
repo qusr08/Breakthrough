@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fe5ee594bf19d84895e31805523d3b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardManager: {fileID: 0}
   spriteRenderer: {fileID: 6648357790744410787}
   _boardPosition: {x: 0, y: 0}
   _blockGroup: {fileID: 0}

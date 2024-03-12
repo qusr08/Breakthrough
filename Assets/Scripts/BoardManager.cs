@@ -29,6 +29,8 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 
 	private Block[ , ] blocks;
 	private List<BlockGroup> blockGroups;
+	private WeightedList<MinoType> weightedMinoList;
+	private Vector2 minoSpawnPosition;
 
 	/// <summary>
 	///		The current state of the board
@@ -69,6 +71,51 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	public int Height {
 		get => _height;
 		set => _height = value;
+	}
+
+
+#if UNITY_EDITOR
+	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+#endif
+	private void _OnValidate ( ) {
+#if UNITY_EDITOR
+		EditorApplication.delayCall -= _OnValidate;
+		if (this == null) {
+			return;
+		}
+#endif
+
+		// Resize board elements based on the width and height of the board
+		backgroundSpriteRenderer.size = new Vector2(Width, Height);
+		borderSpriteRenderer.size = new Vector2(borderThickness * 2 + Width, borderThickness * 2 + Height);
+		glowSpriteRenderer.size = new Vector2(glowThickness * 2 + Width, glowThickness * 2 + Height);
+		gameCamera.orthographicSize = Mathf.Max(Width / 2f / gameCamera.aspect, Height / 2f) + cameraPadding;
+
+		// Set the position of board elements based on the width and height of the board
+		Vector2 boardCenter = new Vector3((Width / 2f) - 0.5f, (Height / 2f) - 0.5f);
+		backgroundSpriteRenderer.transform.localPosition = boardCenter;
+		borderSpriteRenderer.transform.localPosition = boardCenter;
+		glowSpriteRenderer.transform.localPosition = boardCenter;
+		gameCamera.transform.localPosition = new Vector3(boardCenter.x, boardCenter.y, gameCamera.transform.position.z);
+	}
+
+	protected override void Awake ( ) {
+		base.Awake( );
+		OnValidate( );
+
+		// Calculate the spawn position of minos on the board
+		float offsetX = Width % 2 == 0 ? 0.5f : 0f;
+		minoSpawnPosition = new Vector2((Width / 2f) - offsetX, Height - 2.5f);
+
+		blocks = new Block[Width, Height];
+		blockGroups = new List<BlockGroup>( );
+		// weightedMinoList = new WeightedList<MinoType>( );
+	}
+
+	public void Start ( ) {
+		CreateMinoBlock(new Vector2Int(0, 9), MinoType.O); /// TEST
+		CreateWallBlock(new Vector2Int(1, 9), 2); /// TEST
+		CreateBoomBlock(new Vector2Int(2, 9), MinoType.D, BoomBlockType.PYRA); /// TEST
 	}
 
 	/// <summary>
@@ -228,12 +275,19 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	/// <returns>
 	///		A reference to the <strong>Block Group Object</strong> if the block group was successfully created, <strong>null</strong> otherwise
 	/// </returns>
-	public BlockGroup CreateBlockGroup (Vector2Int position) {
+	public BlockGroup CreateBlockGroup (Vector2 position = default) {
 		// Create the block group in the game scene
-		BlockGroup blockGroup = Instantiate(blockGroupPrefab, (Vector2) position, Quaternion.identity, transform).GetComponent<BlockGroup>( );
+		BlockGroup blockGroup = Instantiate(blockGroupPrefab, position, Quaternion.identity, transform).GetComponent<BlockGroup>( );
 		blockGroups.Add(blockGroup);
 
 		return blockGroup;
+	}
+
+	public BlockGroup CreateMino ( ) {
+		// Create a block group for the mino
+		BlockGroup minoBlockGroup = CreateBlockGroup(position: minoSpawnPosition);
+
+		return minoBlockGroup;
 	}
 
 	public void UpdateThemeElements ( ) {
@@ -241,44 +295,5 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		borderSpriteRenderer.color = ThemeSettingsManager.Instance.ActiveThemeSettings.DetailColor;
 		glowSpriteRenderer.color = ThemeSettingsManager.Instance.ActiveThemeSettings.GlowColor;
 		gameCamera.backgroundColor = ThemeSettingsManager.Instance.ActiveThemeSettings.BackgroundColor;
-	}
-
-#if UNITY_EDITOR
-	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
-#endif
-	private void _OnValidate ( ) {
-#if UNITY_EDITOR
-		EditorApplication.delayCall -= _OnValidate;
-		if (this == null) {
-			return;
-		}
-#endif
-
-		// Resize board elements based on the width and height of the board
-		backgroundSpriteRenderer.size = new Vector2(Width, Height);
-		borderSpriteRenderer.size = new Vector2(borderThickness * 2 + Width, borderThickness * 2 + Height);
-		glowSpriteRenderer.size = new Vector2(glowThickness * 2 + Width, glowThickness * 2 + Height);
-		gameCamera.orthographicSize = Mathf.Max(Width / 2f / gameCamera.aspect, Height / 2f) + cameraPadding;
-
-		// Set the position of board elements based on the width and height of the board
-		Vector2 boardCenter = new Vector3((Width / 2f) - 0.5f, (Height / 2f) - 0.5f);
-		backgroundSpriteRenderer.transform.localPosition = boardCenter;
-		borderSpriteRenderer.transform.localPosition = boardCenter;
-		glowSpriteRenderer.transform.localPosition = boardCenter;
-		gameCamera.transform.localPosition = new Vector3(boardCenter.x, boardCenter.y, gameCamera.transform.position.z);
-	}
-
-	protected override void Awake ( ) {
-		base.Awake( );
-		OnValidate( );
-
-		blocks = new Block[Width, Height];
-		blockGroups = new List<BlockGroup>( );
-	}
-
-	public void Start ( ) {
-		CreateMinoBlock(new Vector2Int(0, 9), MinoType.O); /// TEST
-		CreateWallBlock(new Vector2Int(1, 9), 2); /// TEST
-		CreateBoomBlock(new Vector2Int(2, 9), MinoType.D, BoomBlockType.PYRA); /// TEST
 	}
 }

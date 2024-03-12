@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockGroup : MonoBehaviour {
-	// [Header("References")]
 	[Header("Properties")]
 	[SerializeField] private List<Block> blocks;
 
