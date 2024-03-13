@@ -696,6 +696,7 @@ MonoBehaviour:
   borderSpriteRenderer: {fileID: 1346415823}
   glowSpriteRenderer: {fileID: 370877183}
   gameCamera: {fileID: 519420031}
+  cameraScaleReference: 11
   cameraPadding: 1
   borderThickness: 0.5
   glowThickness: 2

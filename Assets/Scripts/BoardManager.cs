@@ -19,6 +19,7 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
 	[SerializeField] private Camera gameCamera;
 	[Header("Properties")]
+	[SerializeField, Min(0.01f)] private float cameraScaleReference;
 	[SerializeField] private float cameraPadding;
 	[SerializeField] private float borderThickness;
 	[SerializeField] private float glowThickness;
@@ -85,11 +86,58 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		}
 #endif
 
-		// Resize board elements based on the width and height of the board
+		// orthosize = orthosizeref + campad
+		// campad = campadref * orthoscale
+		// orthoscale = orthosize / orthoscaleref
+
+		// constants: orthosizeref, campadref, orthoscaleref
+		// find: orthosize, orthoscale
+
+		// variable substitutions (for readability):
+		// > x = orthosize
+		// > xr = orthosizeref
+		// > y = campad
+		// > yr = campadref
+		// > z = orthoscale
+		// > zr = orthoscaleref
+
+		// finding orthosize:
+		// x = xr + y
+		// x = xr + (yr * z)
+		// x = xr + (yr * (x / zr))
+		// x = xr + ((yr * x) / zr)
+		// x - ((yr * x) / zr) = xr
+		// ((zr * x) / zr) - ((yr * x) / zr) = xr
+		// ((zr * x) - (yr * x)) / zr = xr
+		// (zr * x) - (yr * x) = xr * zr
+		// x * (zr - yr) = xr * zr
+		// x = (xr * zr) / (zr - yr)
+		// orthosize = (orthosizeref * orthoscaleref) / (orthoscaleref - campadref)
+		float cameraSize = Mathf.Max(Width / 2f / gameCamera.aspect, Height / 2f);
+		gameCamera.orthographicSize = (cameraSize * cameraScaleReference) / (cameraScaleReference - cameraPadding);
+
+		// finding orthoscale:
+		// z = x / zr
+		// z = (xr + y) / zr
+		// z = (xr + (yr * z)) / zr
+		// z = (xr / zr) + ((yr * z) / zr)
+		// z - ((yr * z) / zr) = xr / zr
+		// ((zr * z) / zr) - ((yr * z) / zr) = xr / zr
+		// ((zr * z) - (yr * z)) / zr = xr / zr
+		// (zr * z) - (yr * z) = xr
+		// z * (zr - yr) = xr
+		// z = xr / (zr - yr)
+		// orthoscale = orthosizeref / (orthoscaleref - campadref)
+		float gameCameraScale = cameraSize / (cameraScaleReference - cameraPadding);
+
+		// Resize the background sprite renderer
 		backgroundSpriteRenderer.size = new Vector2(Width, Height);
-		borderSpriteRenderer.size = new Vector2(borderThickness * 2 + Width, borderThickness * 2 + Height);
-		glowSpriteRenderer.size = new Vector2(glowThickness * 2 + Width, glowThickness * 2 + Height);
-		gameCamera.orthographicSize = Mathf.Max(Width / 2f / gameCamera.aspect, Height / 2f) + cameraPadding;
+
+		// Set the size of scalable sprite renderers
+		float scaledBorderThickness = borderThickness * gameCameraScale;
+		borderSpriteRenderer.size = new Vector2(scaledBorderThickness * 2 + Width, scaledBorderThickness * 2 + Height);
+		float scaledGlowThickness = glowThickness * gameCameraScale;
+		glowSpriteRenderer.size = new Vector2(scaledGlowThickness * 2 + Width, scaledGlowThickness * 2 + Height);
 
 		// Set the position of board elements based on the width and height of the board
 		Vector2 boardCenter = new Vector3((Width / 2f) - 0.5f, (Height / 2f) - 0.5f);
