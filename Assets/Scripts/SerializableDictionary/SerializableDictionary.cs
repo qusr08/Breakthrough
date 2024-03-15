@@ -4,6 +4,21 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 
+#region Custom Dictionaries
+[Serializable]
+public class ThemeSettingsStateDictionary : SerializableDictionary<ThemeSettingsState, ThemeSettings> { }
+[Serializable]
+public class GameSettingsStateDictionary : SerializableDictionary<GameSettingsState, GameSettings> { }
+[Serializable]
+public class MinoBlockColorDictionary : SerializableDictionary<MinoType, Color> { }
+[Serializable]
+public class WallBlockColorDictionary : SerializableDictionary<int, Color> { }
+[Serializable]
+public class BoomBlockIconDictionary : SerializableDictionary<BoomBlockType, Sprite> { }
+[Serializable]
+public class MinoBlockDataDictionary : SerializableDictionary<MinoType, List<Vector2>> { }
+#endregion
+
 public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver {
 	[SerializeField]
 	TKey[ ] m_keys;
@@ -101,16 +116,3 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 		storage[i].data = value;
 	}
 }
-
-#region Custom Dictionaries
-[Serializable]
-public class ThemeSettingsStateDictionary : SerializableDictionary<ThemeSettingsState, ThemeSettings> { }
-[Serializable]
-public class MinoBlockColorDictionary : SerializableDictionary<MinoType, Color> { }
-[Serializable]
-public class WallBlockColorDictionary : SerializableDictionary<int, Color> { }
-[Serializable]
-public class BoomBlockIconDictionary : SerializableDictionary<BoomBlockType, Sprite> { }
-[Serializable]
-public class MinoBlockDataDictionary : SerializableDictionary<MinoType, List<Vector2>> { }
-#endregion

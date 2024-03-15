@@ -58,23 +58,6 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		}
 	}
 
-	/// <summary>
-	///		The width of the board
-	/// </summary>
-	public int Width {
-		get => _width;
-		set => _width = value;
-	}
-
-	/// <summary>
-	///		The height of the board
-	/// </summary>
-	public int Height {
-		get => _height;
-		set => _height = value;
-	}
-
-
 #if UNITY_EDITOR
 	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
@@ -113,7 +96,7 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		// x * (zr - yr) = xr * zr
 		// x = (xr * zr) / (zr - yr)
 		// orthosize = (orthosizeref * orthoscaleref) / (orthoscaleref - campadref)
-		float cameraSize = Mathf.Max(Width / 2f / gameCamera.aspect, Height / 2f);
+		float cameraSize = Mathf.Max(GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / 2f / gameCamera.aspect, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight / 2f);
 		gameCamera.orthographicSize = (cameraSize * cameraScaleReference) / (cameraScaleReference - cameraPadding);
 
 		// finding orthoscale:
@@ -131,16 +114,16 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		float gameCameraScale = cameraSize / (cameraScaleReference - cameraPadding);
 
 		// Resize the background sprite renderer
-		backgroundSpriteRenderer.size = new Vector2(Width, Height);
+		backgroundSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
 
 		// Set the size of scalable sprite renderers
 		float scaledBorderThickness = borderThickness * gameCameraScale;
-		borderSpriteRenderer.size = new Vector2(scaledBorderThickness * 2 + Width, scaledBorderThickness * 2 + Height);
+		borderSpriteRenderer.size = new Vector2(scaledBorderThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, scaledBorderThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
 		float scaledGlowThickness = glowThickness * gameCameraScale;
-		glowSpriteRenderer.size = new Vector2(scaledGlowThickness * 2 + Width, scaledGlowThickness * 2 + Height);
+		glowSpriteRenderer.size = new Vector2(scaledGlowThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, scaledGlowThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
 
 		// Set the position of board elements based on the width and height of the board
-		Vector2 boardCenter = new Vector3((Width / 2f) - 0.5f, (Height / 2f) - 0.5f);
+		Vector2 boardCenter = new Vector3((GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / 2f) - 0.5f, (GameSettingsManager.Instance.ActiveGameSettings.BoardHeight / 2f) - 0.5f);
 		backgroundSpriteRenderer.transform.localPosition = boardCenter;
 		borderSpriteRenderer.transform.localPosition = boardCenter;
 		glowSpriteRenderer.transform.localPosition = boardCenter;
@@ -152,10 +135,10 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		OnValidate( );
 
 		// Calculate the spawn position of minos on the board
-		float offsetX = Width % 2 == 0 ? 0.5f : 0f;
-		minoSpawnPosition = new Vector2((Width / 2f) - offsetX, Height - 2.5f);
+		float offsetX = GameSettingsManager.Instance.ActiveGameSettings.BoardWidth % 2 == 0 ? 0.5f : 0f;
+		minoSpawnPosition = new Vector2((GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / 2f) - offsetX, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight - 2.5f);
 
-		blocks = new Block[Width, Height];
+		blocks = new Block[GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight];
 		blockGroups = new List<BlockGroup>( );
 		// weightedMinoList = new WeightedList<MinoType>( );
 	}
@@ -175,12 +158,12 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	/// </returns>
 	public bool IsPositionOnBoard (Vector2Int position) {
 		// If the position is out of the bounds of the board in the x direction, then return false
-		if (position.x < 0 || position.x >= Width) {
+		if (position.x < 0 || position.x >= GameSettingsManager.Instance.ActiveGameSettings.BoardWidth) {
 			return false;
 		}
 
 		// If the position is out of the bounds of the board in the y direction, then return false
-		if (position.y < 0 || position.y >= Height) {
+		if (position.y < 0 || position.y >= GameSettingsManager.Instance.ActiveGameSettings.BoardWidth) {
 			return false;
 		}
 

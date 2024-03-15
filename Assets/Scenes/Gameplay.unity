@@ -625,6 +625,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cd4f5128cc5124fa25d3d67de806c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameSettingsState: 0
+  gameSettingsStateDictionary:
+    m_keys: 00000000
+    m_values:
+    - {fileID: 11400000, guid: 1c174ff738c409949823539d2fe60eb7, type: 2}
 --- !u!4 &2051475470
 Transform:
   m_ObjectHideFlags: 0
@@ -708,6 +713,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 912319960}
+  - {fileID: 2051475470}
   - {fileID: 483638458}
   - {fileID: 2054263406}
-  - {fileID: 2051475470}

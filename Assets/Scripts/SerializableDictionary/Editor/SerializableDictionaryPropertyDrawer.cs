@@ -5,6 +5,16 @@ using UnityEditor;
 using System.Reflection;
 using System;
 
+#region Custom Dictionaries
+[CustomPropertyDrawer(typeof(ThemeSettingsStateDictionary))]
+[CustomPropertyDrawer(typeof(GameSettingsStateDictionary))]
+[CustomPropertyDrawer(typeof(MinoBlockColorDictionary))]
+[CustomPropertyDrawer(typeof(WallBlockColorDictionary))]
+[CustomPropertyDrawer(typeof(BoomBlockIconDictionary))]
+[CustomPropertyDrawer(typeof(MinoBlockDataDictionary))]
+public class AnySerializableDictionaryPropertyDrawer : SerializableDictionaryPropertyDrawer { }
+#endregion
+
 public class SerializableDictionaryPropertyDrawer : PropertyDrawer {
 	const string KeysFieldName = "m_keys";
 	const string ValuesFieldName = "m_values";
@@ -487,12 +497,3 @@ public class SerializableDictionaryStoragePropertyDrawer : PropertyDrawer {
 		return EditorGUI.GetPropertyHeight(property);
 	}
 }
-
-#region Custom Dictionaries
-[CustomPropertyDrawer(typeof(ThemeSettingsStateDictionary))]
-[CustomPropertyDrawer(typeof(MinoBlockColorDictionary))]
-[CustomPropertyDrawer(typeof(WallBlockColorDictionary))]
-[CustomPropertyDrawer(typeof(BoomBlockIconDictionary))]
-[CustomPropertyDrawer(typeof(MinoBlockDataDictionary))]
-public class AnySerializableDictionaryPropertyDrawer : SerializableDictionaryPropertyDrawer { }
-#endregion
