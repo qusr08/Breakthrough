@@ -18,14 +18,16 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	[SerializeField] private SpriteRenderer borderSpriteRenderer;
 	[SerializeField] private SpriteRenderer glowSpriteRenderer;
 	[SerializeField] private Camera gameCamera;
+	[Space]
+	[SerializeField] private Sprite backgroundSprite;
+	[SerializeField] private Sprite borderSprite;
+	[SerializeField] private Sprite glowSprite;
 	[Header("Properties")]
 	[SerializeField, Min(0.01f)] private float cameraScaleReference;
-	[SerializeField] private float cameraPadding;
-	[SerializeField] private float borderThickness;
-	[SerializeField] private float glowThickness;
+	[SerializeField, Min(0f)] private float cameraPadding;
+	[SerializeField, Min(0f)] private float borderThickness;
+	[SerializeField, Min(0f)] private float glowThickness;
 	[Space]
-	[SerializeField] private int _width;
-	[SerializeField] private int _height;
 	[SerializeField] private BoardState _boardState;
 
 	private Block[ , ] blocks;
@@ -35,7 +37,7 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 
 	/// <summary>
 	///		The current state of the board
-	/// </summary>
+	/// </summary> 
 	public BoardState BoardState {
 		get => _boardState;
 		set {
@@ -59,9 +61,9 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 	}
 
 #if UNITY_EDITOR
-	private void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
+	public void OnValidate ( ) => EditorApplication.delayCall += _OnValidate;
 #endif
-	private void _OnValidate ( ) {
+	public void _OnValidate ( ) {
 #if UNITY_EDITOR
 		EditorApplication.delayCall -= _OnValidate;
 		if (this == null) {
@@ -69,61 +71,33 @@ public class BoardManager : Singleton<BoardManager>, IThemeElement {
 		}
 #endif
 
-		// orthosize = orthosizeref + campad
-		// campad = campadref * orthoscale
-		// orthoscale = orthosize / orthoscaleref
+		// Calculate the camera's orthrographic size based on the board width and height
+		float minCameraWidth = GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / ((cameraScaleReference * gameCamera.aspect) - (borderThickness + cameraPadding));
+		float minCameraHeight = GameSettingsManager.Instance.ActiveGameSettings.BoardHeight / (cameraScaleReference - (borderThickness + cameraPadding));
+		gameCamera.orthographicSize = cameraScaleReference * Mathf.Max(minCameraWidth, minCameraHeight) / 2f;
 
-		// constants: orthosizeref, campadref, orthoscaleref
-		// find: orthosize, orthoscale
-
-		// variable substitutions (for readability):
-		// > x = orthosize
-		// > xr = orthosizeref
-		// > y = campad
-		// > yr = campadref
-		// > z = orthoscale
-		// > zr = orthoscaleref
-
-		// finding orthosize:
-		// x = xr + y
-		// x = xr + (yr * z)
-		// x = xr + (yr * (x / zr))
-		// x = xr + ((yr * x) / zr)
-		// x - ((yr * x) / zr) = xr
-		// ((zr * x) / zr) - ((yr * x) / zr) = xr
-		// ((zr * x) - (yr * x)) / zr = xr
-		// (zr * x) - (yr * x) = xr * zr
-		// x * (zr - yr) = xr * zr
-		// x = (xr * zr) / (zr - yr)
-		// orthosize = (orthosizeref * orthoscaleref) / (orthoscaleref - campadref)
-		float cameraSize = Mathf.Max(GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / 2f / gameCamera.aspect, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight / 2f);
-		gameCamera.orthographicSize = (cameraSize * cameraScaleReference) / (cameraScaleReference - cameraPadding);
-
-		// finding orthoscale:
-		// z = x / zr
-		// z = (xr + y) / zr
-		// z = (xr + (yr * z)) / zr
-		// z = (xr / zr) + ((yr * z) / zr)
-		// z - ((yr * z) / zr) = xr / zr
-		// ((zr * z) / zr) - ((yr * z) / zr) = xr / zr
-		// ((zr * z) - (yr * z)) / zr = xr / zr
-		// (zr * z) - (yr * z) = xr
-		// z * (zr - yr) = xr
-		// z = xr / (zr - yr)
-		// orthoscale = orthosizeref / (orthoscaleref - campadref)
-		float gameCameraScale = cameraSize / (cameraScaleReference - cameraPadding);
-
-		// Resize the background sprite renderer
-		backgroundSpriteRenderer.size = new Vector2(GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
+		// Get the camera's scale based on the calculated orthographic scale and a reference value
+		// This will be used to make sure all UI looks the same even when the camera gets bigger
+		float gameCameraScale = gameCamera.orthographicSize / cameraScaleReference;
+		Vector2 boardSize = new Vector2(GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
 
 		// Set the size of scalable sprite renderers
 		float scaledBorderThickness = borderThickness * gameCameraScale;
-		borderSpriteRenderer.size = new Vector2(scaledBorderThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, scaledBorderThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
 		float scaledGlowThickness = glowThickness * gameCameraScale;
-		glowSpriteRenderer.size = new Vector2(scaledGlowThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardWidth, scaledGlowThickness * 2 + GameSettingsManager.Instance.ActiveGameSettings.BoardHeight);
+		backgroundSpriteRenderer.size = boardSize;
+		borderSpriteRenderer.size = boardSize + (2 * scaledBorderThickness * Vector2.one);
+		glowSpriteRenderer.size = boardSize + (2 * scaledGlowThickness * Vector2.one);
+
+		// Set the sprite's pixels per unit value
+		float scaledBackgroundPixelsPerUnit = backgroundSprite.pixelsPerUnit / gameCameraScale;
+		float scaledBorderPixelsPerUnit = borderSprite.pixelsPerUnit / gameCameraScale;
+		float scaledGlowPixelsPerUnit = glowSprite.pixelsPerUnit / gameCameraScale;
+		backgroundSpriteRenderer.sprite = Sprite.Create(backgroundSprite.texture, backgroundSprite.rect, backgroundSprite.pivot / backgroundSprite.rect.size, scaledBackgroundPixelsPerUnit, 1, SpriteMeshType.FullRect, backgroundSprite.border, true);
+		borderSpriteRenderer.sprite = Sprite.Create(borderSprite.texture, borderSprite.rect, borderSprite.pivot / borderSprite.rect.size, scaledBorderPixelsPerUnit, 1, SpriteMeshType.FullRect, borderSprite.border, true);
+		glowSpriteRenderer.sprite = Sprite.Create(glowSprite.texture, glowSprite.rect, glowSprite.pivot / glowSprite.rect.size, scaledGlowPixelsPerUnit, 1, SpriteMeshType.FullRect, glowSprite.border, true);
 
 		// Set the position of board elements based on the width and height of the board
-		Vector2 boardCenter = new Vector3((GameSettingsManager.Instance.ActiveGameSettings.BoardWidth / 2f) - 0.5f, (GameSettingsManager.Instance.ActiveGameSettings.BoardHeight / 2f) - 0.5f);
+		Vector2 boardCenter = (boardSize / 2f) - (0.5f * Vector2.one);
 		backgroundSpriteRenderer.transform.localPosition = boardCenter;
 		borderSpriteRenderer.transform.localPosition = boardCenter;
 		glowSpriteRenderer.transform.localPosition = boardCenter;

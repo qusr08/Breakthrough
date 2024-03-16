@@ -36,15 +36,6 @@ public class ThemeSettingsManager : Singleton<ThemeSettingsManager> {
 	/// </summary>
 	public ThemeSettings ActiveThemeSettings => themeSettingsStateDictionary[ThemeSettingsState];
 
-	/// <summary>
-	///		Find all game objects in the scene that inherit from the IThemeElement interface and update their theme colors
-	/// </summary>
-	private void UpdateAllThemeElements ( ) {
-		List<IThemeElement> themeElements = FindObjectsOfType<MonoBehaviour>( ).OfType<IThemeElement>( ).ToList( );
-		foreach (IThemeElement themeElement in themeElements) {
-			themeElement.UpdateThemeElements( );
-		}
-	}
 
 	private void OnValidate ( ) {
 		UpdateAllThemeElements( );
@@ -53,5 +44,15 @@ public class ThemeSettingsManager : Singleton<ThemeSettingsManager> {
 	protected override void Awake ( ) {
 		base.Awake( );
 		OnValidate( );
+	}
+
+	/// <summary>
+	///		Find all game objects in the scene that inherit from the IThemeElement interface and update their theme colors
+	/// </summary>
+	private void UpdateAllThemeElements ( ) {
+		List<IThemeElement> themeElements = FindObjectsOfType<MonoBehaviour>( ).OfType<IThemeElement>( ).ToList( );
+		foreach (IThemeElement themeElement in themeElements) {
+			themeElement.UpdateThemeElements( );
+		}
 	}
 }

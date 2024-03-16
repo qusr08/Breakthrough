@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a71feffdceddc704cb9e6f4d5a1348fd, type: 3}
-  m_Name: Default Game Settings
+  m_Name: Test Game Settings
   m_EditorClassIdentifier: 
-  boardWidthValue: 15
-  boardHeightValue: 3
-  minoSpeedMultiplierValue: 3
-  hazardSpeedMultiplierValue: 3
-  wallStrengthMultiplierValue: 3
-  boomBlockChanceValue: 4
+  boardWidthValue: 0
+  boardHeightValue: 0
+  minoSpeedMultiplierValue: 0
+  hazardSpeedMultiplierValue: 0
+  wallStrengthMultiplierValue: 0
+  boomBlockChanceValue: 0
   gameLevelValue: 0
-  allowedMinosValue: 510
-  _gameSettingsCode: 2RH16BC
-  gameSettingsLong: 6014759736
+  allowedMinosValue: 0
+  _gameSettingsCode: 0000000
+  gameSettingsLong: 0
